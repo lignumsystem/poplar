@@ -1,9 +1,9 @@
 POPLARSRC = poplarmain.cc poplarmetabolism.cc poplarsegment.cc
 POPLAROBJ = ${POPLARSRC:.cc=.o}
 
-LSYS = poplar.L
-LSYSSRC = poplar.cpp
-LSYSOBJ = poplar.o
+LSYS = poplar.L ErythrinaRoots.L
+LSYSSRC = ${LSYS:.L=.cpp}
+LSYSOBJ = ${LSYSSRC:.cpp=.o}
 
 CCC = g++
 
@@ -19,11 +19,12 @@ CCCFLAGS = -c  #-prelink -ptused   -ptv  #  -fullwarn
 
 INCLUDE = -I../c++adt/include -I../Firmament/include \
           -I../stl-lignum/include  -I../LEngine/include \
-          -I../Graphics -I/usr/freeware/include -I.
+          -I../Graphics -I/usr/freeware/include -I/usr/X11R6/include \
+          -I/sw/include -I.
 
 
 LIBFLAGS = -L../c++adt/lib -L../stl-lignum/lib -L../Firmament/lib \
-           -L. -L../LEngine/lib -L../Graphics -L/usr/X11R6/lib
+           -L. -L../LEngine/lib -L../Graphics -L/usr/X11R6/lib -L/sw/lib
 
 LIB1   = libc++adt.a
 LIB2   = libLGM.a
@@ -45,13 +46,15 @@ LIBOGL =  -lglut -lGL -lGLU -lX11 -lXext -lXmu
 LIBS     =  $(LIBVISUAL) $(LIBLSYS) $(LIBL) $(LIBLGM) $(LIBSKY) $(LIBADT) $(LIBOGL) \
             $(LIBMATH)
 
-.SUFFIXES: .o .cc
+.SUFFIXES: .o .cc .cpp .L .o .cpp
+
+all: gnupoplar
 
 sinclude Makedepend
 
 gnupoplar: 
 	make "CCC=g++" "CCCFLAGS=-c" "OPTIMIZE=-g" \
-              "AR=ar"  "ARFLAGS=rv"  "LSYS=poplar.L" poplar
+              "AR=ar"  "ARFLAGS=rvs"  "LSYS=$(LSYS)" poplar
 
 poplar: l2c $(POPLAROBJ) $(LIB1) $(LIB2) $(LIB3)  $(LIB4) $(LIB5) $(LIB6)  
 	$(CCC)  -o $@ $(INCLUDE) $(OPTIMIZE) $(POPLAROBJ) $(LIBFLAGS) $(LIBS)
@@ -75,10 +78,15 @@ $(LIB5):
 	(cd ../Graphics; make "CCC=$(CCC)" "CCCFLAGS=$(CCCFLAGS)" \
          "OPTIMIZE=$(OPTIMIZE)"  "AR=$(AR)"  "ARFLAGS = $(ARFLAGS)" $@)
 
-$(LIB6):
-	../LEngine/bin/l2c  $(LSYS) $(LSYSSRC) 
-	$(CCC) $(CCCFLAGS) $(OPTIMIZE) $(INCLUDE)  $(LSYSSRC) 
+$(LIB6): $(LSYSSRC) $(LSYSOBJ)
 	$(AR) $(ARFLAGS) $(@) $(LSYSOBJ)    
+
+.L.cpp:
+	../LEngine/bin/l2c  $< $@
+	rm -f *.c
+
+.cpp.o:
+	$(CCC) $(OPTIMIZE) $(CCCFLAGS) $(INCLUDE)  $< -o $@	
 
 .cc.o: 
 	$(CCC) $(OPTIMIZE) $(CCCFLAGS) $(INCLUDE)  $< -o $@
@@ -89,13 +97,12 @@ changelog:
 	rm -rf ChangeLog
 	rcs2log . > ChangeLog
 clean:
-	rm -rf *.o  Makedepend liblsys.a core ii_files
+	rm -rf *.o  *.cpp Makedepend liblsys.a core ii_files
 distclean: clean
-	rm -rf  sym2d $(LIB4) Makedepend
+	rm -rf  $(LIB4) Makedepend
 	(cd ../Graphics; make distclean)
 	(cd ../LEngine/L2C; make distclean)
-
 depend:
 	(cd ../Graphics; make "CCC=$(CCC)"  depend)
 	(cd ../LEngine/L2C; make "CCC=$(CCC)"  depend)
-	$(CCC) -M $(INCLUDE) $(SYM2DSRC)   > Makedepend
+	$(CCC) -M $(INCLUDE) $(POPLARSRC)   > Makedepend
