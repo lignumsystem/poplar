@@ -262,7 +262,6 @@ int main(int argc, char** argv)
   //yourself! Let us know if you do so, we probly use it!
 
 
-  cout<<"begin visualization"<<endl;
    VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);  //program stuck here Jan202004
 
 
