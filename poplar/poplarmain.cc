@@ -82,8 +82,8 @@ int main(int argc, char** argv)
 		 CreateLeaves<poplarsegment,poplarbud,Ellipse>(0.5,0.5,0.5));
 
   Firmament& f = GetFirmament(poplartree);
-  //resize: 30 inclinations, 30 azimuths, 1200 MJ/year
-  f.resize(30,30,1200);
+  //resize:  inclinations,  azimuths,  MJ/year
+  f.resize(10,10,1200);
   //Compare Leaves
   ForEach(poplartree,ForEachLeafCompare<poplarsegment,poplarbud,Ellipse>());
   //Demonstration of Algorithms for root system

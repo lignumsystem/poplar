@@ -32,12 +32,12 @@ module Turn(double);
 module Roll(double);
 
 //Define the derivation length
-derivation length: 5;
+derivation length: 15;
 
 //Define the Start corresponding to the axiom
 Start:
 {
-  produce B(0, 4,0);
+  produce B(0.0,4.0,0.0);
 }
 
 //You can optionally have the following modules:
@@ -71,8 +71,8 @@ B(leaf, alive,order):
    double I = g2(36.0, 5.0, seed);
    double A = g3(167.0, 105.0, seed);
   // cout << "r " << r << " I " << I << " A " << A << endl;
-   produce F(r/100.0) SB() Roll(A*PI_VALUE/180.0) Pitch((90-I)*PI_VALUE/180) B(1, alive,order+1) EB() 
-           B(0, alive,order);
+   produce F(r/100.0) SB() Roll(A*PI_VALUE/180.0) Pitch((90-I)*PI_VALUE/180) B(1.0, alive,order+1.0) EB() 
+           B(0.0, alive,order);
   }
  else if  (order == 1 && alive>0){
    int seed = 1111111;
@@ -80,8 +80,8 @@ B(leaf, alive,order):
    double A = 180.0*(u(seed)-0.5);
    double I =100.0*(u(seed)-0.5);
   // cout << "r " << r << " I " << I << " A " << A << endl;
-   produce F(r/100.0)  SB() Turn(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(1, alive,order+1) EB() 
-           B(0, alive-1,order);
+   produce F(r/100.0)  SB() Turn(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(1.0, alive,order+1) EB() 
+           B(0.0, alive-1,order);
   }
  else if  (order == 2 && alive){
    int seed = 1111111;
@@ -89,8 +89,8 @@ B(leaf, alive,order):
    double A = 180.0*(u(seed)-0.5);
    double I =100.0*(u(seed)-0.5);
   // cout << "r " << r << " I " << I << " A " << A << endl;
-   produce F(r/100.0)  SB() Turn(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(1, alive,order+1) EB() 
-           B(0, alive-1,order);
+   produce F(r/100.0)  SB() Turn(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(1.0, alive,order+1) EB() 
+           B(0.0, alive-1,order);
   }
  else
    produce B(leaf, alive,order);
