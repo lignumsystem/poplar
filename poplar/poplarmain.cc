@@ -64,10 +64,11 @@ int main(int argc, char** argv)
   //poplar.L is the  L-system. LGMAD and LGMdouble are here optional to
   //remind you  that there is  a possibility to data  exchange between
   //L-system and LIGNUM (in this example it is not used)
-  poplar::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> poplarL;
-  //Give Erythrina roots for poplar defined in ErythrinaRoots.L
-  Erythrina::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> rootL;
 
+  // poplar::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> poplarL;
+   poplar::LSystem<poplarsegment,poplarbud,PoplarBD, PoplarBudData> poplarL;
+   Erythrina::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> rootL;
+ 
   //Create the tree.
   Tree<poplarsegment,poplarbud> poplartree(Point(0,0,0),
 					   PositionVector(0,0,1.0));
@@ -76,6 +77,7 @@ int main(int argc, char** argv)
   rootL.start();
   //Update tree so that structures match
   // poplarL.lstringToLignum(poplartree,3,LGAstate, LGAstatus, LGAomega);
+ 
   poplarL.lstringToLignum(poplartree, 1, PoplarD);
   rootL.lstringToRootSystem(poplartree);
   //Typically  you will  write  something like  this  in the  for-loop

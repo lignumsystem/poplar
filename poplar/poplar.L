@@ -92,7 +92,7 @@ F(s, od) < B(d):
   LGMdouble st = GetValue(d, LGAstate);
 
 //Bend branches upwards
-
+/*
   PositionVector direct = GetDirection(d);
   direct.normalize();
   double fac = 0.0;
@@ -103,6 +103,7 @@ F(s, od) < B(d):
     fac = cr.length();
     fac *= bendUp;
   }
+*/
 
  if (GetValue(d, LGAstate)==DEAD)
       produce B(dead);

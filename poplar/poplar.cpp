@@ -98,7 +98,7 @@ void End()
   LGMdouble st = GetValue(d, LGAstate);
 
 //Bend branches upwards
-
+/*
   PositionVector direct = GetDirection(d);
   direct.normalize();
   double fac = 0.0;
@@ -109,6 +109,7 @@ void End()
     fac = cr.length();
     fac *= bendUp;
   }
+*/
 
  if (GetValue(d, LGAstate)==DEAD)
       { Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dead));Produce((ModuleIdType)(B_id));}

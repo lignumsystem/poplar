@@ -12,6 +12,7 @@ class PoplarBudData;
 //PopalrBD=PoplarBudData
 //PopalrBRP=PoplarBudRelativePosition
 //PoplarD=PoplarData
+
 enum PoplarBD {PoplarBRP,PoplarD};
 
 //enumarations (i.e. names) for the attributes of poplar segment and bud
@@ -69,7 +70,7 @@ class PoplarBudData{
 
 inline LGMdouble GetValue(const PoplarBudData& data,LGMAD name)
 {
-  cout<<"GetValue in PoplarBudData. sep06"<<endl;
+ 
   if (name == LGAstate)
     return data.state;
   else if (name == LGAstatus)
@@ -84,7 +85,7 @@ inline LGMdouble GetValue(const PoplarBudData& data,LGMAD name)
 
 inline LGMdouble SetValue(PoplarBudData& data,LGMAD name,LGMdouble value)
 {
-  cout<<"SetValue in PoplarBudData. sep06"<<endl;
+
   LGMdouble old_value = GetValue(data,name);
   if (name == LGAstate)
     data.state = value;
@@ -100,7 +101,7 @@ inline LGMdouble SetValue(PoplarBudData& data,LGMAD name,LGMdouble value)
 
 
 inline LGMdouble GetValue(const PoplarBudData& data,PoplarBD name)
-{  cout<<"GetValue in PoplarBudData. sep06"<<endl;
+{ 
   if (name == PoplarBRP)
     return data.brp;
   else
@@ -110,7 +111,7 @@ inline LGMdouble GetValue(const PoplarBudData& data,PoplarBD name)
 
 inline LGMdouble SetValue(PoplarBudData& data,PoplarBD name,LGMdouble value)
 { 
-  cout<<"SetValue in PoplarBudData. sep06"<<endl;
+
   LGMdouble old_value = GetValue(data,name);
   if (name == PoplarBRP)
     data.brp = value;
@@ -245,10 +246,7 @@ private:
   //initialize in constructor. p1 is just an example.
   LGMdouble p1;
 };
-
-
-class poplarbud : public Bud<poplarsegment, poplarbud>
-{/*
+/*
   //Constructor  for poplar  bu. The  argument list  is as  assumed by
   //L-system. If you need additional arguments add them after the last
   //one (the tree) and provide default values
@@ -284,6 +282,8 @@ class poplarbud : public Bud<poplarsegment, poplarbud>
   void aging(){SetValue(*this, LGAage, GetValue(*this, LGAage)+1.0);}*/
 
 
+class poplarbud : public Bud<poplarsegment, poplarbud>
+{
   friend PoplarBudData SetValue(poplarbud& b,PoplarBD name,const PoplarBudData& d);
   friend PoplarBudData GetValue(const poplarbud& b,PoplarBD name);
  public:
@@ -298,12 +298,10 @@ class poplarbud : public Bud<poplarsegment, poplarbud>
 };
 
 //SetValue and GetValue for the structure PoplarBudData in L-systems
-inline  PoplarBudData SetValue(poplarbud& b, PoplarBD name, const PoplarBudData& data)
+inline PoplarBudData SetValue(poplarbud& b, PoplarBD name, const PoplarBudData& data)
 {
-  cout<<"PoplarD SetValue"<<endl;
   PoplarBudData old_data = GetValue(b,name);
   if (name == PoplarD){
-    cout<<"get PoplarD value"<<endl;
     SetValue(b,LGAstate,GetValue(data,LGAstate));
     SetValue(b,LGAstatus,GetValue(data,LGAstatus));
     SetValue(b,LGAomega,GetValue(data,LGAomega));
@@ -320,11 +318,9 @@ inline  PoplarBudData SetValue(poplarbud& b, PoplarBD name, const PoplarBudData&
 
 inline PoplarBudData GetValue(const poplarbud& b, PoplarBD name)
 {
-  cout<<"PoplarD GetValue"<<endl;
   PoplarBudData data(ALIVE,0.0,0.0,0.0); 
 
   if (name == PoplarD){
-    cout<<"Set PoplarD value"<<endl;
     SetValue(data,LGAstate,GetValue(b,LGAstate));
     SetValue(data,LGAstatus,GetValue(b,LGAstatus));
     SetValue(data,LGAomega,GetValue(b,LGAomega));
@@ -570,7 +566,6 @@ inline vector<PositionVector>&
       if (poplarbud* b = dynamic_cast<poplarbud*>(tc)){
 	if (GetValue(*b,LGAstatus)>0.0){    // == 1
 	  pdv.push_back(GetDirection(*b));
-	  cout<<"finish GetDirection(*b) already."<<endl;
           rlsize = GetValue(*b, LGAstatus);
 	  //Leaf created, set status to 0 	
 	  SetValue(*b,LGAstatus,0);
@@ -579,7 +574,6 @@ inline vector<PositionVector>&
       if (poplarsegment* ts = dynamic_cast<poplarsegment*>(tc)){
 	Point origo(0,0,0);
    	Point point = GetEndPoint(*ts);
-         cout<<"finish GetDirection(*ts) already."<<endl;
 	PositionVector up(0,0,1);
 	PositionVector down(0,0,-1);
 	
@@ -628,7 +622,7 @@ inline vector<PositionVector>&
 	  double Af = rlsize * 0.08; //GetValue(GetTree(*ts), LGPaleafmax);
 	    //  cout<<"LGPaleafmax value: "<<GetValue(GetTree(*ts), LGPaleafmax)<<endl;
          
-	  SetValue(*leaf, LGAA, 0.1);   //set the leaf area value, which is used in DumpLeaf()
+	  //  SetValue(*leaf, LGAA, Af);   //set the leaf area value, which is used in DumpLeaf()
 
 	  //Insert leaf
 	  ts->addLeaf(leaf);
