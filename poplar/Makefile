@@ -23,9 +23,10 @@ INCLUDE = -I../c++adt/include -I../Firmament/include \
           -I/sw/include -I.
 
 LIBD=lib64
-LIBFLAGS = -L../c++adt/lib -L../stl-lignum/lib -L../Firmament/lib \
+LIBFLAGS =  -L../c++adt/lib -L../stl-lignum/lib -L../Firmament/lib \
            -L. -L../LEngine/lib -L../Graphics \
            -L/usr/freeware/$(LIBD) -L/usr/X11R6/lib -L/sw/lib
+           
 
 LIB1   = libc++adt.a
 LIB2   = libLGM.a
@@ -42,7 +43,7 @@ LIBMATH  = -lm
 LIBVISUAL = -lVisual
 LIBLSYS = -llsys
 
-LIBOGL =  -lglut -lGL -lGLU -lX11 -lXext -lXmu 
+LIBOGL =  -lglut -lGLU -lGL -lXmu -lXext -lX11
 
 LIBS     =  $(LIBVISUAL) $(LIBLSYS) $(LIBL) $(LIBLGM) $(LIBSKY) $(LIBADT) $(LIBOGL) \
             $(LIBMATH)
@@ -54,20 +55,23 @@ all: gnupoplar
 sinclude Makedepend
 
 gnupoplar: 
-	(cd ../LEngine; make gnu)
-	make "CCC=g++" "CCCFLAGS=-c" "OPTIMIZE=-g" \
+	(cd ../LEngine; make "CCC=$(CCC)" "CCCFLAGS=-c" "OPTIMIZE=$(OPTIMIZE)" \
+                             "AR=ar" "ARFLAGS=rvs" lengine)
+	make "CCC=$(CCC)" "CCCFLAGS=-c" "OPTIMIZE=$(OPTIMIZE)" \
               "AR=ar"  "ARFLAGS=rvs"  "LSYS=$(LSYS)" "LIBD=lib32" poplar
 
 sgipoplar: 
-	(cd ../LEngine; make lengine)
-	make "CCC=CC -64 -LANG:std " "CCCFLAGS=-c" "OPTIMIZE=-g" \
+	(cd ../LEngine; make "CCC=CC -64 -LANG:std"  "CCCFLAGS=-c"  "OPTIMIZE=$(OPTIMIZE)" \
+                             "AR=CC -64 -LANG:std -ar" "ARFLAGS=$(ARFLAGS)" lengine)
+	make "CCC=CC -64 -LANG:std" "CCCFLAGS=-c" "OPTIMIZE=$(OPTIMIZE)" \
              "AR=CC -64 -LANG:std -ar"  "ARFLAGS=-o"  "LSYS=$(LSYS)" "LIBD=lib64" poplar
 
 poplar: $(POPLAROBJ) $(LIB1) $(LIB2) $(LIB3)  $(LIB5) $(LIB6)  
 	$(CCC)  -o $@ $(INCLUDE) $(OPTIMIZE) $(POPLAROBJ) $(LIBFLAGS) $(LIBS)
 
 l2c:	
-	(cd ../LEngine; make gnu)
+	(cd ../LEngine; make "CCC=$(CCC)" "CCCFLAGS=$(CCCFLAGS)" \
+                             "OPTIMIZE=$(OPTIMIZE)" "AR=$(AR)" "ARFLAGS=$(ARFLAGS) gnu)
 $(LIB1):
 	(cd ../c++adt; make "CCC=$(CCC)" "CCCFLAGS=$(CCCFLAGS)" \
                             "OPTIMIZE=$(OPTIMIZE)" "AR=$(AR)" "ARFLAGS=$(ARFLAGS)" $@)
@@ -79,7 +83,8 @@ $(LIB3):
          "OPTIMIZE=$(OPTIMIZE)"  "AR=$(AR)"  "ARFLAGS = $(ARFLAGS)" $@)
 
 $(LIB4):
-	(cd ../LEngine; make gnu) 
+	(cd ../LEngine; make "CCC=$(CCC)" "CCCFLAGS=$(CCCFLAGS)" \
+                             "OPTIMIZE=$(OPTIMIZE)" "AR=$(AR)" "ARFLAGS=$(ARFLAGS)" gnu) 
 
 $(LIB5):
 	(cd ../Graphics; make "CCC=$(CCC)" "CCCFLAGS=$(CCCFLAGS)" \
