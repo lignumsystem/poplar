@@ -4,6 +4,7 @@
 #include <mathsym.h>
 #include <Uniform.h>
 #include <Gauss.h> 
+#include <Bernoulli.h>
 using namespace cxxadt;
 
 //First include lengine.h file for some necessary 
@@ -24,6 +25,8 @@ Uniform u(-1);
 Gauss g1(-1);
 Gauss g2(-1);
 Gauss g3(-1); 
+Bernoulli ber( -1);
+
 //The declare the modules your need
 module F(double);
 module B(double,double,double);
@@ -67,6 +70,7 @@ B(leaf, alive,order):
 {
   if (order == 0){
    int seed = 1111111;
+   double b=ber(0.3, seed);
    double r = g1(10.0, 1.0, seed);
    double I = g2(36.0, 5.0, seed);
    double A = g3(167.0, 105.0, seed);

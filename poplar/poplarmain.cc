@@ -1,3 +1,7 @@
+#include "randomc.h"
+//#include "bernoulli.h"
+#include <Bernoulli.h>
+
 //Include Lignum implementation 
 #include <Lignum.h>
 #include <RootFunctor.h>
@@ -16,6 +20,8 @@
 //Include this always for your program
 #include <lengine.h>
 
+#include <time.h>   //temperary
+
 //LSystem captures the rewriting process  This is how you get acces to
 //rewriting process defined in  sym2d.L: wrap LSystem.h into namespace
 //corresponding namespace. You can naturally have several L-systems in
@@ -30,6 +36,7 @@ namespace Erythrina{
 
 int main(int argc, char** argv)
 {
+
   Lex l;
   //poplar.L is the  L-system. LGMAD and LGMdouble are  here optional to
   //remind you  that there is  a possibility to data  exchange between
@@ -58,8 +65,8 @@ int main(int argc, char** argv)
     
     cout << "Step: " << i << endl;  
     //********sb delete it sometime, why?
-    ForEach(poplartree, DoPhotosynthesis());
-
+    //  ForEach(poplartree, DoPhotosynthesis());
+    // ForEach(poplartree, DoRespiration());
     //*******
     poplarL.lignumToLstring(poplartree,1,LGMstatus);  
     rootL.rootSystemToLstring(poplartree);
@@ -82,8 +89,31 @@ int main(int argc, char** argv)
   vector<PositionVector> pv;
   //Create Leaves (Ellipse)
   AccumulateDown(poplartree,pv,
-		 AppendSequence<vector<PositionVector> >(),
-		 CreateTriangleLeaves<poplarsegment,poplarbud,Triangle>(0.2,0.1,0.1));
+  	 AppendSequence<vector<PositionVector> >(),
+  	 CreateTriangleLeaves<poplarsegment,poplarbud,Triangle>(0.2,0.1,0.1));
+   ForEach(poplartree, DoPhotosynthesis());
+   ForEach(poplartree, DoRespiration());
+
+    //*****test Bernoulli from c++adt/Bernoulli****
+   Bernoulli ber( -1);
+    long int seed;
+    //  int seed=2222;
+   double  test;
+   int zero=0, one=0;
+   for (int i=1; i<10001; i++)
+     {  seed=time(0);
+      double b=ber(0.3, seed);
+      cout << b <<"  ";
+      if (i%10==0) cout <<endl;
+      if (b>0.5) one++;
+      else zero++;    
+    }
+    cout << endl;
+    cout <<"test result: "<<one <<" and " << zero << endl;
+    test= (double)one/(double)(one+zero);
+    cout << test <<endl;
+    //test Bernoull done
+
 
   Firmament& f = GetFirmament(poplartree);
   //resize:  inclinations,  azimuths,  MJ/year
@@ -91,7 +121,7 @@ int main(int argc, char** argv)
   //Compare Leaves
   //ForEach(poplartree,ForEachLeafCompare<poplarsegment,poplarbud,Triangle>());
   //Demonstration of Algorithms for root system
-  ForEach(GetRootAxis(poplartree),
+  /*  ForEach(GetRootAxis(poplartree),
 	  EchoCompartmentName<Tree<poplarsegment,poplarbud> >());
   int sum = 0;
   sum = Accumulate(GetRootAxis(poplartree),sum,
@@ -123,11 +153,13 @@ int main(int argc, char** argv)
 
   cout << "Display root structure" << endl;
   DisplayStructure(GetRootAxis(poplartree));
-  cout << endl << "Display root structure done" << endl;
+  cout << endl << "Display root structure done" << endl;*/
   
   //Visualize  LIGNUM  - Note  the  Graphics  is  under development  so
   //interface may change but in  any case you will have some function.
   //But because you know OpenGL you probably can visualize the tree
   //yourself! Let us know if you do so, we probly use it!
   VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);
+
+
 }
