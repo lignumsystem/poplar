@@ -37,8 +37,11 @@ void BroadLeaf<Triangle>::photosynthesis(const LGMdouble& p0)
 
 void PoplarLeafPhotosynthesis::operator()(BroadLeaf<Triangle>* b)
 {
-  //cout<<"   Hello, I am photosynthesis in leaf"<<endl;
-  SetValue(*b,P,5.0);
+  cout<<"   Hello, I am photosynthesis in leaf"<<endl;
+  //You can do it this way: first do your computations (c.f. above) and simply
+  //set  the  value:  SetValue(*b,P,RESULT);  Or call  the  method  if
+  //interface (argument type) is fine
+  b->photosynthesis(1.0);
 }
 
 void PoplarLeafRespiration::operator()(BroadLeaf<Triangle>* bl)
@@ -51,23 +54,12 @@ void poplarsegment::photosynthesis()
 {
   LGMdouble p0=1000;
   LGMdouble T=25;
-  // cout<<"Hello, I am photosynthesis for pop-seg"<<endl;
+  cout<<"Hello, I am photosynthesis for pop-seg"<<endl;
 
-  list<BroadLeaf<Triangle>*> leaves = GetLeafList(*this);
+  list<BroadLeaf<Triangle>*>& leaves = GetLeafList(*this);
 
-  list<BroadLeaf<Triangle>*>::iterator i=leaves.begin();
-
-  do{
-       (*i)->photosynthesis(p0);
-       i++;
-    } while(i!=leaves.end());
-
-  // for( ; i != leaves.end(); i++)
-  //  {
-          // cout << "begin to photosy for leaf" << endl; 
-  //   (*i)->photosynthesis(p0);
-  // }
-  // for_each(leaves.begin(), leaves.end(), (*this)->photosynthesis());
+  //Use functor to traverse leaf list instead of do-while loops
+  for_each(leaves.begin(), leaves.end(), PoplarLeafPhotosynthesis());
   
 }
 
