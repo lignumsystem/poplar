@@ -8,7 +8,7 @@ class poplarbud;
 //enumarations (i.e. names) for the attributes of poplar segment and bud
 enum poplar_attributes {P1, Pb1};
 
-class poplarsegment : public HwTreeSegment<poplarsegment,poplarbud>
+class poplarsegment : public HwTreeSegment<poplarsegment,poplarbud,Ellipse>
 {
   friend LGMdouble SetValue(poplarsegment& ps, poplar_attributes name, 
 			    LGMdouble value){
@@ -36,7 +36,7 @@ public:
   poplarsegment(const Point& p, const PositionVector& d, const LGMdouble go,
                 const METER l, const METER r, const METER rn, 
                 Tree<poplarsegment, poplarbud>* t)
-    :HwTreeSegment<poplarsegment,poplarbud>(p,d,go,l,r,rn,t){}
+    :HwTreeSegment<poplarsegment,poplarbud,Ellipse>(p,d,go,l,r,rn,t){}
   virtual void photosynthesis(); 
   virtual void respiration();
 private:
@@ -84,13 +84,13 @@ class poplarbud : public Bud<poplarsegment, poplarbud>
 class PoplarLeafPhotosynthesis
 {
 public:
-  void operator()(BroadLeaf<>* bl);
+  void operator()(BroadLeaf<Ellipse>* bl);
 };
 
 class PoplarLeafRespiration
 {
  public:
-  void operator()(BroadLeaf<>* bl);
+  void operator()(BroadLeaf<Ellipse>* bl);
 };
 
 #endif

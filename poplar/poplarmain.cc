@@ -49,30 +49,15 @@ int main(int argc, char** argv)
   //(derivationLength returns the derivation length defined in sym2d.L
   //bu naturally  you can ignore  it and derive  as many times  as you
   //want).
-  vector<PositionVector> pv;
-  AccumulateDown(poplartree,pv,
-		 AppendSequence<vector<PositionVector> >(),
-		 CreateLeaves<poplarsegment,poplarbud>(0.5,0.5,0.5));
+  
   for (int i=0; i < poplarL.derivationLength() ; i++)
   {
     
     cout << "Step: " << i << endl;  
-    ForEach(poplartree,DoPhotosynthesis());
-    ForEach(poplartree,DoRespiration());
-    // LGMdouble init = 0.0;
-    // LGMdouble p = Accumulate(poplartree,init,CollectPhotosynthates());
-    // init = 0.0;
-    //cout<<"all p:"<<p<<endl;
-    // LGMdouble m = Accumulate(poplartree,init,CollectRespiration());
-    //cout<<"all m:"<<m<<endl;
-    UnitPM unit(0.0, 0.0);
-    //Collecting photosynthesis and respiration
-    UnitPM m=Accumulate(poplartree,unit,CollectPAndM());
-    //Update string so that structures match
+    
     poplarL.lignumToLstring(poplartree,1,LGMstatus);  
     rootL.rootSystemToLstring(poplartree);
     cout << "lignumToLstring done " << endl;
-    ForEach(poplartree,DropAllLeaves<poplarsegment,poplarbud>());
     //One derivation of L-string, above ground trunk and tree crown
     poplarL.derive();
     //below ground roots
@@ -82,17 +67,18 @@ int main(int argc, char** argv)
     poplarL.lstringToLignum(poplartree,1,LGMstatus);
     rootL.lstringToRootSystem(poplartree);
     cout << "lstringToLignum done " << endl;
-    pv.clear();
-    AccumulateDown(poplartree,pv,
-    		   AppendSequence<vector<PositionVector> >(),
-      		   CreateLeaves<poplarsegment,poplarbud>(0.5,0.5,0.5));
   }
 
   //Some optional clean up see End in sym2d.L
   poplarL.end();  
   rootL.end();
   cout << endl;
-
+  vector<PositionVector> pv;
+  //Create Leaves (Ellipse)
+  AccumulateDown(poplartree,pv,
+		 AppendSequence<vector<PositionVector> >(),
+		 CreateLeaves<poplarsegment,poplarbud,Ellipse>(0.5,0.5,0.5));
+  
   //Demonstration of Algorithms for root system
   ForEach(GetRootAxis(poplartree),
 	  EchoCompartmentName<Tree<poplarsegment,poplarbud> >());
