@@ -137,7 +137,7 @@ int main(int argc, char** argv)
     //   for (int month=0; month<12; month++)
       {
     vs.reset();
-    DumpPopTree(vs, poplartree);   
+    DumpHwTree(vs, poplartree);   
 
      fFile = fopen("weatherdata.dat", "r"); 
     // fFile = fopen(filename[month], "r");
@@ -166,7 +166,7 @@ int main(int argc, char** argv)
 	    f.setDirectRadiation(direct);
 	    f.setDiffuseRadiation(diffuse);
  
-            vs.calculatePopLight();
+            vs.calculatePoplarLight();
  
 	    ForEach(poplartree, DoPhotosynthesis());
             ForEach(poplartree, DoRespiration()); 
