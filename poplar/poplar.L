@@ -5,7 +5,7 @@
 #include <Uniform.h>
 #include <Gauss.h> 
 using namespace cxxadt;
-using namespace std;
+
 //First include lengine.h file for some necessary 
 //declarations and definitions 
 #include <lengine.h>
