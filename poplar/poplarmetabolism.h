@@ -34,7 +34,7 @@ class CollectPhotosynthates
 class CollectLeafPhotosynthates
 {
  public:
-  LGMdouble& operator ()(LGMdouble& init, BroadLeaf* l)const;  
+  LGMdouble& operator ()(LGMdouble& init, BroadLeaf<>* l)const;  
 };
 
 class CollectRespiration
@@ -46,7 +46,7 @@ class CollectRespiration
 class CollectLeafRespiration
 {
  public:
-  LGMdouble& operator ()(LGMdouble& init, BroadLeaf* l)const; 
+  LGMdouble& operator ()(LGMdouble& init, BroadLeaf<>* l)const; 
 };
 
 //UnitPM demonstrates the use of structures or classes with Accumulate
@@ -60,9 +60,9 @@ class UnitPM
   //friend UnitPM& operator = (UnitPM& upm1, UnitPM& upm2);
  public:
   UnitPM(LGMdouble pp,LGMdouble mm):p(pp),m(mm){}
-  UnitPM& operator = (UnitPM& upm);
-  UnitPM& operator += (UnitPM& upm);
-  UnitPM& operator + (UnitPM& upm);
+  UnitPM& operator = (const UnitPM& upm);
+  UnitPM& operator += (const UnitPM& upm);
+  UnitPM& operator + (const UnitPM& upm);
   LGMdouble p;
   LGMdouble m;
 };
@@ -76,7 +76,7 @@ class CollectPAndM
 class CollectLeafPM
 {
  public:
-  UnitPM& operator ()(UnitPM& init, BroadLeaf* l)const;
+  UnitPM& operator ()(UnitPM& init, BroadLeaf<>* l)const;
 };
 
 

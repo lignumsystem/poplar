@@ -84,13 +84,13 @@ class poplarbud : public Bud<poplarsegment, poplarbud>
 class PoplarLeafPhotosynthesis
 {
 public:
-  void operator()(BroadLeaf* bl);
+  void operator()(BroadLeaf<>* bl);
 };
 
 class PoplarLeafRespiration
 {
  public:
-  void operator()(BroadLeaf* bl);
+  void operator()(BroadLeaf<>* bl);
 };
 
 #endif
