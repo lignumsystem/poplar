@@ -125,5 +125,5 @@ int main(int argc, char** argv)
   //interface may change but in  any case you will have some function.
   //But because you know OpenGL you probably can visualize the tree
   //yourself! Let us know if you do so, we probly use it!
-  VisualizeHwTree(poplartree);
+  VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);
 }
