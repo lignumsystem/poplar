@@ -178,7 +178,7 @@ public:
   TreeCompartment<TS,BUD>* operator()(TreeCompartment<TS,BUD>* tc)const
   {
       if (TS* ts = dynamic_cast<TS*>(tc)){
-	  if (GetValue(*ts,age) == 0.0){
+	  if (GetValue(*ts,LGAage) == 0.0){
 	     Firmament& f = GetFirmament(GetTree(*ts));
 	 double B = f.diffuseBallSensor();
 	 const ParametricCurve& fip = GetFunction(GetTree(*ts),LGMIP);
@@ -211,7 +211,7 @@ public:
 	 //Initial foliage
 	 SetValue(*ts,Wf,GetValue(GetTree(*ts),af)*GetValue(*ts,Sa));
  	 //Remember original sapwood area As0
-	 SetValue(*ts,As0,GetValue(*ts,LGAAs)); 
+	 SetValue(*ts,LGAAs0,GetValue(*ts,LGAAs)); 
 	 // cout<<GetValue(*ts, As)<<"check radius of segment................"<<GetValue(*ts, R)<<endl;
 	 }
      }//segment
@@ -239,7 +239,7 @@ public:
   DiameterGrowthData& operator()(DiameterGrowthData& data, TreeCompartment<TS,BUD>* tc)const
   {
     if (TS* ts = dynamic_cast<TS*>(tc)){
-      if (GetValue(*ts,age) == 0){//New segment
+      if (GetValue(*ts,LGAage) == 0){//New segment
 	//Collect the masses
 	SetValue(data,DGWfnew,GetValue(*ts,Wf));
 	SetValue(data,DGWf,GetValue(*ts,Wf));
@@ -252,7 +252,7 @@ public:
 	//Sapwood requirement of  remaining foliage, assume fm returns
 	//proportion of initial foliage present, declining function of
 	//age from 1 to 0.
-	LGMdouble Asr = fm(GetValue(*ts,age))*GetValue(*ts,As0);
+	LGMdouble Asr = fm(GetValue(*ts,LGAage))*GetValue(*ts,LGAAs0);
 	//sapwood area from above
 	LGMdouble Asu = GetValue(data,LGAAs); 
 	//own heartwood, assume aging has done
