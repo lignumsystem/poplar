@@ -30,6 +30,7 @@ namespace Erythrina{
 
 int main(int argc, char** argv)
 {
+  Lex l;
   //poplar.L is the  L-system. LGMAD and LGMdouble are  here optional to
   //remind you  that there is  a possibility to data  exchange between
   //L-system and LIGNUM (in this example it is not used)
