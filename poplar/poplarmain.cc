@@ -137,7 +137,7 @@ int main(int argc, char** argv)
     //   for (int month=0; month<12; month++)
       {
     vs.reset();
-    dumpPopTree(vs, poplartree);   
+    DumpPopTree(vs, poplartree);   
 
      fFile = fopen("weatherdata.dat", "r"); 
     // fFile = fopen(filename[month], "r");
