@@ -57,7 +57,10 @@ int main(int argc, char** argv)
   {
     
     cout << "Step: " << i << endl;  
-    
+    //********sb delete it sometime, why?
+    ForEach(poplartree, DoPhotosynthesis());
+
+    //*******
     poplarL.lignumToLstring(poplartree,1,LGMstatus);  
     rootL.rootSystemToLstring(poplartree);
     cout << "lignumToLstring done " << endl;

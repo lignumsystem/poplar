@@ -2,8 +2,10 @@
 #define POPLAR_H
 
 #include <Lignum.h>
+using namespace cxxadt;
 
 class poplarbud;
+class poplarleaf;
 
 //enumarations (i.e. names) for the attributes of poplar segment and bud
 enum poplar_attributes {P1, Pb1};
@@ -81,6 +83,14 @@ class poplarbud : public Bud<poplarsegment, poplarbud>
   //initialize in constructor
   LGMdouble pb1;
 };
+
+//void BroadLeaf<Triangle>::photosynthesis(const LGMdouble& p0)
+//{
+  // bla.P = p0 * bla.Qabs;
+//}
+
+
+
 
 class PoplarLeafPhotosynthesis
 {
