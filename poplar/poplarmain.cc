@@ -209,7 +209,7 @@ int main(int argc, char** argv)
 
       //   VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);
 
-        //*****test Bernoulli from c++adt/Bernoulli****
+        //*****test bernoulli from poplar/bernoulli****
       /* long int seed =time(0);
     cout<<"do nothing"<< endl;
     double p=0.3, result, test;
@@ -227,6 +227,32 @@ int main(int argc, char** argv)
     cout <<"test result: "<<one <<" and " << zero << endl;
     test= (double)one/(double)(one+zero);
     cout << test <<endl; */
+    //test bernoull done
+
+ //*****test Bernoulli from c++adt/Bernoulli****
+
+    /*   // Bernoulli ber( -1);
+    long int seed;
+    //  int seed=2222;
+   double  test;
+   int zero=0, one=0;
+   seed=-time(0);
+   Bernoulli ber(seed);
+   for (int i=1; i<101; i++)
+     {
+       // cout<<"seed:"<<seed<<" ";
+      double b=ber(0.4, seed - i);
+      cout << b <<"  ";
+      if (i%10==0) cout <<endl;
+      if (b>0.5) one++;
+      else zero++;    
+    }
+    cout << endl;
+    cout <<"test result: "<<one <<" and " << zero << endl;
+    test= (double)one/(double)(one+zero);
+    cout << test <<endl;
     //test Bernoull done
+*/
+
 
 }
