@@ -1,27 +1,8 @@
 #include <poplar.h>
 
-//<<<<<<< poplarsegment.cc
-//void BroadLeaf<Triangle>::photosynthesis(const LGMdouble& p0)
-//{  
-//=======
-// void BroadLeaf<Triangle>::photosynthesis(const LGMdouble& p0)
-// {  
-//>>>>>>> 1.8
-//  cout << "poplarleaf photosynthesis "<< endl; 
-//    bla.P = p0 *(bla.Qabs);
-//<<<<<<< poplarsegment.cc
-//}
-//=======
-// }
-//>>>>>>> 1.8
 
-//<<<<<<< poplarsegment.cc
-
-//void BroadLeaf<Triangle>::photosynthesis(const LGMdouble& p0) //specialization for poplar BroadLeaf:: photosynthesis() 
-//=======
 template<>
 void BroadLeaf<Triangle>::photosynthesis(const LGMdouble& p0)
-  //>>>>>>> 1.8
 {
   // cout << "poplarleaf photosynthesis "<< endl;
     LGMdouble T = 25; //temperature of leaf.
@@ -61,7 +42,7 @@ void PoplarLeafPhotosynthesis::operator()(BroadLeaf<Triangle>* b)
 void PoplarLeafRespiration::operator()(BroadLeaf<Triangle>* bl)
 { 
   cout<<"   I am respiration in leaf"<<endl;
-  SetValue(*bl, M, 3.0);
+  SetValue(*bl,LGAM, 3.0);
 }
 
 void poplarsegment::photosynthesis()
@@ -91,14 +72,14 @@ void poplarsegment::respiration()
   //leaf respiration
   // for_each(leaves.begin(), leaves.end(),PoplarLeafRespiration());
   //segment respiration
-  // SetValue(*this,M,1.0);
+  // SetValue(*this,LGAM,1.0);
 
 
   //**respiration for wooden part, effect of nitrogen in HwTreeSegmentMetabilismI.h***//
   //**ms-- maintenance respiration rate of sapwood
   //**ws--  mass of sapwood
    m_hw += GetValue(t,ms)*GetValue(*this,LGAWs) * tt.tf.nitroRespiration(nit_wood);
-   SetValue(*this, M, m_hw);
+   SetValue(*this,LGAM, m_hw);
    // cout<<"  "<< GetValue(t,ms)*GetValue(*this,Ws)<<endl;
 }
 

@@ -60,7 +60,7 @@ LGMdouble CollectRespiration::operator()(LGMdouble& init,TreeCompartment<poplars
     LGMdouble start=0.0;
     list<BroadLeaf<Triangle>*> leaves=GetLeafList(*ps);
     init=init+accumulate(leaves.begin(), leaves.end(), start, CollectLeafRespiration());
-    init=init+GetValue(*ps, M);
+    init=init+GetValue(*ps,LGAM);
   }
   return init;
 }
@@ -68,7 +68,7 @@ LGMdouble CollectRespiration::operator()(LGMdouble& init,TreeCompartment<poplars
 
 LGMdouble& CollectLeafRespiration::operator()(LGMdouble& init, BroadLeaf<Triangle>* l)const
 {
-  init=init+GetValue(*l,M);
+  init=init+GetValue(*l,LGAM);
   return init;
 }
 
@@ -103,7 +103,7 @@ UnitPM& CollectPAndM::operator ()(UnitPM& init, TreeCompartment<poplarsegment, p
     list<BroadLeaf<Triangle>*> leaves=GetLeafList(*ps);
     init+=accumulate(leaves.begin(), leaves.end(), start, CollectLeafPM());
     start.p=GetValue(*ps, P);
-    start.m=GetValue(*ps, M);
+    start.m=GetValue(*ps,LGAM);
     init+=start;
   }
   return init;
@@ -113,7 +113,7 @@ UnitPM& CollectLeafPM::operator()(UnitPM& init, BroadLeaf<Triangle>* l)const
 {
   UnitPM pm(0.0, 0.0);
   pm.p=GetValue(*l,P);
-  pm.m=GetValue(*l,M);
+  pm.m=GetValue(*l,LGAM);
   init+=pm;
   return init;
 }
