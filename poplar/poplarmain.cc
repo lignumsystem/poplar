@@ -132,12 +132,13 @@ int main(int argc, char** argv)
 
     //weather data read begin:
 
-    // for (int month=0; month<12; month++)
+    //   for (int month=0; month<12; month++)
       {
     vs.reset();
     dumpPopTree(vs, poplartree);   
 
-    fFile = fopen("weatherdata.dat", "r");  // (filename[month], "r");
+     fFile = fopen("weatherdata.dat", "r"); 
+    // fFile = fopen(filename[month], "r");
     if (fFile==NULL)
       exit(1);
     
@@ -165,7 +166,7 @@ int main(int argc, char** argv)
  
             vs.calculatePopLight();
  
-            ForEach(poplartree, DoPhotosynthesis());
+	    ForEach(poplartree, DoPhotosynthesis());
             ForEach(poplartree, DoRespiration()); 
 	  }
 	
@@ -260,7 +261,9 @@ int main(int argc, char** argv)
   //But because you know OpenGL you probably can visualize the tree
   //yourself! Let us know if you do so, we probly use it!
 
-  VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);
+
+  cout<<"begin visualization"<<endl;
+   VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);  //program stuck here Jan202004
 
 
 }

@@ -89,10 +89,34 @@ class poplarbud : public Bud<poplarsegment, poplarbud>
   // bla.P = p0 * bla.Qabs;
 //}
 
+
+
+
+class PoplarLeaf:public BroadLeaf<Triangle>{
+
+ public:
+
+  PoplarLeaf(LGMdouble sf,LGMdouble tauL,LGMdouble dof,int number_of_sectors,
+	    const Petiole& petiole, const PositionVector& leaf_normal,
+	       const Triangle& shap): BroadLeaf<Triangle>(sf, tauL, dof, number_of_sectors, petiole, leaf_normal, shap), T(25.0){}
+
+   PoplarLeaf(const Triangle& shape, const Petiole& petiole, 
+		const PositionVector& leaf_normal): BroadLeaf<Triangle>(shape, petiole, leaf_normal), T(25.0){}
+
+  int photosynthesis();
+  void respiration();
+
+ private:
+  LGMdouble T; //tempreature
+  //  BroadLeafAttributes<Triangle> bla;
+};
+
+
 class PoplarLeafPhotosynthesis
 {
 public:
-  void operator()(BroadLeaf<Triangle>* bl);
+  // void operator()(PoplarLeaf* bl);
+ void operator()(BroadLeaf<Triangle>* bl);
 };
 
 class PoplarLeafRespiration
@@ -332,8 +356,5 @@ double PoplarGrowthFunction<TS,BUD>::operator()(double l)
  
   return P - M - GetValue(data,DGWs) - GetValue(data,DGWfnew) - GetValue(t,ar)* GetValue(data,DGWfnew);
 }
-
-
-
 
 #endif
