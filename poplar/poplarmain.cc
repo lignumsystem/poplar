@@ -261,7 +261,7 @@ int main(int argc, char** argv)
   //But because you know OpenGL you probably can visualize the tree
   //yourself! Let us know if you do so, we probly use it!
 
-
+  glutInit(&argc,argv);
    VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);  //program stuck here Jan202004
 
 
