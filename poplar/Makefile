@@ -2,8 +2,8 @@ POPLARSRC = poplarmain.cc poplarmetabolism.cc poplarsegment.cc
 POPLAROBJ = ${POPLARSRC:.cc=.o}
 
 LSYS = poplar.L ErythrinaRoots.L
-LSYSSRC = ${LSYS:.L=.cpp}
-LSYSOBJ = ${LSYSSRC:.cpp=.o}
+SRC = ${LSYS:.L=.cpp}
+OBJ = ${SRC:.cpp=.o}
 
 CCC = g++
 
@@ -22,9 +22,10 @@ INCLUDE = -I../c++adt/include -I../Firmament/include \
           -I../Graphics -I/usr/freeware/include -I/usr/X11R6/include \
           -I/sw/include -I.
 
-
+LIBD=lib64
 LIBFLAGS = -L../c++adt/lib -L../stl-lignum/lib -L../Firmament/lib \
-           -L. -L../LEngine/lib -L../Graphics -L/usr/X11R6/lib -L/sw/lib
+           -L. -L../LEngine/lib -L../Graphics \
+           -L/usr/freeware/$(LIBD) -L/usr/X11R6/lib -L/sw/lib
 
 LIB1   = libc++adt.a
 LIB2   = libLGM.a
@@ -46,7 +47,7 @@ LIBOGL =  -lglut -lGL -lGLU -lX11 -lXext -lXmu
 LIBS     =  $(LIBVISUAL) $(LIBLSYS) $(LIBL) $(LIBLGM) $(LIBSKY) $(LIBADT) $(LIBOGL) \
             $(LIBMATH)
 
-.SUFFIXES: .o .cc .cpp .L .o .cpp
+.SUFFIXES: .L .cpp .o .cc  .o .cpp 
 
 all: gnupoplar
 
@@ -54,7 +55,7 @@ sinclude Makedepend
 
 gnupoplar: 
 	make "CCC=g++" "CCCFLAGS=-c" "OPTIMIZE=-g" \
-              "AR=ar"  "ARFLAGS=rvs"  "LSYS=$(LSYS)" poplar
+              "AR=ar"  "ARFLAGS=rvs"  "LSYS=$(LSYS)" "LIBD=lib32" poplar
 
 poplar: l2c $(POPLAROBJ) $(LIB1) $(LIB2) $(LIB3)  $(LIB4) $(LIB5) $(LIB6)  
 	$(CCC)  -o $@ $(INCLUDE) $(OPTIMIZE) $(POPLAROBJ) $(LIBFLAGS) $(LIBS)
@@ -78,11 +79,12 @@ $(LIB5):
 	(cd ../Graphics; make "CCC=$(CCC)" "CCCFLAGS=$(CCCFLAGS)" \
          "OPTIMIZE=$(OPTIMIZE)"  "AR=$(AR)"  "ARFLAGS = $(ARFLAGS)" $@)
 
-$(LIB6): $(LSYSSRC) $(LSYSOBJ)
-	$(AR) $(ARFLAGS) $(@) $(LSYSOBJ)    
+$(LIB6): $(SRC) $(OBJ)
+	$(AR) $(ARFLAGS) $(@) $(OBJ)    
 
 .L.cpp:
 	../LEngine/bin/l2c  $< $@
+	$(CCC) $(CCCFLAGS) $(OPTIMIZE) $(INCLUDE)  $@
 	rm -f *.c
 
 .cpp.o:
