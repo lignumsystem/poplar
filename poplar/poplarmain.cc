@@ -1,6 +1,7 @@
 #include "randomc.h"
-#include "bernoulli.h"
-#include <Bernoulli.h>
+#include "Bernoulli.h"
+#include <berncreator.h>
+#include <iostream>
 
 //Include Lignum implementation 
 #include <Lignum.h>
@@ -79,7 +80,8 @@ int main(int argc, char** argv)
   Firmament& f = GetFirmament(poplartree);
   //resize:  inclinations,  azimuths,  MJ/year
   f.resize(40,20,1200);
-
+  // vector<double> direct_direction;
+  //  f.directRadiation(direct_direction);
 
   cout << "regions: " << f.numberOfRegions() 
        << "Ball sensor: " << f.diffuseBallSensor()
@@ -108,16 +110,63 @@ int main(int argc, char** argv)
   //  wf= Accumulate(poplartree, wf, CollectPAndM<poplarsegment, poplarbud>());
   // cout<<"result of collectnew foliage:  "<<wf<<endl;
 
- 
+   FILE * fFile;
+   float a, b, c, d, e, ff, g, h;
+   float direct, diffuse;
 
-  for (int i=0; i < 3; i++) // poplarL.derivationLength()
+   char * filename[12]={"jan.dat", "feb.dat", "mar.dat", "apr.dat", "may.dat", "jun.dat", "jul.dat", "aug.dat", "sep.dat", "oct.dat", "nov.dat", "dec.dat" };
+
+  for (int i=0; i < 3; i++) // poplarL.derivationLength()--yearly
   //for (int i=0; i < 7 ; i++)
   {
     
     cout << "Step: " << i << endl;  
+
+
+    //weather data read begin:
+
+    for (int month=0; month<12; month++)
+      {
+    vs.reset();
+    dumpPopTree(vs, poplartree);   
+
+    fFile = fopen (filename[month], "r");
+    if (fFile==NULL)
+      exit(1);
+    
+    int j=0;
+    while (!feof(fFile))
+      {
+	if(j<6)
+	  {
+            fscanf(fFile, "%f %f %f %f %f %f %f %f\n", &a, &b, &c, &d, &e, &ff, &g, &h);
+            cout<<a<<" "<<b<<" "<<c<<" "<<d<<" "<<e<<" "<<ff<<" "<<g<<endl;
+	    direct += e/6;
+            diffuse += ff/6; 
+            j++;
+	  }
+        else
+	  {
+	    j=0;
+	    vector<double> a(3);
+            a[0] = cos(d)*sin(c);
+            a[1] = cos(d)*cos(c);
+            a[2] = sin(d);
+            f.setSunPosition(a);   
+	    f.setDirectRadiation(direct);
+	    f.setDiffuseRadiation(diffuse);
+ 
+            vs.calculatePopLight();
+ 
+            ForEach(poplartree, DoPhotosynthesis());
+            ForEach(poplartree, DoRespiration()); 
+	  }
+	
+      }
+    fclose(fFile);
+    //weather data read done
    
-      ForEach(poplartree, DoPhotosynthesis());
-     ForEach(poplartree, DoRespiration());
+
    
     poplarL.lignumToLstring(poplartree,1,LGMstatus);  
     rootL.rootSystemToLstring(poplartree);
@@ -133,7 +182,7 @@ int main(int argc, char** argv)
        cout<<"init done"<<endl;
        // cout << "Bisection zero at:  " << Bisection(0.0,10.0,G) << endl;
        //    Bisection(0.0, 50.0, G);
-    ForEach(poplartree, SetSegmentLength<poplarsegment, poplarbud>(1.0));
+       ForEach(poplartree, SetSegmentLength<poplarsegment, poplarbud>(1.0)); //defined in poplar.h
 
     TcData data;
     AccumulateDown(poplartree,data,TreeDiameterGrowth<poplarsegment,poplarbud>());
@@ -148,11 +197,8 @@ int main(int argc, char** argv)
     AccumulateDown(poplartree,pv,
   	 AppendSequence<vector<PositionVector> >(),
   	 CreateTriangleLeaves<poplarsegment,poplarbud,Triangle>(0.2,0.1,0.1));
+      }
 
-   vs.reset();
-   dumpPopTree(vs, poplartree);
- 
-   vs.calculatePopLight();
   }
 
   //Some optional clean up see End in sym2d.L
@@ -207,7 +253,13 @@ int main(int argc, char** argv)
   //But because you know OpenGL you probably can visualize the tree
   //yourself! Let us know if you do so, we probly use it!
 
-      //   VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);
+         VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);
+
+
+}
+
+
+
 
         //*****test bernoulli from poplar/bernoulli****
       /* long int seed =time(0);
@@ -254,5 +306,3 @@ int main(int argc, char** argv)
     //test Bernoull done
 */
 
-
-}

@@ -212,7 +212,7 @@ public:
 	 SetValue(*ts,Wf,GetValue(GetTree(*ts),af)*GetValue(*ts,Sa));
  	 //Remember original sapwood area As0
 	 SetValue(*ts,As0,GetValue(*ts,As)); 
-	 cout<<GetValue(*ts, As)<<"check radius of segment................"<<GetValue(*ts, R)<<endl;
+	 // cout<<GetValue(*ts, As)<<"check radius of segment................"<<GetValue(*ts, R)<<endl;
 	 }
      }//segment
      else if (Axis<TS,BUD>* axis = dynamic_cast<Axis<TS,BUD>*>(tc)){
