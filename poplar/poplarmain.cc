@@ -1,6 +1,7 @@
 //Include Lignum implementation 
 #include <Lignum.h>
 #include <RootFunctor.h>
+#include <CompareLeaves.h>
 
 //Include the implementation of the  tree segment and bud You probably
 //define your own segment and bud in real project for cottonwood.
@@ -78,7 +79,9 @@ int main(int argc, char** argv)
   AccumulateDown(poplartree,pv,
 		 AppendSequence<vector<PositionVector> >(),
 		 CreateLeaves<poplarsegment,poplarbud,Ellipse>(0.5,0.5,0.5));
-  
+
+  //Compare Leaves
+  ForEach(poplartree,ForEachLeafCompare<poplarsegment,poplarbud,Ellipse>());
   //Demonstration of Algorithms for root system
   ForEach(GetRootAxis(poplartree),
 	  EchoCompartmentName<Tree<poplarsegment,poplarbud> >());
