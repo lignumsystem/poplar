@@ -19,7 +19,8 @@ CCCFLAGS = -c  #-prelink -ptused   -ptv  #  -fullwarn
 
 INCLUDE = -I../c++adt/include -I../Firmament/include \
           -I../stl-lignum/include  -I../LEngine/include \
-          -I../Graphics -I/usr/freeware/include -I/usr/X11R6/include \
+          -I../Graphics -I../stl-voxelspace/include \
+          -I../ScotsPine/include -I/usr/freeware/include -I/usr/X11R6/include \
           -I/sw/include -I.
 
 LIBD=lib64
