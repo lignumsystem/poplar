@@ -65,7 +65,6 @@ void poplarsegment::respiration()
   LGMdouble m_hw = 0.0;
 
   Tree<poplarsegment, poplarbud>& tt = dynamic_cast<Tree<poplarsegment, poplarbud>&>(GetTree(*this));
-  LGMdouble nit_wood = GetValue(tt, nitroWood);
   Tree<poplarsegment, poplarbud>& t = dynamic_cast<Tree<poplarsegment, poplarbud>&>(GetTree(*this));
   //cout<<"    I am respiration in segment"<<endl;
   list<BroadLeaf<Triangle>*> leaves=GetLeafList(*this);
@@ -75,10 +74,9 @@ void poplarsegment::respiration()
   // SetValue(*this,LGAM,1.0);
 
 
-  //**respiration for wooden part, effect of nitrogen in HwTreeSegmentMetabilismI.h***//
   //**ms-- maintenance respiration rate of sapwood
   //**ws--  mass of sapwood
-   m_hw += GetValue(t,ms)*GetValue(*this,LGAWs) * tt.tf.nitroRespiration(nit_wood);
+   m_hw += GetValue(t,ms)*GetValue(*this,LGAWs);
    SetValue(*this,LGAM, m_hw);
    // cout<<"  "<< GetValue(t,ms)*GetValue(*this,Ws)<<endl;
 }
