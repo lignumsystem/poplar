@@ -5,7 +5,7 @@
 #include <Uniform.h>
 #include <Gauss.h> 
 using namespace cxxadt;
-using namespace std;
+
 //First include lengine.h file for some necessary 
 //declarations and definitions 
 #include <lengine.h>
@@ -15,8 +15,8 @@ using namespace std;
  namespace poplar{ 
 
 
-//lsystem.h impelemnts the rewriting
-#include <lsystem.h>
+//lsys.h impelemnts the rewriting
+#include <lsys.h>
 
 //Then comes the model. This file is compiled to C++ so 
 //you can first have some C++ declarations and definitions 
@@ -33,12 +33,12 @@ Gauss g3(-1);
  const ModuleIdType Roll_id = 6;
 
 //Define the derivation length
-int DerivationLength() { return  81;}
+int DerivationLength() { return  15;}
 
 //Define the Start corresponding to the axiom
 void Start()
 {
-  { Produce((ModuleIdType)(B_id));Produce((double)(0));Produce((double)( 4));Produce((double)(0));Produce((ModuleIdType)(B_id));}
+  { Produce((ModuleIdType)(B_id));Produce((double)(0.0));Produce((double)(4.0));Produce((double)(0.0));Produce((ModuleIdType)(B_id));}
 }
 
 //You can optionally have the following modules:
@@ -72,8 +72,8 @@ void End()
    double I = g2(36.0, 5.0, seed);
    double A = g3(167.0, 105.0, seed);
   // cout << "r " << r << " I " << I << " A " << A << endl;
-   { Produce((ModuleIdType)(F_id));Produce((double)(r/100.0));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)((90-I)*PI_VALUE/180));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((double)(1));Produce((double)( alive));Produce((double)(order+1));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id)); 
-           Produce((ModuleIdType)(B_id));Produce((double)(0));Produce((double)( alive));Produce((double)(order));Produce((ModuleIdType)(B_id));}
+   { Produce((ModuleIdType)(F_id));Produce((double)(r/100.0));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)((90-I)*PI_VALUE/180));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((double)(1.0));Produce((double)( alive));Produce((double)(order+1.0));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id)); 
+           Produce((ModuleIdType)(B_id));Produce((double)(0.0));Produce((double)( alive));Produce((double)(order));Produce((ModuleIdType)(B_id));}
   }
  else if  (order == 1 && alive>0){
    int seed = 1111111;
@@ -81,8 +81,8 @@ void End()
    double A = 180.0*(u(seed)-0.5);
    double I =100.0*(u(seed)-0.5);
   // cout << "r " << r << " I " << I << " A " << A << endl;
-   { Produce((ModuleIdType)(F_id));Produce((double)(r/100.0));Produce((ModuleIdType)(F_id));  Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Turn_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Turn_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I*PI_VALUE/180.0));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((double)(1));Produce((double)( alive));Produce((double)(order+1));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id)); 
-           Produce((ModuleIdType)(B_id));Produce((double)(0));Produce((double)( alive-1));Produce((double)(order));Produce((ModuleIdType)(B_id));}
+   { Produce((ModuleIdType)(F_id));Produce((double)(r/100.0));Produce((ModuleIdType)(F_id));  Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Turn_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Turn_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I*PI_VALUE/180.0));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((double)(1.0));Produce((double)( alive));Produce((double)(order+1));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id)); 
+           Produce((ModuleIdType)(B_id));Produce((double)(0.0));Produce((double)( alive-1));Produce((double)(order));Produce((ModuleIdType)(B_id));}
   }
  else if  (order == 2 && alive){
    int seed = 1111111;
@@ -90,8 +90,8 @@ void End()
    double A = 180.0*(u(seed)-0.5);
    double I =100.0*(u(seed)-0.5);
   // cout << "r " << r << " I " << I << " A " << A << endl;
-   { Produce((ModuleIdType)(F_id));Produce((double)(r/100.0));Produce((ModuleIdType)(F_id));  Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Turn_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Turn_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I*PI_VALUE/180.0));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((double)(1));Produce((double)( alive));Produce((double)(order+1));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id)); 
-           Produce((ModuleIdType)(B_id));Produce((double)(0));Produce((double)( alive-1));Produce((double)(order));Produce((ModuleIdType)(B_id));}
+   { Produce((ModuleIdType)(F_id));Produce((double)(r/100.0));Produce((ModuleIdType)(F_id));  Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Turn_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Turn_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I*PI_VALUE/180.0));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((double)(1.0));Produce((double)( alive));Produce((double)(order+1));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id)); 
+           Produce((ModuleIdType)(B_id));Produce((double)(0.0));Produce((double)( alive-1));Produce((double)(order));Produce((ModuleIdType)(B_id));}
   }
  else
    { Produce((ModuleIdType)(B_id));Produce((double)(leaf));Produce((double)( alive));Produce((double)(order));Produce((ModuleIdType)(B_id));}

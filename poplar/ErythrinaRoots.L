@@ -17,7 +17,7 @@ open Erythrina;
 #include <lsys.h>
 
 
-const int STEPS=100;
+const int STEPS=30; //change the steps
 const double ALPHA=0.99;
 const double Q=0.72;
 const double DMIN=0.01; //minimum diameter
@@ -42,7 +42,9 @@ inline double Long(double D)
 
 inline pair<double,double> RandomRollAndPitch(double d,int RAMorAXE)
 {
-  pair<double,double> p(1.0,1.0);
+  double x=rand()%2-1;
+  double y=rand()%2-1;
+  pair<double,double> p(x, y);
   return p;
 }
 
@@ -61,7 +63,7 @@ derivation length: STEPS;
 Start: 
 { 
    seed = 1;
-   produce Pitch(PI_VALUE) B(0.25,0.50);
+   produce Pitch(PI_VALUE) B(0.25,0.50); //pitch 180, turn downword
 }
 
 
@@ -79,7 +81,7 @@ B(d,l):
      double da1 = Da(d);
      double longdad = Long(Da(d));
      produce F(l) SB()  Roll(p1.first) Pitch(p1.second) B(dr1,longdr1) EB() 
-             Roll(p2.first) Pitch(p2.second) B(da1,longdad);
+            B(da1,longdad); 
    }
    else{
      double dr2 = Dr(d,2.0);
@@ -88,7 +90,7 @@ B(d,l):
      double longdad = Long(Da(d));
      produce F(l) SB()  Roll(p1.first) Pitch(p1.second) B(dr2,longdr2) EB() 
                   SB()  Roll(p2.first) Pitch(p2.second) B(dr2,longdr2) EB() 
-             Roll(p2.first) Pitch(p2.second) B(da1,longdad); 
+            B(da1,longdad);  
   }
  }
  else{ 
