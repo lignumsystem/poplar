@@ -209,7 +209,7 @@ public:
 	 //Initial heartwood
 	 SetValue(*ts,Rh,sqrt((GetValue(GetTree(*ts),xi)*GetValue(*ts,LGAAs))/PI_VALUE));
 	 //Initial foliage
-	 SetValue(*ts,Wf,GetValue(GetTree(*ts),af)*GetValue(*ts,Sa));
+	 SetValue(*ts,LGAWf,GetValue(GetTree(*ts),af)*GetValue(*ts,Sa));
  	 //Remember original sapwood area As0
 	 SetValue(*ts,LGAAs0,GetValue(*ts,LGAAs)); 
 	 // cout<<GetValue(*ts, As)<<"check radius of segment................"<<GetValue(*ts, R)<<endl;
@@ -241,8 +241,8 @@ public:
     if (TS* ts = dynamic_cast<TS*>(tc)){
       if (GetValue(*ts,LGAage) == 0){//New segment
 	//Collect the masses
-	SetValue(data,DGWfnew,GetValue(*ts,Wf));
-	SetValue(data,DGWf,GetValue(*ts,Wf));
+	SetValue(data,DGWfnew,GetValue(*ts,LGAWf));
+	SetValue(data,DGWf,GetValue(*ts,LGAWf));
 	SetValue(data,DGWs,GetValue(*ts,Ws));
 	//Sapwood requirement
 	SetValue(data,LGAAs,GetValue(*ts,LGAAs));
@@ -271,7 +271,7 @@ public:
 	//Mass of sapwood used in diamater growth
 	SetValue(data,DGWs,GetValue(data,DGWs)+Wsnew);
 	//Total foliage
-	SetValue(data,DGWf,GetValue(data,DGWf)+GetValue(*ts,Wf));
+	SetValue(data,DGWf,GetValue(data,DGWf)+GetValue(*ts,LGAWf));
       }
     }
     return data;
