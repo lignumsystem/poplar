@@ -17,4 +17,4 @@ pr      0.0010      #Proportion of bound solar radiation that is
                     #used in photosynthesis
 LGPxi      0.60        #Fraction of heartwood in tree segments
 LGPzbrentEpsilon    0.001    #Accuracy for finding root of P-M-dW(lambda)
-sf      28.0        #Foliage m2/kg
+LGPsf      28.0        #Foliage m2/kg
