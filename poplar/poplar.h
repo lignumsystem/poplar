@@ -114,7 +114,7 @@ public:
   DiameterGrowthData& operator=(TcData& tcd)
   {
     DiameterGrowthData& dgd = dynamic_cast<DiameterGrowthData&>(tcd);
-    SetValue(*this,As,GetValue(dgd,As)); 
+    SetValue(*this,LGAAs,GetValue(dgd,LGAAs)); 
     SetValue(*this,DGWs,GetValue(dgd,DGWs));
     SetValue(*this,DGWf,GetValue(dgd,DGWf));
     SetValue(*this,DGWfnew,GetValue(dgd,DGWfnew));
@@ -123,14 +123,14 @@ public:
   DiameterGrowthData& operator+=(TcData& tcd)
   {
     DiameterGrowthData& dgd = dynamic_cast<DiameterGrowthData&>(tcd);
-    SetValue(*this,As,GetValue(*this,As)+GetValue(dgd,As));
+    SetValue(*this,LGAAs,GetValue(*this,LGAAs)+GetValue(dgd,LGAAs));
     SetValue(*this,DGWs,GetValue(*this,DGWs)+GetValue(dgd,DGWs));
     SetValue(*this,DGWf,GetValue(*this,DGWf)+GetValue(dgd,DGWf));
     SetValue(*this,DGWfnew,GetValue(*this,DGWfnew)+GetValue(dgd,DGWfnew));
     return *this;
   }
   void clear(){
-    SetValue(*this,As,0.0);
+    SetValue(*this,LGAAs,0.0);
     SetValue(*this,DGWs,0.0);
     SetValue(*this,DGWf,0.0);
     SetValue(*this,DGWfnew,0.0);
@@ -207,11 +207,11 @@ public:
 	 //Reset previous Rh!!!!
 	 SetValue(*ts,Rh,0.0);
 	 //Initial heartwood
-	 SetValue(*ts,Rh,sqrt((GetValue(GetTree(*ts),xi)*GetValue(*ts,As))/PI_VALUE));
+	 SetValue(*ts,Rh,sqrt((GetValue(GetTree(*ts),xi)*GetValue(*ts,LGAAs))/PI_VALUE));
 	 //Initial foliage
 	 SetValue(*ts,Wf,GetValue(GetTree(*ts),af)*GetValue(*ts,Sa));
  	 //Remember original sapwood area As0
-	 SetValue(*ts,As0,GetValue(*ts,As)); 
+	 SetValue(*ts,As0,GetValue(*ts,LGAAs)); 
 	 // cout<<GetValue(*ts, As)<<"check radius of segment................"<<GetValue(*ts, R)<<endl;
 	 }
      }//segment
@@ -245,7 +245,7 @@ public:
 	SetValue(data,DGWf,GetValue(*ts,Wf));
 	SetValue(data,DGWs,GetValue(*ts,Ws));
 	//Sapwood requirement
-	SetValue(data,As,GetValue(*ts,As));
+	SetValue(data,LGAAs,GetValue(*ts,LGAAs));
       }
       else{//old segment
 	const ParametricCurve& fm = GetFunction(GetTree(*ts),LGMFM);
@@ -254,7 +254,7 @@ public:
 	//age from 1 to 0.
 	LGMdouble Asr = fm(GetValue(*ts,age))*GetValue(*ts,As0);
 	//sapwood area from above
-	LGMdouble Asu = GetValue(data,As); 
+	LGMdouble Asu = GetValue(data,LGAAs); 
 	//own heartwood, assume aging has done
 	LGMdouble Ahown  = GetValue(*ts,Ah);
 	//requirement for new radius: sapwood above + own heartwood + own foliage 
@@ -262,12 +262,12 @@ public:
 	//compare Rnew to R, choose max
 	Rnew = max(Rnew, GetValue(*ts,R));
 	//New sapwood requirement, thickness growth
-	double Asnew = PI_VALUE*pow(Rnew,2.0) -  GetValue(*ts,A);
+	double Asnew = PI_VALUE*pow(Rnew,2.0) -  GetValue(*ts,LGAA);
 	
 	//Mass of the new sapwood 
 	double Wsnew = GetValue(GetTree(*ts),rho)*Asnew*GetValue(*ts,L); 
 	//Down goes new plus existing sapwood area 
-	SetValue(data,As,Asnew+GetValue(*ts,As)); 
+	SetValue(data,LGAAs,Asnew+GetValue(*ts,LGAAs)); 
 	//Mass of sapwood used in diamater growth
 	SetValue(data,DGWs,GetValue(data,DGWs)+Wsnew);
 	//Total foliage

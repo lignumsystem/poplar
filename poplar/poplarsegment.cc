@@ -97,7 +97,7 @@ void poplarsegment::respiration()
   //**respiration for wooden part, effect of nitrogen in HwTreeSegmentMetabilismI.h***//
   //**ms-- maintenance respiration rate of sapwood
   //**ws--  mass of sapwood
-   m_hw += GetValue(t,ms)*GetValue(*this,Ws) * tt.tf.nitroRespiration(nit_wood);
+   m_hw += GetValue(t,ms)*GetValue(*this,LGAWs) * tt.tf.nitroRespiration(nit_wood);
    SetValue(*this, M, m_hw);
    // cout<<"  "<< GetValue(t,ms)*GetValue(*this,Ws)<<endl;
 }
