@@ -77,7 +77,7 @@ class poplarbud : public Bud<poplarsegment, poplarbud>
  public:
   poplarbud(const Point& p, const PositionVector& d, const LGMdouble omege, 
 	    Tree<poplarsegment, poplarbud>* tree)
-    :Bud<poplarsegment,poplarbud>(p,d,omega,tree){}
+    :Bud<poplarsegment,poplarbud>(p,d,LGAomega,tree){}
  private:
   //poplar specific bud attributes and structures here
   //initialize in constructor
@@ -186,14 +186,14 @@ public:
 	 //TreeQinMax should work also for open trees: TreeQinMax should then equal to 
 	 //Ball sensor reading
 	 //Open grown branching effect
-	 //double Lq = 1.0-(GetValue(*ts,omega)-1.0)*GetValue(GetTree(*ts),q);
+	 //double Lq = 1.0-(GetValue(*ts,LGAomega)-1.0)*GetValue(GetTree(*ts),q);
 	 //Vigour index
 	  double Lq = GetValue(*ts,LGAvi);
 	 //In Tree Physiology for side branches fp is for example as follows:
 	 //fp = (1-a)f(vi) = (1-0.2)(0.15+0.85vi) = 0.8(0.15+0.85vi)
 	 Lq = apical*(0.15+0.85*Lq);
 	 //experimental forest grown
-	 //double Lq = pow(1.0 - GetValue(GetTree(*ts),q),GetValue(*ts,omega)-1);
+	 //double Lq = pow(1.0 - GetValue(GetTree(*ts),q),GetValue(*ts,LGAomega)-1);
 	 //relative light, if TreeQinMax is ball sensor reading, it is as for open grown pine
 	 // B = GetValue(GetTree(*ts),TreeQinMax); // because don't know what is TreeQinMax
 	 // B=1200;
