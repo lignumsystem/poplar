@@ -62,8 +62,8 @@ int PoplarLeaf::photosynthesis()
        KGC A=Photo*0.000001*0.01*12*0.001*28*24*3600;  //photo * (0.000001 mol)* (0.01 m-2)*12*0.001(kg)*24*3600*days
        // KGC A=Photo-Rd;//  Rd is (umolm-2s-1), so all photosynthesishave to multifilied by leaf area (0.01m-2) and time.
          //   bla.P=A;
-         (*this).bla.P=3*A;
-       //  SetValue(*this, P, A);
+         //(*this).bla.P=3*A;
+       SetValue(*this, LGAP, A);
 	 //** cout <<"print the photosynthesis of segment: "<<GetValue(*this, LGAP)<<endl; 
   
   return 1;
