@@ -54,10 +54,16 @@ all: gnupoplar
 sinclude Makedepend
 
 gnupoplar: 
+	(cd ../LEngine; make gnu)
 	make "CCC=g++" "CCCFLAGS=-c" "OPTIMIZE=-g" \
               "AR=ar"  "ARFLAGS=rvs"  "LSYS=$(LSYS)" "LIBD=lib32" poplar
 
-poplar: l2c $(POPLAROBJ) $(LIB1) $(LIB2) $(LIB3)  $(LIB4) $(LIB5) $(LIB6)  
+sgipoplar: 
+	(cd ../LEngine; make lengine)
+	make "CCC=CC -64 -LANG:std " "CCCFLAGS=-c" "OPTIMIZE=-g" \
+             "AR=CC -64 -LANG:std -ar"  "ARFLAGS=-o"  "LSYS=$(LSYS)" "LIBD=lib64" poplar
+
+poplar: $(POPLAROBJ) $(LIB1) $(LIB2) $(LIB3)  $(LIB5) $(LIB6)  
 	$(CCC)  -o $@ $(INCLUDE) $(OPTIMIZE) $(POPLAROBJ) $(LIBFLAGS) $(LIBS)
 
 l2c:	
@@ -103,7 +109,7 @@ clean:
 distclean: clean
 	rm -rf  $(LIB4) Makedepend
 	(cd ../Graphics; make distclean)
-	(cd ../LEngine/L2C; make distclean)
+	(cd ../LEngine; make distclean)
 depend:
 	(cd ../Graphics; make "CCC=$(CCC)"  depend)
 	(cd ../LEngine/L2C; make "CCC=$(CCC)"  depend)
