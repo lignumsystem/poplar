@@ -79,13 +79,13 @@ int main(int argc, char** argv)
   //Create Leaves (Ellipse)
   AccumulateDown(poplartree,pv,
 		 AppendSequence<vector<PositionVector> >(),
-		 CreateLeaves<poplarsegment,poplarbud,Ellipse>(0.5,0.5,0.5));
+		 CreateTriangleLeaves<poplarsegment,poplarbud,Triangle>(0.5,0.5,0.5));
 
   Firmament& f = GetFirmament(poplartree);
   //resize:  inclinations,  azimuths,  MJ/year
-  f.resize(10,10,1200);
+  f.resize(40,20,1200);
   //Compare Leaves
-  ForEach(poplartree,ForEachLeafCompare<poplarsegment,poplarbud,Ellipse>());
+  ForEach(poplartree,ForEachLeafCompare<poplarsegment,poplarbud,Triangle>());
   //Demonstration of Algorithms for root system
   ForEach(GetRootAxis(poplartree),
 	  EchoCompartmentName<Tree<poplarsegment,poplarbud> >());

@@ -42,13 +42,13 @@ LGMdouble CollectPhotosynthates::operator ()(LGMdouble& init, TreeCompartment<po
 {
   if (poplarsegment* ps=dynamic_cast<poplarsegment*> (tc)){
     LGMdouble start = 0.0;
-    list<BroadLeaf<Ellipse>*> leaves=GetLeafList(*ps);
+    list<BroadLeaf<Triangle>*> leaves=GetLeafList(*ps);
     init = init + accumulate(leaves.begin(), leaves.end(),start,CollectLeafPhotosynthates());
   }
   return init;
 }
 
-LGMdouble& CollectLeafPhotosynthates::operator()(LGMdouble& init, BroadLeaf<Ellipse>* l)const
+LGMdouble& CollectLeafPhotosynthates::operator()(LGMdouble& init, BroadLeaf<Triangle>* l)const
 {
   init=init+GetValue(*l,P);
   return init;
@@ -58,7 +58,7 @@ LGMdouble CollectRespiration::operator()(LGMdouble& init,TreeCompartment<poplars
 {
   if (poplarsegment* ps=dynamic_cast<poplarsegment*> (tc)){
     LGMdouble start=0.0;
-    list<BroadLeaf<Ellipse>*> leaves=GetLeafList(*ps);
+    list<BroadLeaf<Triangle>*> leaves=GetLeafList(*ps);
     init=init+accumulate(leaves.begin(), leaves.end(), start, CollectLeafRespiration());
     init=init+GetValue(*ps, M);
   }
@@ -66,7 +66,7 @@ LGMdouble CollectRespiration::operator()(LGMdouble& init,TreeCompartment<poplars
 }
 
 
-LGMdouble& CollectLeafRespiration::operator()(LGMdouble& init, BroadLeaf<Ellipse>* l)const
+LGMdouble& CollectLeafRespiration::operator()(LGMdouble& init, BroadLeaf<Triangle>* l)const
 {
   init=init+GetValue(*l,M);
   return init;
@@ -100,7 +100,7 @@ UnitPM& CollectPAndM::operator ()(UnitPM& init, TreeCompartment<poplarsegment, p
 {
   if (poplarsegment* ps=dynamic_cast<poplarsegment*> (tc)){
     UnitPM start(0.0, 0.0);
-    list<BroadLeaf<Ellipse>*> leaves=GetLeafList(*ps);
+    list<BroadLeaf<Triangle>*> leaves=GetLeafList(*ps);
     init+=accumulate(leaves.begin(), leaves.end(), start, CollectLeafPM());
     start.p=GetValue(*ps, P);
     start.m=GetValue(*ps, M);
@@ -109,7 +109,7 @@ UnitPM& CollectPAndM::operator ()(UnitPM& init, TreeCompartment<poplarsegment, p
   return init;
 }
  
-UnitPM& CollectLeafPM::operator()(UnitPM& init, BroadLeaf<Ellipse>* l)const
+UnitPM& CollectLeafPM::operator()(UnitPM& init, BroadLeaf<Triangle>* l)const
 {
   UnitPM pm(0.0, 0.0);
   pm.p=GetValue(*l,P);
