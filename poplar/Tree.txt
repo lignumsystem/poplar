@@ -2,7 +2,7 @@
 #paper accepted in Ecological Modelling 1996
 
 LGPaf      1.30        #Needle mass - tree segment area (kg/m^2)relationship
-ar      0.50        #Foliage - root relationship 
+LGPar      0.50        #Foliage - root relationship 
 lr      0.01        #Length - radius relationship (R=lr*L) of a tree segment
 mf      0.24        #Maintenance respiration rate of foliage
 mr      0.240       #Maintenance respiration rate of roots
