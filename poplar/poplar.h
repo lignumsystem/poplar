@@ -225,7 +225,7 @@ public:
 	 double L_new = l*Lq; // = l*Lq*fip(GetValue(*ts,Qin)/B);  there are some problem for fip function so take fip()=1
          
 	 L_new = max(L_new,0.0);
-	  SetValue(*ts,LGAL,L_new);
+	 SetValue(*ts,LGAL,L_new);
 	 //Initial radius
 	 SetValue(*ts,LGAR,GetValue(GetTree(*ts),lr)*L_new);
 	 //Reset previous Rh!!!!
@@ -233,9 +233,11 @@ public:
 	 //Initial heartwood
 	 SetValue(*ts,LGARh,sqrt((GetValue(GetTree(*ts),LGPxi)*GetValue(*ts,LGAAs))/PI_VALUE));
 	 //Initial foliage
-	 SetValue(*ts,LGAWf,GetValue(GetTree(*ts),LGPaf)*GetValue(*ts,LGASa));
+	 //NOTE: HwTree does not have SetValue for LGAWf!!!
+	 //SetValue(*ts,LGAWf,GetValue(GetTree(*ts),LGPaf)*GetValue(*ts,LGASa));
  	 //Remember original sapwood area As0
-	 SetValue(*ts,LGAAs0,GetValue(*ts,LGAAs)); 
+	 //NOTE: HwTree does not have LGAAs0!!!!!
+	 //SetValue(*ts,LGAAs0,GetValue(*ts,LGAAs)); 
 	 // cout<<GetValue(*ts, As)<<"check radius of segment................"<<GetValue(*ts, LGAR)<<endl;
 	 }
      }//segment
