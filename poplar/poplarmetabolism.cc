@@ -50,7 +50,7 @@ LGMdouble CollectPhotosynthates::operator ()(LGMdouble& init, TreeCompartment<po
 
 LGMdouble& CollectLeafPhotosynthates::operator()(LGMdouble& init, BroadLeaf<Triangle>* l)const
 {
-  init=init+GetValue(*l,P);
+  init=init+GetValue(*l,LGAP);
   return init;
 }
 
@@ -102,7 +102,7 @@ UnitPM& CollectPAndM::operator ()(UnitPM& init, TreeCompartment<poplarsegment, p
     UnitPM start(0.0, 0.0);
     list<BroadLeaf<Triangle>*> leaves=GetLeafList(*ps);
     init+=accumulate(leaves.begin(), leaves.end(), start, CollectLeafPM());
-    start.p=GetValue(*ps, P);
+    start.p=GetValue(*ps,LGAP);
     start.m=GetValue(*ps,LGAM);
     init+=start;
   }
@@ -112,7 +112,7 @@ UnitPM& CollectPAndM::operator ()(UnitPM& init, TreeCompartment<poplarsegment, p
 UnitPM& CollectLeafPM::operator()(UnitPM& init, BroadLeaf<Triangle>* l)const
 {
   UnitPM pm(0.0, 0.0);
-  pm.p=GetValue(*l,P);
+  pm.p=GetValue(*l,LGAP);
   pm.m=GetValue(*l,LGAM);
   init+=pm;
   return init;
