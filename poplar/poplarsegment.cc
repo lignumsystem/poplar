@@ -1,13 +1,12 @@
 #include <poplar.h>
 
-
-//void BroadLeaf<Triangle>::photosynthesis(const LGMdouble& p0)
-//{  
+// void BroadLeaf<Triangle>::photosynthesis(const LGMdouble& p0)
+// {  
 //  cout << "poplarleaf photosynthesis "<< endl; 
 //    bla.P = p0 *(bla.Qabs);
-//}
+// }
 
-
+template<>
 void BroadLeaf<Triangle>::photosynthesis(const LGMdouble& p0)
 {
   // cout << "poplarleaf photosynthesis "<< endl;
