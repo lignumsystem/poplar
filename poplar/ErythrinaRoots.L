@@ -17,10 +17,10 @@ open Erythrina;
 #include <lsys.h>
 
 
-const int STEPS=30;
+const int STEPS=100;
 const double ALPHA=0.99;
 const double Q=0.72;
-const double DMIN=0.1; //minimum diameter
+const double DMIN=0.01; //minimum diameter
 
 const int RAM=0;
 const int AXE=1;
@@ -61,7 +61,7 @@ derivation length: STEPS;
 Start: 
 { 
    seed = 1;
-   produce B(0.25,0.50);
+   produce Pitch(PI_VALUE) B(0.25,0.50);
 }
 
 
