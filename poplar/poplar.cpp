@@ -36,7 +36,7 @@ Bernoulli ber( -1);
  const ModuleIdType Roll_id = 6;
 
 //Define the derivation length
-int DerivationLength() { return  15;}
+int DerivationLength() { return  30;}
 
 //Define the Start corresponding to the axiom
 void Start()
@@ -72,9 +72,15 @@ void End()
   if (order == 0){
    int seed = 1111111;
    double b=ber(0.3, seed);
-   double r = g1(10.0, 1.0, seed);
-   double I = g2(36.0, 5.0, seed);
-   double A = g3(167.0, 105.0, seed);
+
+  // double r = g1(10.0, 1.0, seed);  //for trees in stand
+  // double I = g2(36.0, 5.0, seed);
+  // double A = g3(167.0, 105.0, seed);
+
+   double r = g1(5.5, 3.0, seed);  //for trees in stand
+   double I = g2(45.0, 21.0, seed);
+   double A = g3(186.0, 93.0, seed);
+
   // cout << "r " << r << " I " << I << " A " << A << endl;
    { Produce((ModuleIdType)(F_id));Produce((double)(r/100.0));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)((90-I)*PI_VALUE/180));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((double)(1.0));Produce((double)( alive));Produce((double)(order+1.0));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id)); 
            Produce((ModuleIdType)(B_id));Produce((double)(0.0));Produce((double)( alive));Produce((double)(order));Produce((ModuleIdType)(B_id));}

@@ -34,7 +34,7 @@ TreeCompartment<poplarsegment, poplarbud>* DoPhotosynthesis::operator ()(TreeCom
 
 TreeCompartment<poplarsegment, poplarbud>* DoRespiration::operator ()(TreeCompartment<poplarsegment, poplarbud>* tc)const
 {
-  tc->respiration();
+    tc->respiration();
   return tc;
 }
 

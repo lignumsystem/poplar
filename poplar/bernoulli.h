@@ -1,4 +1,4 @@
-/***************************** STOCC.H ************************* 2001-10-24 AF *
+/********************bernoulli.h from STOCC.H ***************** 2001-10-24 AF *
 *
 * This file contains class declarations for the C++ library of non-uniform
 * random number generators. Most functions are fast and accurate, even for

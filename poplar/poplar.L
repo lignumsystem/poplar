@@ -35,7 +35,7 @@ module Turn(double);
 module Roll(double);
 
 //Define the derivation length
-derivation length: 15;
+derivation length: 30;
 
 //Define the Start corresponding to the axiom
 Start:
@@ -71,9 +71,15 @@ B(leaf, alive,order):
   if (order == 0){
    int seed = 1111111;
    double b=ber(0.3, seed);
-   double r = g1(10.0, 1.0, seed);
-   double I = g2(36.0, 5.0, seed);
-   double A = g3(167.0, 105.0, seed);
+
+  // double r = g1(10.0, 1.0, seed);  //for trees in stand
+  // double I = g2(36.0, 5.0, seed);
+  // double A = g3(167.0, 105.0, seed);
+
+   double r = g1(5.5, 3.0, seed);  //for trees in stand
+   double I = g2(45.0, 21.0, seed);
+   double A = g3(186.0, 93.0, seed);
+
   // cout << "r " << r << " I " << I << " A " << A << endl;
    produce F(r/100.0) SB() Roll(A*PI_VALUE/180.0) Pitch((90-I)*PI_VALUE/180) B(1.0, alive,order+1.0) EB() 
            B(0.0, alive,order);

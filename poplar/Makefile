@@ -1,4 +1,4 @@
-POPLARSRC = poplarmain.cc poplarmetabolism.cc poplarsegment.cc bernoulli.cc
+POPLARSRC = poplarmain.cc poplarmetabolism.cc poplarsegment.cc bernoulli.cc 
 POPLAROBJ = ${POPLARSRC:.cc=.o}
 
 LSYS = poplar.L ErythrinaRoots.L
@@ -11,20 +11,25 @@ CCC = g++
 OPTIMIZE   = -g 
 
 AR =  $(CCC) -ar  
-ARFLAGS = -o 
+ARFLAGS = -o   
 
 SUPPRESS = #-w 1155 -w 1183
 
 CCCFLAGS = -c  #-prelink -ptused   -ptv  #  -fullwarn 
 
 INCLUDE = -I../c++adt/include -I../Firmament/include \
-          -I../stl-lignum/include  -I../LEngine/include \
-          -I../Graphics -I../stl-voxelspace/include \
-          -I../ScotsPine/include -I/usr/freeware/include -I/usr/X11R6/include \
-          -I/sw/include -I.
+	-I../stl-lignum/include  -I../LEngine/include \
+	-I../stl-voxelspace/include \
+	-I../Graphics -I/usr/freeware/include -I/usr/X11R6/include \
+	-I../Graphics -I../stl-voxelspace/include \
+	-I../ScotsPine/include -I/usr/freeware/include -I/usr/X11R6/include \
+          -I/sw/include -I.	
+
 
 LIBD=lib64
 LIBFLAGS =  -L../c++adt/lib -L../stl-lignum/lib -L../Firmament/lib \
+	-L. -L../LEngine/lib -L../Graphics \
+	   -L../stl-voxelspace/lib \
            -L. -L../LEngine/lib -L../Graphics -L../stl-voxelspace/lib\
            -L/usr/freeware/$(LIBD) -L/usr/X11R6/lib -L/sw/lib
 

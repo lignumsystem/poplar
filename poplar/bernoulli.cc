@@ -1,4 +1,13 @@
+//<<<<<<< bernoulli.cc
+/***********************************************************************
+                     bernoulli.cc
+ bernoulli is a member function of StochasticLib Class, and can create a
+integer 0 or 1 with probability p.
+***********************************************************************/
+
+//=======
 #include <iostream>
+//>>>>>>> 1.3
 #include "bernoulli.h"
 #include <cmath>
 #include "randomc.h"
@@ -14,7 +23,11 @@ StochasticLib::StochasticLib (int seed)
     double sum = 0;
     fac_table[0] = 0;
     for (int i=1; i<FAK_LEN; i++) {
+      //<<<<<<< bernoulli.cc
+      sum += log(static_cast<double>(i)); 
+      //=======
       sum += log(static_cast<double>(i));
+      //>>>>>>> 1.3
       fac_table[i] = sum;}}}
 
 /***********************************************************************

@@ -89,9 +89,6 @@ class poplarbud : public Bud<poplarsegment, poplarbud>
   // bla.P = p0 * bla.Qabs;
 //}
 
-
-
-
 class PoplarLeafPhotosynthesis
 {
 public:
@@ -103,5 +100,240 @@ class PoplarLeafRespiration
  public:
   void operator()(BroadLeaf<Triangle>* bl);
 };
+
+
+
+
+enum DGAD {DGWs, DGWf, DGWfnew};
+
+class DiameterGrowthData:public TcData{
+  friend double GetValue(const DiameterGrowthData& dgd, DGAD name);
+  friend double SetValue(DiameterGrowthData& dgd, DGAD name, double value);
+public:
+  DiameterGrowthData():Ws(0.0),Wf(0.0),Wfnew(0.0){}
+  DiameterGrowthData& operator=(TcData& tcd)
+  {
+    DiameterGrowthData& dgd = dynamic_cast<DiameterGrowthData&>(tcd);
+    SetValue(*this,As,GetValue(dgd,As)); 
+    SetValue(*this,DGWs,GetValue(dgd,DGWs));
+    SetValue(*this,DGWf,GetValue(dgd,DGWf));
+    SetValue(*this,DGWfnew,GetValue(dgd,DGWfnew));
+    return *this;
+  }
+  DiameterGrowthData& operator+=(TcData& tcd)
+  {
+    DiameterGrowthData& dgd = dynamic_cast<DiameterGrowthData&>(tcd);
+    SetValue(*this,As,GetValue(*this,As)+GetValue(dgd,As));
+    SetValue(*this,DGWs,GetValue(*this,DGWs)+GetValue(dgd,DGWs));
+    SetValue(*this,DGWf,GetValue(*this,DGWf)+GetValue(dgd,DGWf));
+    SetValue(*this,DGWfnew,GetValue(*this,DGWfnew)+GetValue(dgd,DGWfnew));
+    return *this;
+  }
+  void clear(){
+    SetValue(*this,As,0.0);
+    SetValue(*this,DGWs,0.0);
+    SetValue(*this,DGWf,0.0);
+    SetValue(*this,DGWfnew,0.0);
+  }
+private:
+  double Ws,Wf,Wfnew;//Sapwood, total foliage and new foliage mass. 
+};
+
+inline double GetValue(const DiameterGrowthData& dgd, DGAD name)  
+{
+  if (name == DGWs)
+    return dgd.Ws;
+  else if (name == DGWf)
+    return dgd.Wf;
+  else if (name == DGWfnew)
+    return dgd.Wfnew;
+  else{
+    cout << " DiameterGrowthData GetValue unknown name:" << endl;
+    return -1.0;
+  }
+}
+ 
+inline double SetValue(DiameterGrowthData& dgd, DGAD name, double value)  
+{
+  double old_value = GetValue(dgd,name);
+  if (name == DGWs)
+    dgd.Ws = value;
+  else if (name == DGWf)
+    dgd.Wf = value;
+  else if (name == DGWfnew)
+    dgd.Wfnew = value;
+  return old_value;
+}
+   
+
+template <class TS,class BUD>
+class SetSegmentLength{
+public:
+  SetSegmentLength(double lamda):l(lamda),apical(1.0){}
+  SetSegmentLength& operator=(const SetSegmentLength& sl){
+    l = sl.lamda;
+    apical = sl.apical;
+    return *this;
+  }
+  TreeCompartment<TS,BUD>* operator()(TreeCompartment<TS,BUD>* tc)const
+  {
+      if (TS* ts = dynamic_cast<TS*>(tc)){
+	  if (GetValue(*ts,age) == 0.0){
+	     Firmament& f = GetFirmament(GetTree(*ts));
+	 double B = f.diffuseBallSensor();
+	 const ParametricCurve& fip = GetFunction(GetTree(*ts),LGMIP);
+	 //Omega starts from 1 
+	 //TreeQinMax should work also for open trees: TreeQinMax should then equal to 
+	 //Ball sensor reading
+	 //Open grown branching effect
+	 //double Lq = 1.0-(GetValue(*ts,omega)-1.0)*GetValue(GetTree(*ts),q);
+	 //Vigour index
+	  double Lq = GetValue(*ts,vi);
+	 //In Tree Physiology for side branches fp is for example as follows:
+	 //fp = (1-a)f(vi) = (1-0.2)(0.15+0.85vi) = 0.8(0.15+0.85vi)
+	 Lq = apical*(0.15+0.85*Lq);
+	 //experimental forest grown
+	 //double Lq = pow(1.0 - GetValue(GetTree(*ts),q),GetValue(*ts,omega)-1);
+	 //relative light, if TreeQinMax is ball sensor reading, it is as for open grown pine
+	 // B = GetValue(GetTree(*ts),TreeQinMax); // because don't know what is TreeQinMax
+	 // B=1200;
+         //0.8 describes the effect of branching  
+	 double L_new = l*Lq; // = l*Lq*fip(GetValue(*ts,Qin)/B);  there are some problem for fip function so take fip()=1
+         
+	 L_new = max(L_new,0.0);
+	  SetValue(*ts,L,L_new);
+	 //Initial radius
+	 SetValue(*ts,R,GetValue(GetTree(*ts),lr)*L_new);
+	 //Reset previous Rh!!!!
+	 SetValue(*ts,Rh,0.0);
+	 //Initial heartwood
+	 SetValue(*ts,Rh,sqrt((GetValue(GetTree(*ts),xi)*GetValue(*ts,As))/PI_VALUE));
+	 //Initial foliage
+	 SetValue(*ts,Wf,GetValue(GetTree(*ts),af)*GetValue(*ts,Sa));
+ 	 //Remember original sapwood area As0
+	 SetValue(*ts,As0,GetValue(*ts,As)); 
+	 cout<<GetValue(*ts, As)<<"check radius of segment................"<<GetValue(*ts, R)<<endl;
+	 }
+     }//segment
+     else if (Axis<TS,BUD>* axis = dynamic_cast<Axis<TS,BUD>*>(tc)){
+      list<TreeCompartment<TS,BUD>*> & ls = GetTreeCompartmentList(*axis);
+	 //new brancing [TS,BP,B]
+	 if (ls.size() == 3)
+	   apical = 0.8;
+	 //old branch
+	 else
+	 apical = 1.0;
+	   }
+     return tc;
+  }
+private:
+  double l;//Lamda to iterate segment lengths
+  mutable double apical; //Apical dominance, 1 or less, e.g. 0.8
+};
+
+//This  is must be  the same  as diameterGrowth  method, but  we can't
+//change the segment's dimensions.
+template <class TS,class BUD>
+class TryDiameterGrowth{
+public:
+  DiameterGrowthData& operator()(DiameterGrowthData& data, TreeCompartment<TS,BUD>* tc)const
+  {
+    if (TS* ts = dynamic_cast<TS*>(tc)){
+      if (GetValue(*ts,age) == 0){//New segment
+	//Collect the masses
+	SetValue(data,DGWfnew,GetValue(*ts,Wf));
+	SetValue(data,DGWf,GetValue(*ts,Wf));
+	SetValue(data,DGWs,GetValue(*ts,Ws));
+	//Sapwood requirement
+	SetValue(data,As,GetValue(*ts,As));
+      }
+      else{//old segment
+	const ParametricCurve& fm = GetFunction(GetTree(*ts),LGMFM);
+	//Sapwood requirement of  remaining foliage, assume fm returns
+	//proportion of initial foliage present, declining function of
+	//age from 1 to 0.
+	LGMdouble Asr = fm(GetValue(*ts,age))*GetValue(*ts,As0);
+	//sapwood area from above
+	LGMdouble Asu = GetValue(data,As); 
+	//own heartwood, assume aging has done
+	LGMdouble Ahown  = GetValue(*ts,Ah);
+	//requirement for new radius: sapwood above + own heartwood + own foliage 
+	LGMdouble Rnew = sqrt((Asu + Ahown + Asr)/PI_VALUE);
+	//compare Rnew to R, choose max
+	Rnew = max(Rnew, GetValue(*ts,R));
+	//New sapwood requirement, thickness growth
+	double Asnew = PI_VALUE*pow(Rnew,2.0) -  GetValue(*ts,A);
+	
+	//Mass of the new sapwood 
+	double Wsnew = GetValue(GetTree(*ts),rho)*Asnew*GetValue(*ts,L); 
+	//Down goes new plus existing sapwood area 
+	SetValue(data,As,Asnew+GetValue(*ts,As)); 
+	//Mass of sapwood used in diamater growth
+	SetValue(data,DGWs,GetValue(data,DGWs)+Wsnew);
+	//Total foliage
+	SetValue(data,DGWf,GetValue(data,DGWf)+GetValue(*ts,Wf));
+      }
+    }
+    return data;
+  }
+};
+
+
+//LPineGrowthFunction  will  implement in  the  function operator  the
+//elongation/shortening of  segments, simulation of  diameter and root
+//growth.   The it  returns  P-M-G.   Use it  with  some root  finding
+//algorithm.  For  example Bisection. See function  operator that does
+//the job.
+template <class TS,class BUD>
+class PoplarGrowthFunction{
+public:
+  PoplarGrowthFunction(Tree<TS,BUD>& tree):t(tree),P(-1.0),M(-1.0){}
+  double operator()(double l);
+  void init();
+  double getP()const{return P;}
+  double getM()const{return M;}
+private:
+  Tree<TS,BUD>& t;
+  double P;
+  double M;
+};
+
+
+//Collect photosynthates and respiration once per growth allocation.
+template <class TS,class BUD>
+void PoplarGrowthFunction<TS,BUD>::init()
+{
+  double p = 0.0;
+  P = Accumulate(t,p,SumTreePhotosynthesis<TS,BUD>());
+  double m = 0.0;
+  M =  Accumulate(t,m,SumTreeRespiration<TS,BUD>());
+  //if (P <= M)
+  //cout << "P: " << P << " M: " << M << " P-M: " << P-M << endl;
+} 
+
+template <class TS,class BUD>
+double PoplarGrowthFunction<TS,BUD>::operator()(double l)
+{
+  DiameterGrowthData data;
+  
+
+  //1.Elongate or shorten segment lengths
+  ForEach(t,SetSegmentLength<TS,BUD>(l));
+
+  //2. Simulate  diameter  growth  and  collect  sapwood  and  foliage
+  //masses.
+  data = AccumulateDown(t,data,TryDiameterGrowth<TS,BUD>());   
+  
+
+  //3. return P-M-G where G = iWs(l) + iWfnew(l) + iWrnew(l)
+  //iWs = sapwood mass: new segments + thickening
+  //iWfnew = new foliage
+  //iWrnew = new roots = ar*iWfnew
+ 
+  return P - M - GetValue(data,DGWs) - GetValue(data,DGWfnew) - GetValue(t,ar)* GetValue(data,DGWfnew);
+}
+
+
+
 
 #endif

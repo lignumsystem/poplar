@@ -67,6 +67,7 @@ class UnitPM
   LGMdouble m;
 };
 
+//template <class TS, class BUD>
 class CollectPAndM
 {
  public:
