@@ -32,7 +32,7 @@ module Turn(double);
 module Roll(double);
 
 //Define the derivation length
-derivation length: 81;
+derivation length: 40;
 
 //Define the Start corresponding to the axiom
 Start:
