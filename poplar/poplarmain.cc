@@ -1,6 +1,4 @@
-//#include "randomc.h"
 #include <Bernoulli.h>
-//#include <berncreator.h>
 #include <iostream>
 
 //Include Lignum implementation 
@@ -20,7 +18,7 @@
 
 //Impelements  VisualizeLGMTree.  Visualization  may and  probaly will
 //change in the future so the header file name may be something else.
-#include <OpenGLUnix.h>
+//#include <OpenGLUnix.h>
 
 //Includes all kinds of stuff, turtle graphics etc.
 //Include this always for your program
@@ -125,12 +123,12 @@ int main(int argc, char** argv)
 
     //weather data read begin:
 
-    for (int month=0; month<12; month++)
+    // for (int month=0; month<12; month++)
       {
     vs.reset();
     dumpPopTree(vs, poplartree);   
 
-    fFile = fopen (filename[month], "r");
+    fFile = fopen("weatherdata.dat", "r");  // (filename[month], "r");
     if (fFile==NULL)
       exit(1);
     
@@ -140,7 +138,7 @@ int main(int argc, char** argv)
 	if(j<6)
 	  {
             fscanf(fFile, "%f %f %f %f %f %f %f %f\n", &a, &b, &c, &d, &e, &ff, &g, &h);
-            cout<<a<<" "<<b<<" "<<c<<" "<<d<<" "<<e<<" "<<ff<<" "<<g<<endl;
+	    // cout<<a<<" "<<b<<" "<<c<<" "<<d<<" "<<e<<" "<<ff<<" "<<g<<endl;
 	    direct += e/6;
             diffuse += ff/6; 
             j++;
@@ -253,7 +251,7 @@ int main(int argc, char** argv)
   //But because you know OpenGL you probably can visualize the tree
   //yourself! Let us know if you do so, we probly use it!
 
-         VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);
+  //  VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);
 
 
 }
