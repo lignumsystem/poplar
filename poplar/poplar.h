@@ -227,7 +227,7 @@ public:
 	 L_new = max(L_new,0.0);
 	 SetValue(*ts,LGAL,L_new);
 	 //Initial radius
-	 SetValue(*ts,LGAR,GetValue(GetTree(*ts),lr)*L_new);
+	 SetValue(*ts,LGAR,GetValue(GetTree(*ts),LGPlr)*L_new);
 	 //Reset previous Rh!!!!
 	 SetValue(*ts,LGARh,0.0);
 	 //Initial heartwood
