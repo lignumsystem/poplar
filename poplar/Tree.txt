@@ -8,12 +8,12 @@ mf      0.24        #Maintenance respiration rate of foliage
 mr      0.240       #Maintenance respiration rate of roots
 ms      0.0240      #Maintenance respiration rate of sapwood
 na      0.7854      #Needle angle (pi/4)
-nl      0.04        #Needle length (10 cm = 0.10 m) 
-q       0.10        #Tree segment shortening factor
+LGPnl      0.04        #Needle length (10 cm = 0.10 m) 
+LGPq       0.10        #Tree segment shortening factor
 LGPsr      0.330       #Senescence rate of roots
 LGPss      0.07        #Senescence rate of sapwood
 LGPrhoW     400.0       #Density (kg/m3) of wood in tree segment
-pr      0.0010      #Proportion of bound solar radiation that is
+LGPpr      0.0010      #Proportion of bound solar radiation that is
                     #used in photosynthesis
 LGPxi      0.60        #Fraction of heartwood in tree segments
 LGPzbrentEpsilon    0.001    #Accuracy for finding root of P-M-dW(lambda)
