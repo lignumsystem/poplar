@@ -121,7 +121,9 @@ int main(int argc, char** argv)
    float a, b, c, d, e, ff, g, h;
    float direct, diffuse;
 
-   char * filename[12]={"jan.dat", "feb.dat", "mar.dat", "apr.dat", "may.dat", "jun.dat", "jul.dat", "aug.dat", "sep.dat", "oct.dat", "nov.dat", "dec.dat" };
+   char * filename[12]={"jan.dat", "feb.dat", "mar.dat", "apr.dat", 
+			"may.dat", "jun.dat", "jul.dat", "aug.dat", 
+			"sep.dat", "oct.dat", "nov.dat", "dec.dat" };
 
   for (int i=0; i < 3; i++) // poplarL.derivationLength()--yearly
   //for (int i=0; i < 7 ; i++)
@@ -186,16 +188,15 @@ int main(int argc, char** argv)
     cout << "derive done " << endl;
     //Update tree so that structures match
     ForEach(poplartree,TreeAging<poplarsegment,poplarbud>());
-       G.init();
-       cout<<"init done"<<endl;
-       // cout << "Bisection zero at:  " << Bisection(0.0,10.0,G) << endl;
-       //    Bisection(0.0, 50.0, G);
-       ForEach(poplartree, SetSegmentLength<poplarsegment, poplarbud>(1.0)); //defined in poplar.h
+    G.init();
+    cout<<"init done"<<endl;
+    // cout << "Bisection zero at:  " << Bisection(0.0,10.0,G) << endl;
+    //    Bisection(0.0, 50.0, G);
+    ForEach(poplartree, SetSegmentLength<poplarsegment, poplarbud>(1.0)); //defined in poplar.h
 
     TcData data;
     AccumulateDown(poplartree,data,TreeDiameterGrowth<poplarsegment,poplarbud>());
     // cout<<".....................TcData............."<<GetValue(data, As)<<endl;
-
 
     poplarL.lstringToLignum(poplartree,1,LGAstatus);
     rootL.lstringToRootSystem(poplartree);
@@ -203,8 +204,8 @@ int main(int argc, char** argv)
 
     pv.clear();
     AccumulateDown(poplartree,pv,
-  	 AppendSequence<vector<PositionVector> >(),
-  	 CreateTriangleLeaves<poplarsegment,poplarbud,Triangle>(0.2,0.1,0.1));
+		   AppendSequence<vector<PositionVector> >(),
+		   CreateTriangleLeaves<poplarsegment,poplarbud,Triangle>(0.2,0.1,0.1));
       }
 
   }
