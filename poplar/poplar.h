@@ -201,7 +201,7 @@ public:
 	 double L_new = l*Lq; // = l*Lq*fip(GetValue(*ts,Qin)/B);  there are some problem for fip function so take fip()=1
          
 	 L_new = max(L_new,0.0);
-	  SetValue(*ts,L,L_new);
+	  SetValue(*ts,LGAL,L_new);
 	 //Initial radius
 	 SetValue(*ts,R,GetValue(GetTree(*ts),lr)*L_new);
 	 //Reset previous Rh!!!!
@@ -265,7 +265,7 @@ public:
 	double Asnew = PI_VALUE*pow(Rnew,2.0) -  GetValue(*ts,LGAA);
 	
 	//Mass of the new sapwood 
-	double Wsnew = GetValue(GetTree(*ts),rho)*Asnew*GetValue(*ts,L); 
+	double Wsnew = GetValue(GetTree(*ts),rho)*Asnew*GetValue(*ts,LGAL); 
 	//Down goes new plus existing sapwood area 
 	SetValue(data,LGAAs,Asnew+GetValue(*ts,LGAAs)); 
 	//Mass of sapwood used in diamater growth
