@@ -25,9 +25,8 @@ INCLUDE = -I../c++adt/include -I../Firmament/include \
 
 LIBD=lib64
 LIBFLAGS =  -L../c++adt/lib -L../stl-lignum/lib -L../Firmament/lib \
-           -L. -L../LEngine/lib -L../Graphics \
+           -L. -L../LEngine/lib -L../Graphics -L../stl-voxelspace/lib\
            -L/usr/freeware/$(LIBD) -L/usr/X11R6/lib -L/sw/lib
-           
 
 LIB1   = libc++adt.a
 LIB2   = libLGM.a
@@ -35,6 +34,7 @@ LIB3   = libsky.a
 LIB4   = libL.a
 LIB5   = libVisual.a
 LIB6   = liblsys.a
+LIB7   = libvoxel.a
 
 LIBADT = -lc++adt
 LIBLGM = -lLGM
@@ -43,11 +43,11 @@ LIBL   = -lL
 LIBMATH  = -lm 
 LIBVISUAL = -lVisual
 LIBLSYS = -llsys
-
+LIBVOX = -lvoxel
 LIBOGL =  -lglut -lGLU -lGL -lXmu -lXext -lX11
 
-LIBS     =  $(LIBVISUAL) $(LIBLSYS) $(LIBL) $(LIBLGM) $(LIBSKY) $(LIBADT) $(LIBOGL) \
-            $(LIBMATH)
+LIBS     =  $(LIBVISUAL) $(LIBLSYS) $(LIBL)  $(LIBVOX) $(LIBLGM) \
+            $(LIBSKY) $(LIBADT) $(LIBOGL) $(LIBMATH)
 
 .SUFFIXES: .L .cpp .o .cc  .o .cpp 
 
@@ -67,7 +67,7 @@ sgipoplar:
 	make "CCC=CC -64 -LANG:std" "CCCFLAGS=-c" "OPTIMIZE=$(OPTIMIZE)" \
              "AR=CC -64 -LANG:std -ar"  "ARFLAGS=-o"  "LSYS=$(LSYS)" "LIBD=lib64" poplar
 
-poplar: $(POPLAROBJ) $(LIB1) $(LIB2) $(LIB3)  $(LIB5) $(LIB6)  
+poplar: $(POPLAROBJ) $(LIB1) $(LIB2) $(LIB3)  $(LIB5) $(LIB6)  $(LIB7) 
 	$(CCC)  -o $@ $(INCLUDE) $(OPTIMIZE) $(POPLAROBJ) $(LIBFLAGS) $(LIBS)
 
 l2c:	
@@ -92,7 +92,11 @@ $(LIB5):
          "OPTIMIZE=$(OPTIMIZE)"  "AR=$(AR)"  "ARFLAGS = $(ARFLAGS)" $@)
 
 $(LIB6): $(SRC) $(OBJ)
-	$(AR) $(ARFLAGS) $(@) $(OBJ)    
+	$(AR) $(ARFLAGS) $(@) $(OBJ)   
+
+$(LIB7):
+	(cd ../stl-voxelspace; make "CCC=$(CCC)" "CCCFLAGS=$(CCCFLAGS)" \
+         "OPTIMIZE=$(OPTIMIZE)"  "AR=$(AR)"  "ARFLAGS = $(ARFLAGS)" $@) 
 
 .L.cpp:
 	../LEngine/bin/l2c  $< $@
