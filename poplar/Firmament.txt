@@ -1,0 +1,8 @@
+#Sectors 
+10    #incl
+10    #azim
+1200  #Radiation MJ
+#Gap data follows
+
+
+         
