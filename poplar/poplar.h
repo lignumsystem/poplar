@@ -188,7 +188,7 @@ public:
 	 //Open grown branching effect
 	 //double Lq = 1.0-(GetValue(*ts,omega)-1.0)*GetValue(GetTree(*ts),q);
 	 //Vigour index
-	  double Lq = GetValue(*ts,vi);
+	  double Lq = GetValue(*ts,LGAvi);
 	 //In Tree Physiology for side branches fp is for example as follows:
 	 //fp = (1-a)f(vi) = (1-0.2)(0.15+0.85vi) = 0.8(0.15+0.85vi)
 	 Lq = apical*(0.15+0.85*Lq);
