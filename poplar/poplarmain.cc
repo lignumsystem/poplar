@@ -1,6 +1,6 @@
-#include "randomc.h"
-#include "Bernoulli.h"
-#include <berncreator.h>
+//#include "randomc.h"
+#include <Bernoulli.h>
+//#include <berncreator.h>
 #include <iostream>
 
 //Include Lignum implementation 
