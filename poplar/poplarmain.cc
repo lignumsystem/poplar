@@ -8,13 +8,22 @@
 #include <Bisection.h>
 #include <Shading.h>
 
-
 //Include the implementation of the  tree segment and bud You probably
 //define your own segment and bud in real project for cottonwood.
 #include <poplar.h>
 #include <poplarmetabolism.h>
 #include <VoxelSpace.h>
+#include <VisualFunctor.h>
 
+//Impelements VisualizeLGMTree
+#include <OpenGLUnix.h>
+
+//The three following global  variables create problems when compiling
+//poplar. You may get undefined symbols for _cam_x, _cam_y and _cam_z
+//if commented. If uncommented you may get double decalarations!!!
+// GLfloat cam_x;
+// GLfloat cam_y;
+// GLfloat cam_z;
 
 //Impelements  VisualizeLGMTree.  Visualization  may and  probaly will
 //change in the future so the header file name may be something else.
@@ -86,7 +95,7 @@ int main(int argc, char** argv)
        << "Plant sensor: " <<f.diffusePlaneSensor() <<endl;
 
   //create voxel space 
-   VoxelSpace vs(Point(0,0,0), Point(50, 50, 18), 1, 1, 1, 50, 50, 18,  GetFirmament(poplartree));
+  VoxelSpace vs(Point(0,0,0), Point(50, 50, 18), 1, 1, 1, 50, 50, 18,  GetFirmament(poplartree));
   
 
    vector<PositionVector> pv;
@@ -251,7 +260,7 @@ int main(int argc, char** argv)
   //But because you know OpenGL you probably can visualize the tree
   //yourself! Let us know if you do so, we probly use it!
 
-  //  VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);
+  VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);
 
 
 }
