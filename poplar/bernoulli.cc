@@ -1,8 +1,7 @@
 #include "bernoulli.h"
-
 #include "randomc.h"
 #include <iostream>
-
+using namespace std;
 /***********************************************************************
                       Constructor
 ***********************************************************************/
@@ -14,7 +13,7 @@ StochasticLib::StochasticLib (int seed)
     double sum = 0;
     fac_table[0] = 0;
     for (int i=1; i<FAK_LEN; i++) {
-      sum += log(i);
+      sum += log(static_cast<double>(i));
       fac_table[i] = sum;}}}
 
 /***********************************************************************
