@@ -14,8 +14,8 @@ using namespace std;
 //can have several tree sepecies in a program 
 open poplar;
 
-//lsystem.h impelemnts the rewriting
-#include <lsystem.h>
+//lsys.h impelemnts the rewriting
+#include <lsys.h>
 
 //Then comes the model. This file is compiled to C++ so 
 //you can first have some C++ declarations and definitions 
