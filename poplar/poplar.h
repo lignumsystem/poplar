@@ -207,7 +207,7 @@ public:
 	 //Reset previous Rh!!!!
 	 SetValue(*ts,LGARh,0.0);
 	 //Initial heartwood
-	 SetValue(*ts,LGARh,sqrt((GetValue(GetTree(*ts),xi)*GetValue(*ts,LGAAs))/PI_VALUE));
+	 SetValue(*ts,LGARh,sqrt((GetValue(GetTree(*ts),LGPxi)*GetValue(*ts,LGAAs))/PI_VALUE));
 	 //Initial foliage
 	 SetValue(*ts,LGAWf,GetValue(GetTree(*ts),af)*GetValue(*ts,LGASa));
  	 //Remember original sapwood area As0
