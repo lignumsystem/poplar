@@ -52,8 +52,8 @@ int main(int argc, char** argv)
   //bu naturally  you can ignore  it and derive  as many times  as you
   //want).
   
-  // for (int i=0; i < poplarL.derivationLength() ; i++)
-   for (int i=0; i < 7 ; i++)
+   for (int i=0; i < poplarL.derivationLength() ; i++)
+  //for (int i=0; i < 7 ; i++)
   {
     
     cout << "Step: " << i << endl;  
