@@ -265,7 +265,7 @@ public:
 	double Asnew = PI_VALUE*pow(Rnew,2.0) -  GetValue(*ts,LGAA);
 	
 	//Mass of the new sapwood 
-	double Wsnew = GetValue(GetTree(*ts),rho)*Asnew*GetValue(*ts,LGAL); 
+	double Wsnew = GetValue(GetTree(*ts),LGPrhoW)*Asnew*GetValue(*ts,LGAL); 
 	//Down goes new plus existing sapwood area 
 	SetValue(data,LGAAs,Asnew+GetValue(*ts,LGAAs)); 
 	//Mass of sapwood used in diamater growth
