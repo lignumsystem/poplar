@@ -209,7 +209,7 @@ public:
 	 //Initial heartwood
 	 SetValue(*ts,LGARh,sqrt((GetValue(GetTree(*ts),LGPxi)*GetValue(*ts,LGAAs))/PI_VALUE));
 	 //Initial foliage
-	 SetValue(*ts,LGAWf,GetValue(GetTree(*ts),af)*GetValue(*ts,LGASa));
+	 SetValue(*ts,LGAWf,GetValue(GetTree(*ts),LGPaf)*GetValue(*ts,LGASa));
  	 //Remember original sapwood area As0
 	 SetValue(*ts,LGAAs0,GetValue(*ts,LGAAs)); 
 	 // cout<<GetValue(*ts, As)<<"check radius of segment................"<<GetValue(*ts, LGAR)<<endl;
