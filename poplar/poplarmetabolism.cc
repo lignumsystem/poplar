@@ -27,7 +27,7 @@ TreeCompartment<poplarsegment, poplarbud>* ForEachPrintCompartments::operator ()
 
 
 TreeCompartment<poplarsegment, poplarbud>* DoPhotosynthesis::operator ()(TreeCompartment<poplarsegment, poplarbud>* tc)const
-{
+{ //cout<<"Dophotosynthesis."<<endl;
   tc->photosynthesis();
   return tc;
 }
@@ -40,18 +40,20 @@ TreeCompartment<poplarsegment, poplarbud>* DoRespiration::operator ()(TreeCompar
 
 LGMdouble CollectPhotosynthates::operator ()(LGMdouble& init, TreeCompartment<poplarsegment, poplarbud>* tc)const
 {
-  if (poplarsegment* ps=dynamic_cast<poplarsegment*> (tc)){
+    if (poplarsegment* ps=dynamic_cast<poplarsegment*> (tc)){
     LGMdouble start = 0.0;
     list<BroadLeaf<Triangle>*> leaves=GetLeafList(*ps);
     init = init + accumulate(leaves.begin(), leaves.end(),start,CollectLeafPhotosynthates());
-  }
-  return init;
+    }
+    return init;
+    //  return 10.0;
 }
 
 LGMdouble& CollectLeafPhotosynthates::operator()(LGMdouble& init, BroadLeaf<Triangle>* l)const
 {
   init=init+GetValue(*l,LGAP);
   return init;
+
 }
 
 LGMdouble CollectRespiration::operator()(LGMdouble& init,TreeCompartment<poplarsegment, poplarbud>* tc)const

@@ -5,6 +5,7 @@
 #include <Uniform.h>
 #include <Gauss.h> 
 #include <Bernoulli.h>
+#include <poplar.h>
 using namespace cxxadt;
 
 //First include lengine.h file for some necessary 
@@ -28,20 +29,38 @@ Gauss g2(-1);
 Gauss g3(-1); 
 Bernoulli ber( -1);
 
+
+//main stem branching angle
+const double ba=60.0 * PI_VALUE/180.0;
+const double bendUp=10.0* PI_VALUE/180.0;
+const double maxIncl = 8.0; 
+
+
+
 //The declare the modules your need
- const ModuleIdType F_id = 2;
+  const ModuleIdType F_id = 2;
  const ModuleIdType B_id = 3;
  const ModuleIdType Pitch_id = 4;
  const ModuleIdType Turn_id = 5;
  const ModuleIdType Roll_id = 6;
+ const ModuleIdType Split_id = 7;
+static const ModuleIdType __ignoreArr[] = {  Roll_id, Pitch_id, Turn_id,0 };
+int NumOfIgnored()
+{ return sizeof(__ignoreArr)/sizeof(__ignoreArr[0])-1; }
+ModuleIdType GetIgnored(int i)
+{ return __ignoreArr[i]; }
+
 
 //Define the derivation length
 int DerivationLength() { return  30;}
 
 //Define the Start corresponding to the axiom
 void Start()
-{
-  { Produce((ModuleIdType)(B_id));Produce((double)(0.0));Produce((double)(4.0));Produce((double)(0.0));Produce((ModuleIdType)(B_id));}
+{ 
+  int seed=time(0);
+  srand(seed);
+  PoplarBudData d(ALIVE, 1.0, 0.0, 1.0);   
+  { Produce((ModuleIdType)(F_id));Produce((double)(0.8));Produce((int)( 0));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d));Produce((ModuleIdType)(B_id));}          
 }
 
 //You can optionally have the following modules:
@@ -64,49 +83,92 @@ void End()
 {
 }
 
-//Here are the rewritings. If there is no rewriting
-// the symbol rewrites to itself. "produce" denotes
-//the rewriting and corresponds to "return" in C++ 
- void _P1(double leaf,double alive,double order)
+//Here are the rewritings. If there is no rewriting 
+//the symbol rewrites to itself. "produce" denotes
+//the rewriting and corresponds to "return" in C++
+
+   void _P1(double s,int od,PoplarBudData d)
 {
-  if (order == 0){
-   int seed = 1111111;
-   double b=ber(0.3, seed);
+  PoplarBudData dead(DEAD, 1.0, GetValue(d, LGAomega), 1.0);
+  PoplarBudData dorm(DORMANT, 1.0, GetValue(d, LGAomega), 1.0);
+  PoplarBudData d1(GetValue(d, LGAstate), 1.0, GetValue(d, LGAomega), 1.0);
+  PoplarBudData d2(GetValue(d, LGAstate), 1.0, GetValue(d, LGAomega)+1, 1.0);
 
-  // double r = g1(10.0, 1.0, seed);  //for trees in stand
-  // double I = g2(36.0, 5.0, seed);
-  // double A = g3(167.0, 105.0, seed);
+  LGMdouble o=GetValue(d, LGAomega);
+  LGMdouble st = GetValue(d, LGAstate);
 
-   double r = g1(5.5, 3.0, seed);  //for trees in stand
-   double I = g2(45.0, 21.0, seed);
-   double A = g3(186.0, 93.0, seed);
+//Bend branches upwards
 
-  // cout << "r " << r << " I " << I << " A " << A << endl;
-   { Produce((ModuleIdType)(F_id));Produce((double)(r/100.0));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)((90-I)*PI_VALUE/180));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((double)(1.0));Produce((double)( alive));Produce((double)(order+1.0));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id)); 
-           Produce((ModuleIdType)(B_id));Produce((double)(0.0));Produce((double)( alive));Produce((double)(order));Produce((ModuleIdType)(B_id));}
+  PositionVector direct = GetDirection(d);
+  direct.normalize();
+  double fac = 0.0;
+  if(asin(direct.getZ())<maxIncl)
+  {
+    PositionVector up(0.0, 0.0, 1.0);
+    PositionVector cr = Cross(up, direct);
+    fac = cr.length();
+    fac *= bendUp;
   }
- else if  (order == 1 && alive>0){
-   int seed = 1111111;
-   double r = g1(10.0, 1.0, seed);
-   double A = 180.0*(u(seed)-0.5);
-   double I =100.0*(u(seed)-0.5);
-  // cout << "r " << r << " I " << I << " A " << A << endl;
-   { Produce((ModuleIdType)(F_id));Produce((double)(r/100.0));Produce((ModuleIdType)(F_id));  Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Turn_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Turn_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I*PI_VALUE/180.0));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((double)(1.0));Produce((double)( alive));Produce((double)(order+1));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id)); 
-           Produce((ModuleIdType)(B_id));Produce((double)(0.0));Produce((double)( alive-1));Produce((double)(order));Produce((ModuleIdType)(B_id));}
+
+ if (GetValue(d, LGAstate)==DEAD)
+      { Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dead));Produce((ModuleIdType)(B_id));}
+  else if (GetValue(d, LGAstate)==DORMANT)
+      { Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dorm));Produce((ModuleIdType)(B_id));}
+  else {
+    int seed = time(NULL);
+   double r = g1(5.5, 3.0, seed);  //for trees in Alley Cropping
+   double I = g2(36.0, 5.0, seed); //  double I = g2(45.0, 21.0, seed);
+
+   { Produce((ModuleIdType)(F_id));Produce((double)(r/10.0));Produce((int)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(Split_id)); Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d1));Produce((ModuleIdType)(B_id));}
+
   }
- else if  (order == 2 && alive){
-   int seed = 1111111;
-   double r = g1(10.0, 1.0, seed);
-   double A = 180.0*(u(seed)-0.5);
-   double I =100.0*(u(seed)-0.5);
-  // cout << "r " << r << " I " << I << " A " << A << endl;
-   { Produce((ModuleIdType)(F_id));Produce((double)(r/100.0));Produce((ModuleIdType)(F_id));  Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Turn_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Turn_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I*PI_VALUE/180.0));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((double)(1.0));Produce((double)( alive));Produce((double)(order+1));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id)); 
-           Produce((ModuleIdType)(B_id));Produce((double)(0.0));Produce((double)( alive-1));Produce((double)(order));Produce((ModuleIdType)(B_id));}
-  }
- else
-   { Produce((ModuleIdType)(B_id));Produce((double)(leaf));Produce((double)( alive));Produce((double)(order));Produce((ModuleIdType)(B_id));}
+
+}
 
 
+   void _P2(double s,int o)
+{
+   PoplarBudData dorm(DORMANT, 1.0, o+1, 1.0);
+   PoplarBudData d1(1.0, 1.0, o+1, 1.0);
+   PoplarBudData d2(1.0, 1.0, o+1, 1.0);
+
+   double A  = rand()%360;  //360.0*(u(seed++)-0.5);
+   double A1 = rand()%360;  //360.0*(u(seed++)-0.5);
+   double A2 = rand()%360;   //45-90;  //360.0*(u(seed++)-0.5);
+   double A3 = rand()%360;   //45-90;  //360.0*(u(seed++)-0.5);
+
+   double I  = rand()%30+30;  //100.0*(u(seed++)-0.5);
+   double I1 = rand()%30+30;  //100.0*(u(seed++)-0.5);
+   double I2 = rand()%75;  //-180;  //100.0*(u(seed++)-0.5);
+   double I3 = rand()%75;   //-180;  //100.0*(u(seed++)-0.5);
+
+  if (s<0.05){
+    { Produce((ModuleIdType)(F_id));Produce((double)(s));Produce((int)( o));Produce((ModuleIdType)(F_id));}
+}
+else if (0.05<=s<0.1)
+{
+  cout<<s<<" :value of s(o=0)"<<endl;
+  { Produce((ModuleIdType)(F_id));Produce((double)(s/2));Produce((int)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I*PI_VALUE/180));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dorm));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id));
+        Produce((ModuleIdType)(F_id));Produce((double)(s/2));Produce((int)( o));Produce((ModuleIdType)(F_id)); }
+}
+else
+{
+{ Produce((ModuleIdType)(F_id));Produce((double)(s/3));Produce((int)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I*PI_VALUE/180));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dorm));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id));
+        Produce((ModuleIdType)(F_id));Produce((double)(s/3));Produce((int)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(A1*PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I1*PI_VALUE/180));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dorm));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id));
+        Produce((ModuleIdType)(F_id));Produce((double)(s/3));Produce((int)( o));Produce((ModuleIdType)(F_id)); }
+}
+
+}
+
+
+void _P3()
+{
+  { }
+}
+
+ void _P4(double s,int o)
+{
+  { Produce((ModuleIdType)(F_id));Produce((double)(s));Produce((int)( o));Produce((ModuleIdType)(F_id));}
 }
 
 //This is a ToDO for Jari: interpretation typically
@@ -117,7 +179,7 @@ void End()
 
 
 
- void _I2(double s)
+  void _I5(double s,int o)
 {
   ;
 }
@@ -125,36 +187,73 @@ void End()
 //Finally, "close" the "namespace"
  
 
+
+
 void _PC1(const CallerData* pCD)
 {
 const char* pArg;
-pArg = pCD->Strct.pArg(0);
+pArg = pCD->LCntxt.pArg(0);
 double p0;
 memcpy(&p0, pArg, sizeof(double));
 pArg += sizeof(double);
-double p1;
-memcpy(&p1, pArg, sizeof(double));
-pArg += sizeof(double);
-double p2;
-memcpy(&p2, pArg, sizeof(double));
+int p1;
+memcpy(&p1, pArg, sizeof(int));
+pArg = pCD->Strct.pArg(0);
+PoplarBudData p2;
+memcpy(&p2, pArg, sizeof(PoplarBudData));
 _P1(p0,p1,p2);
 }
 
 
-void _IC2(const CallerData* pCD)
+void _PC2(const CallerData* pCD)
 {
 const char* pArg;
 pArg = pCD->Strct.pArg(0);
 double p0;
 memcpy(&p0, pArg, sizeof(double));
-_I2(p0);
+pArg += sizeof(double);
+int p1;
+memcpy(&p1, pArg, sizeof(int));
+_P2(p0,p1);
+}
+
+
+void _PC3(const CallerData* pCD)
+{
+_P3();
+}
+
+
+void _PC4(const CallerData* pCD)
+{
+const char* pArg;
+pArg = pCD->Strct.pArg(0);
+double p0;
+memcpy(&p0, pArg, sizeof(double));
+pArg += sizeof(double);
+int p1;
+memcpy(&p1, pArg, sizeof(int));
+_P4(p0,p1);
+}
+
+
+void _IC5(const CallerData* pCD)
+{
+const char* pArg;
+pArg = pCD->Strct.pArg(0);
+double p0;
+memcpy(&p0, pArg, sizeof(double));
+pArg += sizeof(double);
+int p1;
+memcpy(&p1, pArg, sizeof(int));
+_I5(p0,p1);
 }
 
 static const ProductionPrototype proto[] =
 {
 	{
 		{
-			{ 0 }, 0
+			{ F_id }, 1
 		},
 		{
 			{ B_id }, 1
@@ -163,6 +262,42 @@ static const ProductionPrototype proto[] =
 			{ 0 }, 0
 		},
 		_PC1
+	},
+	{
+		{
+			{ 0 }, 0
+		},
+		{
+			{ F_id }, 1
+		},
+		{
+			{ Split_id }, 1
+		},
+		_PC2
+	},
+	{
+		{
+			{ 0 }, 0
+		},
+		{
+			{ Split_id }, 1
+		},
+		{
+			{ 0 }, 0
+		},
+		_PC3
+	},
+	{
+		{
+			{ 0 }, 0
+		},
+		{
+			{ F_id }, 1
+		},
+		{
+			{ 0 }, 0
+		},
+		_PC4
 	}
 };
 static const ProductionPrototype iproto[] =
@@ -177,18 +312,19 @@ static const ProductionPrototype iproto[] =
 		{
 			{ 0 }, 0
 		},
-		_IC2
+		_IC5
 	}
 };
 static const ModuleData moduleData[] =
 {
 { "SB",  0 },
 { "EB",  0 },
-{ "F", sizeof(double)},
-{ "B", sizeof(double)+sizeof(double)+sizeof(double)},
+{ "F", sizeof(double)+sizeof(int)},
+{ "B", sizeof(PoplarBudData)},
 { "Pitch", sizeof(double)},
 { "Turn", sizeof(double)},
-{ "Roll", sizeof(double)}
+{ "Roll", sizeof(double)},
+{ "Split",  0 }
 };
 
 
@@ -197,7 +333,7 @@ const ModuleData* GetModuleData(int i)
 
 
 int NumOfModules()
-{ return 7; }
+{ return 8; }
 
 int NumOfProductions()
 { return sizeof(proto)/sizeof(proto[0]); }
@@ -210,6 +346,4 @@ const ProductionPrototype& GetIProductionPrototype(int i)
 { return iproto[i]; }
 int NumOfConsidered() { return 0; }
 ModuleIdType GetConsidered(int) { return -1; }
-int NumOfIgnored() { return 0; }
-ModuleIdType GetIgnored(int) { return -1; }
 } //closing namespace
