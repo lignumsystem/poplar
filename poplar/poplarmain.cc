@@ -1,5 +1,5 @@
 #include "randomc.h"
-//#include "bernoulli.h"
+#include "bernoulli.h"
 #include <Bernoulli.h>
 
 //Include Lignum implementation 
@@ -20,7 +20,7 @@
 //Include this always for your program
 #include <lengine.h>
 
-#include <time.h>   //temperary
+#include <time.h>   //temperary for creating stochastic seed=time();
 
 //LSystem captures the rewriting process  This is how you get acces to
 //rewriting process defined in  sym2d.L: wrap LSystem.h into namespace
@@ -95,18 +95,17 @@ int main(int argc, char** argv)
    ForEach(poplartree, DoRespiration());
 
     //*****test Bernoulli from c++adt/Bernoulli****
-   Bernoulli ber( -1);
-    long int seed;
-    //  int seed=2222;
-   double  test;
-   int zero=0, one=0;
-   for (int i=1; i<10001; i++)
-     {  seed=time(0);
-      double b=ber(0.3, seed);
-      cout << b <<"  ";
-      if (i%10==0) cout <<endl;
-      if (b>0.5) one++;
-      else zero++;    
+     long int seed =time(0);
+  cout<<"do nothing"<< endl;
+  double p=0.3, result, test;
+  int zero=0, one=0;
+  StochasticLib obj(seed);
+  for (int i=1; i<10001; i++)
+    { result=obj.Bernoulli(p);
+    cout << result <<"  ";
+     if (i%10==0) cout <<endl;
+    if (result>0.5) one++;
+    else zero++;    
     }
     cout << endl;
     cout <<"test result: "<<one <<" and " << zero << endl;
