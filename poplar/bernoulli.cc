@@ -1,6 +1,7 @@
-#include "bernoulli.h"
-#include "randomc.h"
 #include <iostream>
+#include "bernoulli.h"
+#include <cmath>
+#include "randomc.h"
 using namespace std;
 /***********************************************************************
                       Constructor
