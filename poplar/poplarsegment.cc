@@ -107,8 +107,7 @@ void poplarsegment::respiration()
 
   //**ms-- maintenance respiration rate of sapwood
   //**ws--  mass of sapwood
-   m_hw += GetValue(t,ms)*GetValue(*this,LGAWs);
+   m_hw += GetValue(t,LGPms)*GetValue(*this,LGAWs);
    SetValue(*this,LGAM, m_hw);
-   // cout<<"  "<< GetValue(t,ms)*GetValue(*this,Ws)<<endl;
 }
 
