@@ -203,16 +203,16 @@ public:
 	 L_new = max(L_new,0.0);
 	  SetValue(*ts,LGAL,L_new);
 	 //Initial radius
-	 SetValue(*ts,R,GetValue(GetTree(*ts),lr)*L_new);
+	 SetValue(*ts,LGAR,GetValue(GetTree(*ts),lr)*L_new);
 	 //Reset previous Rh!!!!
-	 SetValue(*ts,Rh,0.0);
+	 SetValue(*ts,LGARh,0.0);
 	 //Initial heartwood
-	 SetValue(*ts,Rh,sqrt((GetValue(GetTree(*ts),xi)*GetValue(*ts,LGAAs))/PI_VALUE));
+	 SetValue(*ts,LGARh,sqrt((GetValue(GetTree(*ts),xi)*GetValue(*ts,LGAAs))/PI_VALUE));
 	 //Initial foliage
 	 SetValue(*ts,LGAWf,GetValue(GetTree(*ts),af)*GetValue(*ts,LGASa));
  	 //Remember original sapwood area As0
 	 SetValue(*ts,LGAAs0,GetValue(*ts,LGAAs)); 
-	 // cout<<GetValue(*ts, As)<<"check radius of segment................"<<GetValue(*ts, R)<<endl;
+	 // cout<<GetValue(*ts, As)<<"check radius of segment................"<<GetValue(*ts, LGAR)<<endl;
 	 }
      }//segment
      else if (Axis<TS,BUD>* axis = dynamic_cast<Axis<TS,BUD>*>(tc)){
@@ -260,7 +260,7 @@ public:
 	//requirement for new radius: sapwood above + own heartwood + own foliage 
 	LGMdouble Rnew = sqrt((Asu + Ahown + Asr)/PI_VALUE);
 	//compare Rnew to R, choose max
-	Rnew = max(Rnew, GetValue(*ts,R));
+	Rnew = max(Rnew, GetValue(*ts,LGAR));
 	//New sapwood requirement, thickness growth
 	double Asnew = PI_VALUE*pow(Rnew,2.0) -  GetValue(*ts,LGAA);
 	

@@ -69,7 +69,7 @@ int main(int argc, char** argv)
   poplarL.start();
   rootL.start();
   //Update tree so that structures match
-  poplarL.lstringToLignum(poplartree,1,LGMstatus);
+  poplarL.lstringToLignum(poplartree,1,LGAstatus);
   rootL.lstringToRootSystem(poplartree);
   //Typically  you will  write  something like  this  in the  for-loop
   //(derivationLength returns the derivation length defined in sym2d.L
@@ -168,7 +168,7 @@ int main(int argc, char** argv)
    
 
    
-    poplarL.lignumToLstring(poplartree,1,LGMstatus);  
+    poplarL.lignumToLstring(poplartree,1,LGAstatus);  
     rootL.rootSystemToLstring(poplartree);
     cout << "lignumToLstring done " << endl;
     //One derivation of L-string, above ground trunk and tree crown
@@ -189,7 +189,7 @@ int main(int argc, char** argv)
     // cout<<".....................TcData............."<<GetValue(data, As)<<endl;
 
 
-    poplarL.lstringToLignum(poplartree,1,LGMstatus);
+    poplarL.lstringToLignum(poplartree,1,LGAstatus);
     rootL.lstringToRootSystem(poplartree);
     cout << "lstringToLignum done " << endl;
 
