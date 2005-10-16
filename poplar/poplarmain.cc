@@ -1,5 +1,6 @@
-#include <Bernoulli.h>
+#include <algorithm>
 #include <iostream>
+#include <iomanip>
 
 //Include Lignum implementation 
 #include <Lignum.h>
@@ -17,17 +18,10 @@
 #include <poplarmetabolism.h>
 #include <VoxelSpace.h>
 #include <VisualFunctor.h>
-#include <LGMVisualization.h>
+#include <Polygon.h>
 //Impelements VisualizeLGMTree
+#include <GLSettings.h>
 #include <OpenGLUnix.h>
-
-//The three following global  variables create problems when compiling
-//poplar. You may get undefined symbols for _cam_x, _cam_y and _cam_z
-//if commented. If uncommented you may get double decalarations!!!
-// GLfloat cam_x;
-// GLfloat cam_y;
-// GLfloat cam_z;
-
 
 //Includes all kinds of stuff, turtle graphics etc.
 //Include this always for your program
@@ -51,276 +45,255 @@ int main(int argc, char** argv)
 {
   int iterations = 3;
   string metafile = "MetaFile.txt";
-  /* if (argc != 3){
-     cout << "Usage: ./pine Iterations MetaFile" << endl;
-     return 0;
-     }
-     else{
-     iterations = atoi(argv[argc-2]);
-     metafile = string(argv[argc-1]);
-     }
-  */
-  Lex l;
-  //poplar.L is the  L-system. LGMAD and LGMdouble are here optional to
-  //remind you  that there is  a possibility to data  exchange between
-  //L-system and LIGNUM (in this example it is not used)
 
-  // poplar::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> poplarL;
-  poplar::LSystem<poplarsegment,poplarbud,PoplarBD, PoplarBudData> poplarL;
-  Erythrina::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> rootL;
+  Lex l;
+
+   poplar::LSystem<poplarsegment,poplarbud,PoplarBD, PoplarBudData> poplarL;
+   Erythrina::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> rootL;
  
   //Create the tree.
-  Tree<poplarsegment,poplarbud> poplartree(Point(0,0,0),
-					   PositionVector(0,0,1.0));
-  //Start by evaluating the axiom (see start in sym2d.L)
-  poplarL.start();
-  rootL.start();
-  //Update tree so that structures match
-  // poplarL.lstringToLignum(poplartree,3,LGAstate, LGAstatus, LGAomega);
- 
-  poplarL.lstringToLignum(poplartree, 1, PoplarD);
-  rootL.lstringToRootSystem(poplartree);
-  //Typically  you will  write  something like  this  in the  for-loop
-  //(derivationLength returns the derivation length defined in sym2d.L
-  //bu naturally  you can ignore  it and derive  as many times  as you
-  //want).
-  
+   Tree<poplarsegment,poplarbud> poplartree(Point(0, 0, 0),
+  			   PositionVector(0,0,1.0));
+   /* PoplarTree poplartree("fleafpair.fun","fleafsize.fun",
+			"fbudsize.fun","fbudflush.fun",
+			"fapical.fun","fvigorindex.fun",
+			"fminsegment.fun","fpetiolelength.fun",
+			"frce.fun",
+			Point(0,0,0),PositionVector(0,0,1.0));*/
 
-  Firmament& f = GetFirmament(poplartree);
-  //resize:  inclinations,  azimuths,  MJ/year
-  f.resize(40,20,1200);
-  // vector<double> direct_direction;
-  // f.directRadiation(direct_direction);
-
-  cout << "regions: " << f.numberOfRegions() 
-       << "Ball sensor: " << f.diffuseBallSensor()
-       << "Plant sensor: " <<f.diffusePlaneSensor() <<endl;
-
-  //create voxel space 
-  // VoxelSpace vs(Point(0,0,0), Point(200, 200, 200), 4, 4, 4, 50, 50, 50,  GetFirmament(poplartree)); //originally (50, 50, 18), 1,1,1, 50, 50, 18
-  VoxelSpace vs(Point(0,0,0), Point(50, 50, 18), 1, 1, 1, 50, 50, 18,  GetFirmament(poplartree));
-
-  vector<PositionVector> pv;
-  //Create Leaves (Triangle)
-  AccumulateDown(poplartree,pv,
-		 AppendSequence<vector<PositionVector> >(),
-		 CreatePoplarLeaves(0.2,0.1,0.1));
 
   //initialization of parameters and functions
   InitializeTree<poplarsegment, poplarbud> init_poplar(metafile, VERBOSE);
   init_poplar.initialize(poplartree);
 
+  // SetValue(poplartree,TreeRefRadiation,2480.0);
 
-  //**  PoplarGrowthFunction<poplarsegment,poplarbud> G(poplartree);
-  //** ParametricCurve K(0.2);
-  // EvaluateRadiationForHwTreeSegment<poplarsegment, poplarbud> R(K);
-  //double wf=0;
-  //  wf= Accumulate(poplartree, wf, CollectPAndM<poplarsegment, poplarbud>());
-  // cout<<"result of collectnew foliage:  "<<wf<<endl;
-  
-  TreeGrowthAllocatorPropagateUp<poplarsegment, poplarbud,
-    SetSegmentLength, TryDiameterGrowth, double> G(poplartree, 0.0);
-  
-  
-  FILE * fFile;
-  float a, b, c, d, e, ff, g, h;
-  float direct=0, diffuse=100;
-  
-  char * filename[12]={"jan.dat", "feb.dat", "mar.dat", "apr.dat", 
-		       "may.dat", "jun.dat", "jul.dat", "aug.dat", 
-		       "sep.dat", "oct.dat", "nov.dat", "dec.dat" };
-  
-  for (int i=0; i <6; i++) // poplarL.derivationLength()--yearly
-    {
-      cout << "Step: " << i << endl;  
-      //cout<<"finish photosynthesis. "<<endl;
-      //poplarL.lignumToLstring(poplartree,3,LGAstate, LGAstatus, LGAomega);  
-      poplarL.lignumToLstring(poplartree, 1, PoplarD);  
-      rootL.rootSystemToLstring(poplartree);
-      cout << "lignumToLstring done " << endl; 
-      
-      //One derivation of L-string, above ground trunk and tree crown
-      poplarL.derive();
-      //below ground roots
-      rootL.derive();
-      cout << "expand done " << endl;
-      //Update tree so that structures match
-      
-      //poplarL.lstringToLignum(poplartree,3,LGAstate, LGAstatus, LGAomega );
-      poplarL.lstringToLignum(poplartree,1, PoplarD);
-      rootL.lstringToRootSystem(poplartree);
-      cout << "lstringToLignum done " << endl;
-      
-      TreePhysiologyVigourIndex(poplartree);
-      cout << "Vigour index" << endl;
-      //G.init();
-      // cout << "Bisection zero at:  " << Bisection(0.0, 100.0, G, GetValue(poplartree,LGPzbrentEpsilon)) << endl;
+  Firmament& f = GetFirmament(poplartree);
+  f.resize(40,20,1200); //resize:  inclinations,  azimuths,  1200 MJ/year for previous tree,  
+
+  //create voxel space 
+  VoxelSpace vs(Point(0,0,0), Point(200, 200, 200), 4, 4, 4, 50, 50, 50,  GetFirmament(poplartree)); 
+  //  VoxelSpace vs(Point(0,0,0), Point(50, 50, 18), 1, 1, 1, 50, 50, 18,  GetFirmament(poplartree));
+
+  /*  string voxelfile="VoxelSpace.txt";
+  ifstream vf(voxelfile.c_str());
+   int vx,vy,vz; vx = vy = vz = 0;
+  LGMdouble s1,s2,s3; s1 = s2 = s3 = 1.0;
+    vf >> vx >> vy >> vz >> s1 >> s2 >> s3;
+    cout << "Voxel Space: " << vx << " " << vy << " " << vz << " " 
+       << s1 << " " << s2 << " " << s3 << endl;
+    VoxelSpace vs(Point(0,0,0),Point(vx,vy,vz), s1,s2,s3, static_cast<int>(vx/s1),	static_cast<int>(vy/s2),	static_cast<int>(vz/s3), GetFirmament(poplartree));
+  */
+
+  //Start by evaluating the axiom (see start in sym2d.L)
+  poplarL.start();
+  rootL.start();
+  poplarL.lstringToLignum(poplartree, 1, PoplarD);
+
+   vector<PositionVector> pv;
+    AccumulateDown(poplartree,pv,
+  	 AppendSequence<vector<PositionVector> >(),
+		   CreatePoplarLeaves(0.02,0.01,0.01));   //petiolLength, base and heighth
    
-      //poplarL.lignumToLstring(poplartree,3,LGAstate, LGAstatus, LGAomega);  
-      poplarL.lignumToLstring(poplartree,1, PoplarD);  
-      rootL.rootSystemToLstring(poplartree);
-      cout << "lignumToLstring done " << endl; 
+   FILE * fFile;
+   float a, b, c, d, e, ff, g, h;
+   float direct=0, diffuse=100;
+
+   char * filename[12]={"jan.dat", "feb.dat", "mar.dat", "apr.dat", 
+			"may.dat", "jun.dat", "jul.dat", "aug.dat", 
+			"sep.dat", "oct.dat", "nov.dat", "dec.dat" };
+
+  for (int age=0; age<1; age++) // poplarL.derivationLength()--yearly
+  {
+     cout << "age: " << age << endl;  
+   
+	fFile = fopen("weatherdata.dat", "r"); // fFile = fopen(filename[month], "r");
+       if (fFile==NULL)
+        exit(1);   
+
+       while (!feof(fFile))
+        {
+           vs.reset();  //reset the voxelbox to be initial, all Qabs, Qin to be 0.
+	   //  DumpHwTree(vs, poplartree);       // dumpPopTree(vs, poplartree);
+       BoundingBox bBox;
+      bBox = Accumulate(poplartree, bBox,
+			FindHwBoundingBox<poplarsegment,
+			poplarbud,Triangle>()); 
+      cout << bBox;
+      Point span = bBox.getMax()-bBox.getMin();
+      int nx, ny, nz;
+      if(span.getX() < 0.3)
+	nx = 1;
+      else
+	nx = static_cast<int>(span.getX()/0.3) + 1;
+      if(span.getY() < 0.3)
+	ny = 1;
+      else
+	ny = static_cast<int>(span.getY()/0.3) + 1;
+      if(span.getZ() < 0.3)
+	nz = 1;
+      else
+	nz = static_cast<int>(span.getZ()/0.3) + 1;
+ 
+      vs.move(bBox.getMin());
+      vs.resize(0.3,0.3,0.3,nx,ny,nz);
+  
+        DumpHwTree(vs,poplartree);
+	LGMdouble treePhotosynthesis =0; 
+	LGMdouble treeRespiration = 0;
+
+	   for (int i=0; i<6*7*24*2; i++)
+	  {
+            direct=0;
+            diffuse=0;
+	    if(!feof(fFile))
+	      {  //day, time, elevation, azimuth, diffuse, direct, Ta(temperature), VPD(pressure)
+	        fscanf(fFile, "%f %f %f %f %f %f %f %f\n", &a, &b, &c, &d, &e, &ff, &g, &h);
+                direct =ff;
+                diffuse =e;
+	      }
+           else
+	     break;
+
+	    //  cout<<"direct and diffuse value: "<<direct<<" ,"<<diffuse<<endl;
+	    vector<double> a(3);
+            a[0] = sin(d);
+            a[1] = cos(d);
+            a[2] = c;
+	    f.setSunPosition(a); 
+  
+	    f.setDirectRadiation(direct);
+	    f.setDiffuseRadiation(diffuse);  //diffuse
+	    //Emole = 2.176 *100000 joule/mole; umole = 0.2176 J = 0.2176 * 10-6 MJ
+            //radiation from data file is umole/m2/s
+
+	vs.calculatePoplarLight(); 
+ 
+       SetHwTreeQabs(vs,poplartree); 
+
+      LGMdouble maxQin = 0.0;
+      maxQin = Accumulate(poplartree, maxQin, GetQinMax<poplarsegment,poplarbud>() );
+      SetValue(poplartree, TreeQinMax, maxQin);
+      // cout << "  TreeQinMax: " << maxQin << "  MJ/m2" << endl;
+
+    LGMdouble treeQabs = 0.0;
+    treeQabs = Accumulate(poplartree,treeQabs,
+			  CollectQabs<poplarsegment,poplarbud>());
+    LGMdouble treeLA = 0.0;
+    treeLA = Accumulate(poplartree,treeLA,CollectFoliageArea<
+			  poplarsegment, poplarbud>());
+    //  cout << " Tree leaf area: " << treeLA
+    // << "  m2,  Qabs: " << treeQabs << "  MJ,  Qabs/(Qin*LA): "
+    // << treeQabs/(treeLA*GetFirmament(poplartree).diffuseBallSensor()) << endl;
+
+  
+    // ForEach(poplartree, DoPhotosynthesis()); 
+    poplartree.photosynthesis();
+ 
+    treePhotosynthesis += GetValue(poplartree,TreeP);
+    //cout << "TreePhotosynthesis:  " << treePhotosynthesis << "  kg C" << endl;
+	  }
+ 
+     ForEach(poplartree, DoRespiration());
+	   //poplartree.respiration();
+
+    //One derivation of L-string, above ground trunk and tree crown
+    poplarL.derive();
+    //below ground roots
+    rootL.derive();
+    //cout << "expand done " << endl;
+    //Update tree so that structures match
+ 
+    poplarL.lstringToLignum(poplartree,1, PoplarD);
+    rootL.lstringToRootSystem(poplartree);
+    // cout << "lstringToLignum done " << endl;
+    
+    TreePhysiologyVigourIndex(poplartree);
+    // cout << "Vigour index" << endl;
+     
+    LGMdouble p = 0.0, m = 0.0;
+    LGMdouble P = treePhotosynthesis;
+LGMdouble M = Accumulate(poplartree,m, SumTreeRespiration<poplarsegment, poplarbud>());
+SetValue(poplartree,TreeM,M);
+    //  LGMdouble M = treeRespiration;
+    if (P==0 && age==0)
+      { cout<<"accumulated P: "<<P<<endl;
+       P = 0.0001;
+      }
+    SetValue(poplartree,TreeP,P);
+    SetValue(poplartree,TreeM,M); 
+
+    TreeGrowthAllocatorPropagateUp<poplarsegment, poplarbud,
+      SetSegmentLength, TryDiameterGrowth, double> G(poplartree, 0.0);
+   
+    G.init();
+    cout << "G.init finished." << endl;
+    cout << "Bisection zero at:  " << Bisection(0.0, 10.0, G, GetValue(poplartree,LGPzbrentEpsilon)) << endl; //GetValue(poplartree,LGPzbrentEpsilon)=0.001
+      double length=0.0;
+      //  PropagateUp(poplartree, length, KillPoplarBuds<poplarsegment, poplarbud>());
+
+     poplarL.lignumToLstring(poplartree,1, PoplarD);  
+     rootL.rootSystemToLstring(poplartree);
+     cout << "lignumToLstring done " << endl; 
 
       poplarL.derive();
       cout << "Split done " << endl;
 
-      // poplarL.lstringToLignum(poplartree,3,LGAstate, LGAstatus, LGAomega);
-      poplarL.lstringToLignum(poplartree,1, PoplarD);
-      rootL.lstringToRootSystem(poplartree);
-      cout << "lstringToLignum done " << endl;
+    poplarL.lstringToLignum(poplartree,1, PoplarD);
+    rootL.lstringToRootSystem(poplartree);
+    cout << "lstringToLignum done " << endl;
 
-      pv.clear();
-      AccumulateDown(poplartree,pv,
-		     AppendSequence<vector<PositionVector> >(),
-		     CreatePoplarLeaves(0.2,0.1,0.1));
+    pv.clear();
 
-
-      ForEach(poplartree,SubAging<poplarsegment,poplarbud>());  
-
-      TcData data;    // DiameterGrowthData data;     
-      AccumulateDown(poplartree,data,TreeDiameterGrowth<poplarsegment,poplarbud>());
+ 
+        AccumulateDown(poplartree,pv,
+     	   AppendSequence<vector<PositionVector> >(),
+           CreatePoplarLeaves(0.0,0.0001,0.0001));   //CreateTriangleLeaves<poplarsegment,poplarbud,Triangle>
       
-      /////////do tree pruning"
-      double length=0.0;
+     ForEach(poplartree,SubAging<poplarsegment,poplarbud>()); 
+      double r0 = 0.0;
+    PropagateUp(poplartree,r0,ForwardR0());
+    // DiameterGrowthData data;  
+    TcData data;     
+    AccumulateDown(poplartree,data,
+		   TreeDiameterGrowth<poplarsegment, poplarbud>());
+
+    /////////do tree pruning"
+    // double length=0.0;
       PropagateUp(poplartree, length, KillPoplarBuds<poplarsegment, poplarbud>());
-      // poplarL.lignumToLstring(poplartree,3,LGAstate, LGAstatus, LGAomega);  
-      // poplarL.lstringToLignum(poplartree,3,LGAstate, LGAstatus, LGAomega);
       poplarL.lignumToLstring(poplartree,1,PoplarD);  
-      poplarL.lstringToLignum(poplartree, 1, PoplarD);
-      poplarL.prune(poplartree);
-      //  ForEach(poplartree,IncreaseAge<poplarsegment,poplarbud>(1.0));
-      ForEach(poplartree,TreeAging<poplarsegment,poplarbud>()); 
-      // ForEach(poplartree,SubAging<poplarsegment,poplarbud>()); 
-      
-      ForEach(poplartree, WakeupPoplarBuds<poplarsegment, poplarbud>());
-      // poplarL.lignumToLstring(poplartree,3,LGAstate, LGAstatus, LGAomega);  
-      // poplarL.lstringToLignum(poplartree,3,LGAstate, LGAstatus, LGAomega);
-      poplarL.lignumToLstring(poplartree,1,PoplarD);  
-      poplarL.lstringToLignum(poplartree,1,PoplarD);  
-    }
+      poplarL.lstringToLignum(poplartree,1,PoplarD);
+        poplarL.prune(poplartree);
+    
+  	}
+     fclose(fFile);
+
+    //sapwood senescence
+        ForEach(poplartree,TreeAging<poplarsegment,poplarbud>());
+    //Root mortality
+    SetValue(poplartree,TreeWr, 
+	     GetValue(poplartree,TreeWr)-GetValue(poplartree,LGPsr)*
+	     GetValue(poplartree,TreeWr));
+     
+       ForEach(poplartree, WakeupPoplarBuds<poplarsegment, poplarbud>());
+        poplarL.lignumToLstring(poplartree,1,PoplarD);  
+       poplarL.lstringToLignum(poplartree,1,PoplarD);  
+  }
 
   //Some optional clean up see End in sym2d.L
   poplarL.end();  
   rootL.end();
-  cout << endl;
-
-  //Compare Leaves
-  //ForEach(poplartree,ForEachLeafCompare<poplarsegment,poplarbud,Triangle>());
-  //Demonstration of Algorithms for root system
-  /*  ForEach(GetRootAxis(poplartree),
-      EchoCompartmentName<Tree<poplarsegment,poplarbud> >());
-      int sum = 0;
-      sum = Accumulate(GetRootAxis(poplartree),sum,
-      CountRootCompartments<Tree<poplarsegment,poplarbud>,int>());
-      cout << "Accumulate Number of root compartments: " << sum << endl;
-  
-      sum = 0;
-      sum = AccumulateDown(GetRootAxis(poplartree),sum,
-      CountRootCompartments<Tree<poplarsegment,poplarbud>,int>());
-      cout << "AccumulateDown (1) Number of root compartments: " << sum << endl;
-
-      sum = 0;
-      sum = AccumulateDown(GetRootAxis(poplartree),sum,
-      AddRootCompartments<int>(),
-      CountRootCompartments<Tree<poplarsegment,poplarbud>,int>());
-      cout << "AccumulateDown (2) Number of root compartments: " << sum << endl;
-
-      cout << "PropagateUp status as reference" << endl;
-      LGMdouble s=0.0;
-      PropagateUp(GetRootAxis(poplartree),s,
-      PropagateStatusAsReference<Tree<poplarsegment,poplarbud> >());
-      cout << "PropagateUp status as reference done" << endl;
-
-      cout << "PropagateUp status as value" << endl;
-      s=0.0;
-      PropagateUp(GetRootAxis(poplartree),s,
-      PropagateStatusAsValue<Tree<poplarsegment,poplarbud> >());
-      cout << "PropagateUp status as value done" << endl;
-
-      cout << "Display root structure" << endl;
-      DisplayStructure(GetRootAxis(poplartree));
-      cout << endl << "Display root structure done" << endl;*/
-  
-  //Visualize  LIGNUM  - Note  the  Graphics  is  under development  so
-  //interface may change but in  any case you will have some function.
-  //But because you know OpenGL you probably can visualize the tree
-  //yourself! Let us know if you do so, we probly use it!
-
+   
   PrintTreeInformation<poplarsegment, poplarbud, ostream> printPoplar;
   printPoplar(poplartree);    //print out tree information such as tree height, dbh
 
-  //  ForEach(poplartree, DropAllLeaves<poplarsegment, poplarbud,Triangle>());
+  // ForEach(poplartree, DropAllLeaves<poplarsegment, poplarbud,Triangle>());
 
-  //Old visualization for a single tree, still functioning
-  //glutInit(&argc,argv);
-  //VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);  
+  glutInit(&argc,argv);
+  VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);  
 
-  
-  //New visualization for many trees, i.e. a forest stand
-  //1. The class to visualize with 
-  LGMVisualization viz; 
-  //2. Necessary internal initializtions
-  viz.InitVisualization();  
-  //3. Adding tree(s) to visualize
-  // textures i.e. texture file size should be 512x512
-  viz.AddHwTree<poplarsegment,poplarbud,Triangle>(poplartree, "koivu.bmp", "lehti.tga");
-  //4. Create OpenGL display lists
-  viz.makeDisplayLists();
-  //5. Define quality of the visualization
-  //vis.SetMode(WIREFRAME) is another possibility
-  //TODO: visualiztion of the roots
-  viz.SetMode(SOLID);
-  //6. Open the window and visualize the tree.
-  viz.StartVisualization();
 }
 
 
 
-
-
-
-//*****test bernoulli from poplar/bernoulli****
-/* long int seed =time(0);
-   cout<<"do nothing"<< endl;
-   double p=0.3, result, test;
-   int zero=0, one=0;
-   StochasticLib obj(seed);
-   for (int i=1; i<10001; i++)
-   { 
-   result=obj.Bernoulli(p);
-   cout << result <<"  ";
-   if (i%10==0) cout <<endl;
-   if (result>0.5) one++;
-   else zero++;    
-   }
-   cout << endl;
-   cout <<"test result: "<<one <<" and " << zero << endl;
-   test= (double)one/(double)(one+zero);
-   cout << test <<endl; */
-//test bernoull done
-
-//*****test Bernoulli from c++adt/Bernoulli****
-
-/*   // Bernoulli ber( -1);
-     long int seed;
-     //  int seed=2222;
-     double  test;
-     int zero=0, one=0;
-     seed=-time(0);
-     Bernoulli ber(seed);
-     for (int i=1; i<101; i++)
-     {
-     // cout<<"seed:"<<seed<<" ";
-     double b=ber(0.4, seed - i);
-     cout << b <<"  ";
-     if (i%10==0) cout <<endl;
-     if (b>0.5) one++;
-     else zero++;    
-     }
-     cout << endl;
-     cout <<"test result: "<<one <<" and " << zero << endl;
-     test= (double)one/(double)(one+zero);
-     cout << test <<endl;
-     //test Bernoull done
-     */
 

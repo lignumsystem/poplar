@@ -40,8 +40,8 @@ void BroadLeaf<Triangle>::photosynthesis(const LGMdouble& p0)
 
 int PoplarLeaf::photosynthesis()
 {
-   // cout << "poplarleaf photosynthesis "<< endl;
-    LGMdouble T = 25; //temperature of leaf.
+  // cout << "poplarleaf photosynthesis "<< endl;
+    LGMdouble T = 25; //temperature of leaf.l
     double Ca=360, Kc=460, Ko=330;
     double Ci=0.7 * Ca * ((1.674-0.061294*T+0.0011688*pow(T,2)-0.0000088741*pow(T,3))/0.73547);
     double Oi=210*((0.047-0.0013087*T+0.000025603*pow(T, 2)-0.00000021441*pow(T,3))/0.026934);
@@ -51,19 +51,25 @@ int PoplarLeaf::photosynthesis()
     double G = (0.5*Vomax*Kc*Oi)/(Vcmax*Ko);
 
     double Jmax=105;
-     double Q=GetValue((*this), LGAQabs);  //(*this).bla.Q_in;   //abs;    //Qabs-absorbed radiation
-     cout<<"Qabs of leaves: "<<Q<<endl; 
-     //double Q=200;  //1200;
-    double a = 0.0551;
+    double Q=GetValue((*this), LGAQabs);  //(*this).bla.Q_in;   //abs;    //Qabs-absorbed radiation
+    //  Q=200;  //1200;  //  
+       double a = 0.0551;
        double J =a* Q *pow((1+pow(a, 2)*pow(Q,2)/pow(Jmax, 2)), 0.5);
        double Wj = (J*Ci)/(4.5*Ci+10.5*G);
+     
        KGC Rd=2.21;
-       KGC Photo =(KGC)((1-G/Ci) * min(Wc,Wj));
-       KGC A=Photo*0.000001*0.01*12*0.001*28*24*3600;  //photo * (0.000001 mol)* (0.01 m-2)*12*0.001(kg)*24*3600*days
-       // KGC A=Photo-Rd;//  Rd is (umolm-2s-1), so all photosynthesishave to multifilied by leaf area (0.01m-2) and time.
-         //   bla.P=A;
-         //(*this).bla.P=3*A;
-       SetValue(*this, LGAP, A);
+       KGC Photo =(KGC)((1-G/Ci) * min(Wc,Wj));        //(umole/m2/s)
+     
+       //Emole = 2.176 *100000 joule/mole; umole = 0.2176 J 
+         //  KGC A=Photo*0.01;          //0.01KG/MJ?? p0=0.001    
+     // KGC A=Photo-Rd;//  Rd is (umolm-2s-1), so all photosynthesis have to multifilied by leaf area (0.01m-2) and time.
+
+       //  KGC A=Photo*0.000001*30*60*0.5 *44 *0.001; //3 (umole/m2/s)* 0.000001Mole *30*60(s) * 0.1m2(should be all leaves in one new branch??no, only one leaf area) * 44 *0.001Kg
+   
+       KGC A=Photo * 30 *60 * GetValue(*this, LGAA)* 0.000001 *12 * 0.001; //(umole/m2/s) * time * LeafArea * 0.000001mole * Carbon(12) *0.001Kg
+          
+       SetValue(*this, LGAP, A);     //(*this).bla.P=A;
+      
 	 //** cout <<"print the photosynthesis of segment: "<<GetValue(*this, LGAP)<<endl; 
   
   return 1;
@@ -71,7 +77,7 @@ int PoplarLeaf::photosynthesis()
 
 void PoplarLeafPhotosynthesis::operator()(BroadLeaf<Triangle>* b)
 {
-  //  cout<<"   Hello, I am photosynthesis in leaf"<<endl;
+  //cout<<"   Hello, I am photosynthesis in leaf"<<endl;
   //You can do it this way: first do your computations (c.f. above) and simply
   //set  the  value:  SetValue(*b,P,RESULT);  Or call  the  method  if
   //interface (argument type) is fine
@@ -83,7 +89,10 @@ void PoplarLeafPhotosynthesis::operator()(BroadLeaf<Triangle>* b)
 void PoplarLeafRespiration::operator()(BroadLeaf<Triangle>* bl)
 { 
   //** cout<<"   I am respiration in leaf"<<endl;
-  SetValue(*bl, LGAM, 0.2*GetValue(*bl, LGAWf));
+  // Tree<poplarsegment, poplarbud>& t = dynamic_cast<Tree<poplarsegment, poplarbud>&>(GetTree(*this));
+  SetValue(*bl, LGAM, 0.25 *GetValue(*bl, LGAWf));
+  // SetValue(*bl, LGAM, 0.0); //0.25 is growth respiration for poplar
+  // cout<<"LGPmf: "<<GetValue(t, LGPmf)<<endl;
 }
 
 void poplarsegment::photosynthesis()
@@ -115,8 +124,10 @@ void poplarsegment::respiration()
   //*SetValue(*this,LGAM,1.0);
   //**ms-- maintenance respiration rate of sapwood
   //**ws--  mass of sapwood
-   //** cout<<"LGPms and LGAWs:"<<GetValue(t,LGPms)<<", "<<GetValue(*this,LGAWs)<<endl;
+   //cout<<"LGPms and LGAWs:"<<GetValue(t,LGPms)<<", "<<GetValue(*this,LGAWs)<<endl;
    m_hw += GetValue(t,LGPms)*GetValue(*this,LGAWs);
-   SetValue(*this,LGAM, m_hw);
+   m_hw += GetValue(t,TreeWr)*GetValue(t,LGPmr)/10.0;  
+   SetValue(*this,LGAM, m_hw/4.0); 
+   // SetValue(*this,LGAM, 0.0); 
 }
 

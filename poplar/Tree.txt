@@ -4,9 +4,9 @@ LGPaf      1.30        #Needle mass - tree segment area (kg/m^2)relationship
 LGPar      0.50        #Foliage - root relationship 
 LGPdof     0.80        #Degree of filling of leaf
 LGPlr      0.01        #Length - radius relationship (R=lr*L) of a tree segment
-LGPmf      0.24        #Maintenance respiration rate of foliage
-LGPmr      0.240       #Maintenance respiration rate of roots
-LGPms      0.0240      #Maintenance respiration rate of sapwood
+LGPmf      0.10        #Maintenance respiration rate of foliage 0.24, [0.25 fromRauscher(Ecophy, 1990)]
+LGPmr      0.100       #Maintenance respiration rate of roots 0.240
+LGPms      0.015      #Maintenance respiration rate of sapwood 0.024 [0.015 fromRauscher(Ecophy, 1990)]
 LGPna      0.7854      #Needle angle (pi/4)
 LGPnl      0.04        #Needle length (10 cm = 0.10 m) 
 LGPq       1.0        #Tree segment shortening factor

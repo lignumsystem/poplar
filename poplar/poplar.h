@@ -57,8 +57,7 @@ class PoplarBudData{
   LGMdouble state;  //Dead(0), alive(1), dormant(2)
   LGMdouble status; //[0:1] meaning relative leaf size
   LGMdouble omega;  //branching order
-  LGMdouble brp;    //[0:1] meaning  the relative position  of the bud
-		    //in a segment
+  LGMdouble brp;    //[0:1] meaning  the relative position  of the bud in a segment
 
   //Direction is explicitely three floating point numbers; 
   LGMdouble x;
@@ -236,7 +235,6 @@ public:
   virtual void respiration();
   TcData& diameterGrowth(TcData& data);
 
-
   double r_segment;
   double segment_length;
   double subAge;
@@ -246,40 +244,6 @@ private:
   //initialize in constructor. p1 is just an example.
   LGMdouble p1;
 };
-/*
-  //Constructor  for poplar  bu. The  argument list  is as  assumed by
-  //L-system. If you need additional arguments add them after the last
-  //one (the tree) and provide default values
-  friend LGMdouble SetValue(poplarbud& pb, poplar_attributes name,
-			    LGMdouble value){
-    LGMdouble tmp=GetValue(pb, name);
-    if (name==Pb1)
-      pb.pb1=value;
-    else
-      cerr << "Poplar bud Set Value Unknown attribute: " << name << endl; 
-    return tmp;
-  }
-
-  friend LGMdouble GetValue(poplarbud& pb, poplar_attributes name){
-    if (name==Pb1)
-      return pb.pb1;
-    else{
-      cerr << "Poplar bud Get Value Unknown attribute: " << name << endl; 
-      cerr << "Returning -1 " << endl; 
-    }
-    return -1.0;
-    }
-
- public:
-  poplarbud(const Point& p, const PositionVector& d, const LGMdouble omege, 
-	    Tree<poplarsegment, poplarbud>* tree)
-    :Bud<poplarsegment,poplarbud>(p,d,LGAomega,tree){}
- private:
-  //poplar specific bud attributes and structures here
-  //initialize in constructor
-  LGMdouble pb1;
-
-  void aging(){SetValue(*this, LGAage, GetValue(*this, LGAage)+1.0);}*/
 
 
 class poplarbud : public Bud<poplarsegment, poplarbud>
@@ -382,10 +346,11 @@ public:
   }
   //TreeCompartment<TS,BUD>* operator()(TreeCompartment<TS,BUD>* tc)const
   double& operator()(double& qin, TreeCompartment<poplarsegment, poplarbud>* tc)const
-  {
+    {
+      // cout<<"set Segment Length here"<<endl;
       if (poplarsegment* ts = dynamic_cast<poplarsegment*>(tc)){
-         if (GetValue(*ts, SUBAGE) != 0.0){
-            qin=GetValue(*ts, LGAQin);
+         if (GetValue(*ts, SUBAGE) > 0.5){
+            qin=GetValue(*ts, LGAQin);//Take the Qin, it will be passed to segment in front
 	  }
 	 else {	
 	     Firmament& f = GetFirmament(GetTree(*ts));
@@ -413,22 +378,22 @@ public:
 	     apical = 0.1;  //double(double(qin)/double(B));
 	     // cout<<apical<<" : the value of apical."<<endl;
 	 }
-
+     
 	 double L_new=l * apical * (0.1+0.9*vi);  //0.0008* l will be too big so that the voxel space can not hold all compartments.
          L_new = max(L_new,0.0);
-
+	
          if (L_new<0.005)
 	     L_new=0;
-	    // cout<<"L_new: "<<L_new<<", "<<l<<endl;
+	 // cout<<"L_new: "<<L_new<<", l: "<<l<<endl;
 	 SetValue(*ts,LGAL,L_new);
-
+	
 	 double af=0.01; 
 	 SetValue(*ts, LGARTop, af);
 	 double asf=af/(GetValue(GetTree(*ts), LGPsf)*GetValue(GetTree(*ts), LGPyc));
 	 double atot=asf;
 
 	 //Initial radius
-	 SetValue(*ts,LGAR, 0.03*L_new);  // SetValue(*ts,LGAR,GetValue(GetTree(*ts),LGPlr)*L_new);
+	 SetValue(*ts,LGAR, 0.005*L_new);  // SetValue(*ts,LGAR,GetValue(GetTree(*ts),LGPlr)*L_new);
 	 //Reset previous Rh!!!!
 	 SetValue(*ts,LGARh,0.0);
 	 //Initial heartwood
@@ -440,7 +405,7 @@ public:
  	 //Remember original sapwood area As0
 
 	 //NOTE: HwTree does not have LGAAs0!!!!!
-	 SetValue(*ts,LGAAs0,GetValue(*ts,LGAAs)); 
+	 SetValue(*ts,LGAAs0,GetValue(*ts,LGAAs));   
 	 //* cout<<GetValue(*ts, LGAAs)<<"check radius of segment................"<<GetValue(*ts, LGAR)<<endl;
 	   ts->r_segment = GetValue(*ts, LGAR);
 	   ts->segment_length = GetValue(*ts, LGAL);
@@ -473,10 +438,9 @@ private:
 class TryDiameterGrowth{
 public:
   DiameterGrowthData& operator()(DiameterGrowthData& data, TreeCompartment<poplarsegment, poplarbud>* tc)const
-  {
-    if (poplarsegment* ts = dynamic_cast<poplarsegment*>(tc)){
-      if (GetValue(*ts, SUBAGE) == 0){
-	// cout<<"//New segment!!!TryDiameterGrowth"<<endl;
+  { 
+    if (poplarsegment* ts = dynamic_cast<poplarsegment*>(tc)){ 
+      if (GetValue(*ts, SUBAGE) < 0.5){
 	//Collect the masses
 	//***SetValue(data,DGWfnew,GetValue(*ts,DGWfnew));
 	//***SetValue(data,DGWf,GetValue(*ts,DGWf));
@@ -484,9 +448,8 @@ public:
 	//Sapwood requirement
 	//**SetValue(data,LGAAs,GetValue(*ts,LGAAs));
 
-
 	LGMdouble As=GetValue(*ts, LGAAs);
-	LGMdouble Af=As*20*200;
+	LGMdouble Af=As*20*10;
 
 	LGMdouble Wf = Af/20;
 
@@ -495,7 +458,7 @@ public:
 	//cout<<"setValue of DGWfnew is: "<<GetValue(data,DGWfnew)<<"or "<<Wf<<endl;
 	SetValue(data, DGWs, GetValue(*ts, LGAWs));
 	SetValue(data, LGAAs, GetValue(*ts, LGAAs));
-	//*** cout<<"DGWs: "<<GetValue(data,DGWs)<<" DGWfnew: "<<GetValue(data,DGWfnew)<<"DGWf: "<<GetValue(data, DGWf)<<endl;
+        //cout<<"DGWs: "<<GetValue(data,DGWs)<<" DGWfnew: "<<GetValue(data,DGWfnew)<<"DGWf: "<<GetValue(data, DGWf)<<endl;
 
       }
       else{//old segment
@@ -528,23 +491,12 @@ public:
 	SetValue(data,DGWs,GetValue(data,DGWs)+Wsnew);
 	//Total foliage
 	SetValue(data,DGWf,GetValue(data,DGWf)+GetValue(*ts,LGAWf));
+	
       }
     }
     return data;
   }
 };
-
-
-  template <class TS, class BUD, class T>
-    class CreateTriangleLeaves{
-    public:
-    CreateTriangleLeaves(METER l, METER b, METER h):pl(l),base(b),height(h){}
-    vector<PositionVector>& operator()(vector<PositionVector>& v,
-				       TreeCompartment<TS,BUD>* tc)const;
-    METER pl;//Petiole length
-    METER base; //base length
-    METER height; //height of the triangle
-  };
 
 
 class CreatePoplarLeaves{
@@ -555,23 +507,25 @@ class CreatePoplarLeaves{
     METER pl;//Petiole length
     METER base; //base length
     METER height; //height of the triangle
-  mutable double rlsize; //Relative leaf size 
+  mutable double rlsize; //Relative leaf size (LGAstatus)
 };
 
 inline vector<PositionVector>& 
     CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
 					       TreeCompartment<poplarsegment, poplarbud>* tc)const
-    {
-      double rlsize=1.0;
-      if (poplarbud* b = dynamic_cast<poplarbud*>(tc)){
-	if (GetValue(*b,LGAstatus)>0.0){    // == 1
+{ 
+      // double rlsize=0.1;
+       if (poplarbud* b = dynamic_cast<poplarbud*>(tc)){ 
+	 // cout<<"LGAstatus: the leaf size "<<GetValue(*b,LGAstatus)<<endl;
+	 if (GetValue(*b, LGAstate)!=DEAD &&GetValue(*b,LGAstatus)>0.0 && GetValue(*b, LGAage) == 0.0){    // == 1	     
 	  pdv.push_back(GetDirection(*b));
           rlsize = GetValue(*b, LGAstatus);
-	  //Leaf created, set status to 0 	
-	  SetValue(*b,LGAstatus,0);
+	  // SetValue(*b,LGAstatus,0);         
 	}
+
       }
       if (poplarsegment* ts = dynamic_cast<poplarsegment*>(tc)){
+	if(GetValue(*ts, LGAage) == 0.0){
 	Point origo(0,0,0);
    	Point point = GetEndPoint(*ts);
 	PositionVector up(0,0,1);
@@ -582,18 +536,19 @@ inline vector<PositionVector>&
 	                  //the  program and  not reinitialized  in each
            	          //call.
 	int seed = 3267;
-        if (GetValue(*ts, LGAL)==0.0)
-          pdv.clear();
+	
+	 if (GetValue(*ts, LGAL)==0.0)
+           pdv.clear();
 	for (unsigned int i = 0; i <pdv.size(); i++){
 	  PositionVector pdir = pdv[i];
 	  //Leaves are  created at the end  of the segment  where the buds
 	  //are, second argument is the intial length of the petiole
 	  Petiole petiole(point,point + pl*(Point)pdir);
-	  cout<<"the value of pl is: "<<pl<<" and pdir is :"<<(Point)pdir<<endl;
 	  //Randomize  the leaf blade  normal by  rotating in  around axis
 	  //that lies in the horizontal plane defined by cross product of
 	  //petiole direction and up-vector. Also it is direction towards  
 	  //right corner of the triangle
+
 	  PositionVector axis1 = Cross(pdir,up).normalize();
 	  //limit the rotation  of the leaf normal to  [-90,90] degrees so
 	  //that the leaf normal does not point downwards
@@ -608,32 +563,33 @@ inline vector<PositionVector>&
 	  PositionVector axis3 = Cross(leaf_normal,axis1).normalize();
 	  //I hope I got the cross  products right, but we will see in
 	  //the visualization how the leaves settle themselves
+
 	  Point right = point + base*0.5*(Point)axis1;
 	  Point left  = point + base*0.5*(Point)axis2;
 	  Point apex  = point + height*(Point)axis3;
 	  Triangle shape(left,right,apex);
 	  BroadLeaf<Triangle>* leaf = new BroadLeaf<Triangle>(shape,petiole,leaf_normal);
 
-
           SetValue(*leaf, LGAdof, 0.6); //GetValue(GetTree(*tc), LGPdof)); // cout<<"LGAdof: "<<GetValue(*leaf, LGAdof)<<endl;
           SetValue(*leaf, LGAtauL, GetValue(GetTree(*tc), LGPtauL));
           SetValue(*leaf, LGAsf, GetValue(GetTree(*tc), LGPsf));
   
-	  double Af = rlsize * 0.08; //GetValue(GetTree(*ts), LGPaleafmax);
+	  double Af = rlsize * 0.01; //GetValue(GetTree(*ts), LGPaleafmax);
 	    //  cout<<"LGPaleafmax value: "<<GetValue(GetTree(*ts), LGPaleafmax)<<endl;
          
-	  //  SetValue(*leaf, LGAA, Af);   //set the leaf area value, which is used in DumpLeaf()
+	  SetValue(*leaf, LGAA, Af); // 0.02);   //set the leaf area value, which is used in DumpLeaf()
 
 	  //Insert leaf
-	  ts->addLeaf(leaf);
-	  //**cout << "Leaf inserted" << endl;
+	  ts->addLeaf(leaf);	 
+         // Point p = GetCenterPoint(*leaf);
+         // cout<<p<<endl;
+	}
 	}
 	//clear the vector; don't create leaves twice
 	pdv.clear();
       }
       return pdv;
     }
-
 
 template <class TS,class BUD>
 class KillPoplarBuds{
@@ -643,8 +599,8 @@ class KillPoplarBuds{
 	    length = GetValue(*ts,LGAL);
 	}
 	else if (BUD* b = dynamic_cast<BUD*>(tc)){
-	    if (length == 0.0){
-	       SetValue(*b,LGAstate,DEAD);   //***SetValue(*b,LGAstate,DORMANT);
+	  if(length < 0.05 || GetValue(*b, LGAomega)>2){    //original(length ==0)
+	       SetValue(*b,LGAstate,DEAD);   //***SetValue(*b,LGAstate,DORMANT);             
 	    }
 	}
 	return length;
@@ -665,8 +621,7 @@ class WakeupPoplarBuds{
 	          SetValue(*b,LGAstate, ALIVE); 
 		}  
               else 
-                 SetValue(*b,LGAstate, DORMANT); 
-
+                SetValue(*b,LGAstate, DEAD); //  SetValue(*b,LGAstate, DORMANT); 
 	    }
 	}
 	return 0;
@@ -678,11 +633,40 @@ class SubAging{
  public:
   double operator()(TreeCompartment<TS, BUD>* tc)const{
       if (TS* ts = dynamic_cast<TS*>(tc)){
-	SetValue(*ts, SUBAGE, GetValue(*ts, SUBAGE)+1.0);
+	SetValue(*ts, SUBAGE, GetValue(*ts, SUBAGE)+1.0);         
+  }
+      if (BUD* b = dynamic_cast<BUD*>(tc)){
+	//SetValue(*b, SUBAGE, GetValue(*b, SUBAGE)+1.0); 
+        SetValue(*b,LGAstatus, GetValue(*b, LGAstatus)+ 0.1);
   }
 }
 };
 
+
+
+//This propagates the  Radius of the first part  of the split segments
+//to the rest of the  segments in the sequence maintaining the sapwood
+//allocated.
+class ForwardR0{
+ public:
+  double& operator()(double& r0,
+		  TreeCompartment<poplarsegment, poplarbud>* tc)const
+  {
+    if (poplarsegment* ts = dynamic_cast<poplarsegment*>(tc)){
+      //Ages are zero
+      if (GetValue(*ts,LGAage) == 0.0){
+	//If the r0 is not set
+	if (r0 == 0.0)
+	  //This is the first part of the split segment
+	  r0 = GetValue(*ts,LGAR);
+	else
+	  //These are the other segments resulting from the split
+	  SetValue(*ts,LGAR,r0);
+      }
+    }
+    return r0;
+  }
+};
 
 
 #endif

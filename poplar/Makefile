@@ -1,4 +1,4 @@
-POPLARSRC = poplarmain.cc poplarmetabolism.cc poplarsegment.cc
+POPLARSRC = poplarmain.cc poplarmetabolism.cc poplarsegment.cc 
 POPLAROBJ = ${POPLARSRC:.cc=.o}
 
 LSYS = poplar.L ErythrinaRoots.L

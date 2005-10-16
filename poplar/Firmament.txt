@@ -1,8 +1,8 @@
 #Sectors 
-10    #incl
-10    #azim
-1200  #Radiation MJ
+10    #incl 10
+10    #azim 10 
+1200  #Radiation MJ 1200
 #Gap data follows
-
+#GapData.fun
 
          
