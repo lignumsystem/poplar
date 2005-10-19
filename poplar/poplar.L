@@ -66,11 +66,12 @@ ignore: Roll Pitch Turn HRoll;
 //state, status(leafSize), omega, brp-relative position  of the bud in a segment
 Start:
 {
+  //Terminating bud not creating leaves
   PoplarBudData d1(ALIVE,0.0,0.0,1.0);
+  //Axillary buds assoaciated with a leaf
   PoplarBudData d2(ALIVE,0.1,1.0,1.0);
 
- produce Roll(30.0 * PI_VALUE/180.0) F(0.05, 0)
-           Roll(roll)  B(d1);    
+ produce Roll(30.0 * PI_VALUE/180.0) F(0.05, 0) SB() Pitch(-PI_VALUE/4.0)B(d2) EB() Roll(roll)  B(d1);    
 }
 
 
@@ -139,9 +140,9 @@ F(s,od)  < B(d):
     if (GetValue(d,LGAomega) == 0)
          produce F(r/10.0, o) Split()  B(d1);
     else if (GetValue(d,LGAomega) == 1)
-         produce F(r/10.0, o) Split()  Pitch(-fac)B(d1);
+         produce F(r/10.0, o) Split()  Pitch(-fac)B(d2);
     else
-         produce F(r/10.0, o) Split() Pitch(-fac)B(d1);
+         produce F(r/10.0, o) Split() Pitch(-fac)B(d2);
   }
   else
     produce B(dead);
@@ -174,13 +175,13 @@ F(s,o) > Split():
 else if (0.1<=s && s<0.2)
 {
  // cout<<s<<" :value of s(o=0)"<<endl;
-  produce F(s/2, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180) B(dorm) EB()
+  produce F(s/2, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
         F(s/2, o);
 }
 else 
 {
-produce F(s/3, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180) B(dorm) EB()
-        F(s/3, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180) B(dorm) EB()
+produce F(s/3, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/3, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
         F(s/3, o);
 }
 
