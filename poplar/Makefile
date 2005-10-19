@@ -5,7 +5,7 @@ LSYS = poplar.L ErythrinaRoots.L
 SRC = ${LSYS:.L=.cpp}
 OBJ = ${SRC:.cpp=.o}
 
-CCC = g++
+CCC = g++ 
 
 #OPTIMIZE = -Ofast=ip28 -IPA
 OPTIMIZE   = -g 
@@ -56,7 +56,7 @@ LIBS     =  $(LIBVISUAL) $(LIBLSYS) $(LIBL)  $(LIBVOX) $(LIBLGM) \
 
 .SUFFIXES: .L .cpp .o .cc  .o .cpp 
 
-all: gnupoplar
+all: sgipoplar
 
 sinclude Makedepend
 

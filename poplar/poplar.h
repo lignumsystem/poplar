@@ -205,7 +205,7 @@ class poplarsegment : public HwTreeSegment<poplarsegment,poplarbud,Triangle>
     LGMdouble tmp = GetValue(ps,name);
     if (name == P1)
       ps.p1 = value;
-    else if (name=SUBAGE)
+    else if (name==SUBAGE)
       ps.subAge = value;
     else
       cerr << "Poplar segment Set Value Unknown attribute: " << name << endl; 
@@ -214,7 +214,7 @@ class poplarsegment : public HwTreeSegment<poplarsegment,poplarbud,Triangle>
   friend LGMdouble GetValue(poplarsegment& ps, poplar_attributes name){
     if (name == P1)
       return ps.p1;
-    else if (name = SUBAGE)
+    else if (name == SUBAGE)
       return ps.subAge;
     else{
       cerr << "Poplar segment Get Value Unknown attribute: " << name << endl; 
@@ -576,7 +576,7 @@ inline vector<PositionVector>&
   
 	  double Af = rlsize * 0.01; //GetValue(GetTree(*ts), LGPaleafmax);
 	    //  cout<<"LGPaleafmax value: "<<GetValue(GetTree(*ts), LGPaleafmax)<<endl;
-         
+	 
 	  SetValue(*leaf, LGAA, Af); // 0.02);   //set the leaf area value, which is used in DumpLeaf()
 
 	  //Insert leaf

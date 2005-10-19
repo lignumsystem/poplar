@@ -41,22 +41,22 @@ TcData& poplarsegment::diameterGrowth(TcData& data)
 int PoplarLeaf::photosynthesis()
 {
   // cout << "poplarleaf photosynthesis "<< endl;
-  LGMdouble T = 25; //temperature of leaf.l
-  double Ca=360, Kc=460, Ko=330;
-  double Ci=0.7 * Ca * ((1.674-0.061294*T+0.0011688*pow(T,2)-0.0000088741*pow(T,3))/0.73547);
-  double Oi=210*((0.047-0.0013087*T+0.000025603*pow(T, 2)-0.00000021441*pow(T,3))/0.026934);
-  double Vcmax=57.15;
-  double Vomax=0.21*Vcmax;
-  double Wc=(Vcmax*Ci)/(Ci+Kc*(1+Oi/Ko));
-  double G = (0.5*Vomax*Kc*Oi)/(Vcmax*Ko);
 
-  double Jmax=105;
-  double Q=GetValue((*this), LGAQabs);  //(*this).bla.Q_in;   //abs;    //Qabs-absorbed radiation
-  //  Q=200;  //1200;  //  
-  double a = 0.0551;
-  double J =a* Q *pow((1+pow(a, 2)*pow(Q,2)/pow(Jmax, 2)), 0.5);
-  double Wj = (J*Ci)/(4.5*Ci+10.5*G);
-     
+    LGMdouble T = 25; //temperature of leaf.l
+    double Ca=360, Kc=460, Ko=330;
+    double Ci=0.7 * Ca * ((1.674-0.061294*T+0.0011688*pow(T,2)-0.0000088741*pow(T,3))/0.73547);
+    double Oi=210*((0.047-0.0013087*T+0.000025603*pow(T, 2)-0.00000021441*pow(T,3))/0.026934);
+    double Vcmax=57.15;
+    double Vomax=0.21*Vcmax;
+    double Wc=(Vcmax*Ci)/(Ci+Kc*(1+Oi/Ko));
+    double G = (0.5*Vomax*Kc*Oi)/(Vcmax*Ko);
+
+    double Jmax=105;
+    double Q=GetValue((*this), LGAQabs);  //(*this).bla.Q_in;  //Qabs-absorbed radiation
+      double a = 0.0551;
+       double J =a* Q *pow((1+pow(a, 2)*pow(Q,2)/pow(Jmax, 2)), 0.5);
+       double Wj = (J*Ci)/(4.5*Ci+10.5*G);
+
   KGC Rd=2.21;
   KGC Photo =(KGC)((1-G/Ci) * min(Wc,Wj));        //(umole/m2/s)
      
@@ -66,9 +66,10 @@ int PoplarLeaf::photosynthesis()
 
   //  KGC A=Photo*0.000001*30*60*0.5 *44 *0.001; //3 (umole/m2/s)* 0.000001Mole *30*60(s) * 0.1m2(should be all leaves in one new branch??no, only one leaf area) * 44 *0.001Kg
    
-  KGC A=Photo * 30 *60 * GetValue(*this, LGAA)* 0.000001 *12 * 0.001; //(umole/m2/s) * time * LeafArea * 0.000001mole * Carbon(12) *0.001Kg
-          
-  SetValue(*this, LGAP, A);     //(*this).bla.P=A;
+       KGC A=Photo * 30 *60 * 0.000001 *12 * 0.001; //(umole/m2/s) * time * 0.000001mole * Carbon(12) *0.001Kg: LeafArea(* GetValue(*this, LGAA)) is not included here any more because it is already timed in VoxelSpaceI.h for Qabs.
+       // cout<<"leaf area: "<<GetValue(*this, LGAA)<<"Photo: "<<Photo<<endl;
+       SetValue(*this, LGAP, A);     //(*this).bla.P=A;
+
       
   //** cout <<"print the photosynthesis of segment: "<<GetValue(*this, LGAP)<<endl; 
   

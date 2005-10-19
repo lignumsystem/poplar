@@ -43,7 +43,6 @@ namespace Erythrina{
 
 int main(int argc, char** argv)
 {
-  int iterations = 3;
   string metafile = "MetaFile.txt";
 
   Lex l;
@@ -103,7 +102,7 @@ int main(int argc, char** argv)
 			"may.dat", "jun.dat", "jul.dat", "aug.dat", 
 			"sep.dat", "oct.dat", "nov.dat", "dec.dat" };
 
-  for (int age=0; age<1; age++) // poplarL.derivationLength()--yearly
+  for (int age=0; age<3; age++) // poplarL.derivationLength()--yearly
   {
      cout << "age: " << age << endl;  
    
@@ -154,12 +153,14 @@ int main(int argc, char** argv)
 	      }
            else
 	     break;
+	    if (diffuse<1)
+	      continue;
 
-	    //  cout<<"direct and diffuse value: "<<direct<<" ,"<<diffuse<<endl;
+	    // cout<<"direct and diffuse value: "<<direct<<" ,"<<diffuse<<endl;
 	    vector<double> a(3);
-            a[0] = sin(d);
-            a[1] = cos(d);
-            a[2] = c;
+	    a[0] = 0; // sin(d);
+            a[1] = 0;  //cos(d);
+            a[2] = 1;  //c;  
 	    f.setSunPosition(a); 
   
 	    f.setDirectRadiation(direct);
@@ -218,7 +219,7 @@ SetValue(poplartree,TreeM,M);
     //  LGMdouble M = treeRespiration;
     if (P==0 && age==0)
       { cout<<"accumulated P: "<<P<<endl;
-       P = 0.0001;
+       P = 0.0002;
       }
     SetValue(poplartree,TreeP,P);
     SetValue(poplartree,TreeM,M); 
@@ -258,7 +259,7 @@ SetValue(poplartree,TreeM,M);
     AccumulateDown(poplartree,data,
 		   TreeDiameterGrowth<poplarsegment, poplarbud>());
 
-    /////////do tree pruning"
+    /////////do tree pruning
     // double length=0.0;
       PropagateUp(poplartree, length, KillPoplarBuds<poplarsegment, poplarbud>());
       poplarL.lignumToLstring(poplartree,1,PoplarD);  
