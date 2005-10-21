@@ -3,6 +3,18 @@
 
 // declared in poplar.h poplarsegment class.
 
+class LeafResize
+{
+ public:
+  LeafResize(double la){leafArea=la;}
+  void LeafResize :: operator()(BroadLeaf<Triangle>* b)  
+  {
+     SetValue(*b, LGAA, leafArea); 
+  }
+  double leafArea;
+};
+
+
 TcData& poplarsegment::diameterGrowth(TcData& data)
 {
   //New segment (age == 0) is iteratively set. 
@@ -25,18 +37,21 @@ TcData& poplarsegment::diameterGrowth(TcData& data)
     SetValue(*this,LGAR, Rnew);
   } 
   //Pass down sapwood area requirement
-  SetValue(data,LGAAs,GetValue(*this,LGAAs));   
+  SetValue(data,LGAAs,GetValue(*this,LGAAs)); 
+
+  
+   LGMdouble As=GetValue(*this, LGAAs);
+   LGMdouble Af=As*20*10;
+    list<BroadLeaf<Triangle> *> leaves=GetLeafList(*this);
+    int nLeaves = leaves.size();
+    double la= min(Af/(double)(nLeaves), 0.005); 
+    cout<<"number of leaves: "<<nLeaves<<endl;
+    LeafResize f(la);
+    for_each(leaves.begin(), leaves.end(), f); 
+
   return data;
 }
 
-
-
-/*
-  template<>
-  void BroadLeaf<Triangle>::photosynthesis(const LGMdouble& p0)
-  {
-  }
-*/
 
 int PoplarLeaf::photosynthesis()
 {
@@ -66,7 +81,7 @@ int PoplarLeaf::photosynthesis()
 
   //  KGC A=Photo*0.000001*30*60*0.5 *44 *0.001; //3 (umole/m2/s)* 0.000001Mole *30*60(s) * 0.1m2(should be all leaves in one new branch??no, only one leaf area) * 44 *0.001Kg
    
-       KGC A=Photo * 30 *60 * 0.000001 *12 * 0.001; //(umole/m2/s) * time * 0.000001mole * Carbon(12) *0.001Kg: LeafArea(* GetValue(*this, LGAA)) is not included here any more because it is already timed in VoxelSpaceI.h for Qabs.
+  KGC A=Photo * 30 *60 * 0.000001 *12 * 0.001;// * GetValue(*this, LGAA); //(umole/m2/s) * time * 0.000001mole * Carbon(12) *0.001Kg: LeafArea(* GetValue(*this, LGAA)) is not included here any more because it is already timed in VoxelSpaceI.h for Qabs.
        // cout<<"leaf area: "<<GetValue(*this, LGAA)<<"Photo: "<<Photo<<endl;
        SetValue(*this, LGAP, A);     //(*this).bla.P=A;
 
@@ -127,20 +142,17 @@ void poplarsegment::respiration()
   //**ws--  mass of sapwood
   //cout<<"LGPms and LGAWs:"<<GetValue(t,LGPms)<<", "<<GetValue(*this,LGAWs)<<endl;
   m_hw += GetValue(t,LGPms)*GetValue(*this,LGAWs);
-  m_hw += GetValue(t,TreeWr)*GetValue(t,LGPmr)/10.0;  
-  SetValue(*this,LGAM, m_hw/4.0); 
-  // SetValue(*this,LGAM, 0.0); 
+  SetValue(*this,LGAM, m_hw/4.0);  
 }
 
 vector<PositionVector>& 
 CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
 			       TreeCompartment<poplarsegment, poplarbud>* tc)const
 { 
-  // double rlsize=0.1;
+  
   if (poplarbud* b = dynamic_cast<poplarbud*>(tc)){ 
     if (GetValue(*b,LGAstatus)>0.0){    // == 1	     
       pdv.push_back(GetDirection(*b));
-      rlsize = GetValue(*b, LGAstatus);
       SetValue(*b,LGAstatus,0.0); //leaf created, no more leaves for
       //this bud
     }
@@ -200,10 +212,10 @@ CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
 	SetValue(*leaf, LGAtauL, GetValue(GetTree(*tc), LGPtauL));
 	SetValue(*leaf, LGAsf, GetValue(GetTree(*tc), LGPsf));
   
-	double Af = rlsize * 0.01; //GetValue(GetTree(*ts), LGPaleafmax);
+	double Af = 0.1 * 0.01; //GetValue(GetTree(*ts), LGPaleafmax);
 	//  cout<<"LGPaleafmax value: "<<GetValue(GetTree(*ts), LGPaleafmax)<<endl;
 	SetValue(*leaf, LGAA, Af); // 0.02);   //set the leaf area value, which is used in DumpLeaf()
-	//Insert leaf
+	//cout<<"Insert leaf"<<endl;
 	InsertLeaf(*ts,leaf);
 	// Point p = GetCenterPoint(*leaf);
 	// cout<<p<<endl;

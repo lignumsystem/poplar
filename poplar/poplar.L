@@ -110,7 +110,7 @@ F(s,od)  < B(d):
   PoplarBudData dead(DEAD, 0.0, GetValue(d, LGAomega), 1.0);
   PoplarBudData dorm(DORMANT, 0.1, GetValue(d, LGAomega), 1.0);
   PoplarBudData d1(GetValue(d, LGAstate), 0.0, GetValue(d, LGAomega), 1.0);
-  PoplarBudData d2(GetValue(d, LGAstate), 0.1, GetValue(d, LGAomega)+1, 1.0);
+  PoplarBudData d2(GetValue(d, LGAstate), 0.1, GetValue(d, LGAomega), 1.0);
 
   LGMdouble o=GetValue(d, LGAomega);
   LGMdouble st = GetValue(d, LGAstate);
@@ -140,9 +140,9 @@ F(s,od)  < B(d):
     if (GetValue(d,LGAomega) == 0)
          produce F(r/10.0, o) Split()  B(d1);
     else if (GetValue(d,LGAomega) == 1)
-         produce F(r/10.0, o) Split()  Pitch(-fac)B(d2);
+         produce F(r/10.0, o) Split()  Pitch(fac)B(d2);
     else
-         produce F(r/10.0, o) Split() Pitch(-fac)B(d2);
+         produce F(r/10.0, o) Split() Pitch(fac)B(d2);
   }
   else
     produce B(dead);

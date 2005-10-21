@@ -71,7 +71,7 @@ int main(int argc, char** argv)
   f.resize(40,20,1200); //resize:  inclinations,  azimuths,  1200 MJ/year for previous tree,  
 
   //create voxel space 
-  VoxelSpace vs(Point(0,0,0), Point(200, 200, 200), 4, 4, 4, 50, 50, 50,  GetFirmament(poplartree)); 
+  VoxelSpace vs(Point(0,0,0), Point(50, 50, 50), 1, 1, 1, 50, 50, 50,  GetFirmament(poplartree)); 
   //  VoxelSpace vs(Point(0,0,0), Point(50, 50, 18), 1, 1, 1, 50, 50, 18,  GetFirmament(poplartree));
 
   /*  string voxelfile="VoxelSpace.txt";
@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 			"may.dat", "jun.dat", "jul.dat", "aug.dat", 
 			"sep.dat", "oct.dat", "nov.dat", "dec.dat" };
 
-  for (int age=0; age<3; age++) // poplarL.derivationLength()--yearly
+  for (int age=0; age<1; age++) // poplarL.derivationLength()--yearly
   {
      cout << "age: " << age << endl;  
    
@@ -136,8 +136,9 @@ int main(int argc, char** argv)
  
       vs.move(bBox.getMin());
       vs.resize(0.3,0.3,0.3,nx,ny,nz);
-  
+      cout<<"begin DumpHwTree. "<<endl;
         DumpHwTree(vs,poplartree);
+     cout<<"end DumpHwTree. "<<endl;
 	LGMdouble treePhotosynthesis =0; 
 	LGMdouble treeRespiration = 0;
 
@@ -156,11 +157,11 @@ int main(int argc, char** argv)
 	    if (diffuse<1)
 	      continue;
 
-	    // cout<<"direct and diffuse value: "<<direct<<" ,"<<diffuse<<endl;
+	    //cout<<"direct and diffuse value: "<<direct<<" ,"<<diffuse<<endl;
 	    vector<double> a(3);
-	    a[0] = 0; // sin(d);
-            a[1] = 0;  //cos(d);
-            a[2] = 1;  //c;  
+	    a[0] = sin(d);
+            a[1] = cos(d);
+            a[2] = c;  
 	    f.setSunPosition(a); 
   
 	    f.setDirectRadiation(direct);
@@ -175,7 +176,7 @@ int main(int argc, char** argv)
       LGMdouble maxQin = 0.0;
       maxQin = Accumulate(poplartree, maxQin, GetQinMax<poplarsegment,poplarbud>() );
       SetValue(poplartree, TreeQinMax, maxQin);
-      // cout << "  TreeQinMax: " << maxQin << "  MJ/m2" << endl;
+      //  cout << "  TreeQinMax: " << maxQin << "  MJ/m2" << endl;
 
     LGMdouble treeQabs = 0.0;
     treeQabs = Accumulate(poplartree,treeQabs,
@@ -202,7 +203,7 @@ int main(int argc, char** argv)
     poplarL.derive();
     //below ground roots
     rootL.derive();
-    //cout << "expand done " << endl;
+    cout << "expand done " << endl;
     //Update tree so that structures match
  
     poplarL.lstringToLignum(poplartree,1, PoplarD);
@@ -214,15 +215,9 @@ int main(int argc, char** argv)
      
     LGMdouble p = 0.0, m = 0.0;
     LGMdouble P = treePhotosynthesis;
-LGMdouble M = Accumulate(poplartree,m, SumTreeRespiration<poplarsegment, poplarbud>());
-SetValue(poplartree,TreeM,M);
-    //  LGMdouble M = treeRespiration;
-    if (P==0 && age==0)
-      { cout<<"accumulated P: "<<P<<endl;
-       P = 0.0002;
-      }
+    LGMdouble M = Accumulate(poplartree,m, SumTreeRespiration<poplarsegment, poplarbud>()) + GetValue(poplartree,LGPmr)* GetValue(poplartree,TreeWr) ;
+    SetValue(poplartree,TreeM,M);
     SetValue(poplartree,TreeP,P);
-    SetValue(poplartree,TreeM,M); 
 
     TreeGrowthAllocatorPropagateUp<poplarsegment, poplarbud,
       SetSegmentLength, TryDiameterGrowth, double> G(poplartree, 0.0);
@@ -230,8 +225,8 @@ SetValue(poplartree,TreeM,M);
     G.init();
     cout << "G.init finished." << endl;
     cout << "Bisection zero at:  " << Bisection(0.0, 10.0, G, GetValue(poplartree,LGPzbrentEpsilon)) << endl; //GetValue(poplartree,LGPzbrentEpsilon)=0.001
-      double length=0.0;
-      //  PropagateUp(poplartree, length, KillPoplarBuds<poplarsegment, poplarbud>());
+
+     
 
      poplarL.lignumToLstring(poplartree,1, PoplarD);  
      rootL.rootSystemToLstring(poplartree);
@@ -260,7 +255,7 @@ SetValue(poplartree,TreeM,M);
 		   TreeDiameterGrowth<poplarsegment, poplarbud>());
 
     /////////do tree pruning
-    // double length=0.0;
+     double length=0.0;
       PropagateUp(poplartree, length, KillPoplarBuds<poplarsegment, poplarbud>());
       poplarL.lignumToLstring(poplartree,1,PoplarD);  
       poplarL.lstringToLignum(poplartree,1,PoplarD);

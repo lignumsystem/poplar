@@ -72,11 +72,12 @@ ModuleIdType GetIgnored(int i)
 //state, status(leafSize), omega, brp-relative position  of the bud in a segment
 void Start()
 {
+  //Terminating bud not creating leaves
   PoplarBudData d1(ALIVE,0.0,0.0,1.0);
+  //Axillary buds assoaciated with a leaf
   PoplarBudData d2(ALIVE,0.1,1.0,1.0);
 
- { Produce((ModuleIdType)(Roll_id));Produce((double)(30.0 * PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(F_id));Produce((double)(0.05));Produce((double)( 0));Produce((ModuleIdType)(F_id));
-           Produce((ModuleIdType)(Roll_id));Produce((double)(roll));Produce((ModuleIdType)(Roll_id));  Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d1));Produce((ModuleIdType)(B_id));}    
+ { Produce((ModuleIdType)(Roll_id));Produce((double)(30.0 * PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(F_id));Produce((double)(0.05));Produce((double)( 0));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(-PI_VALUE/4.0));Produce((ModuleIdType)(Pitch_id));Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d2));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(roll));Produce((ModuleIdType)(Roll_id));  Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d1));Produce((ModuleIdType)(B_id));}    
 }
 
 
@@ -115,7 +116,7 @@ void End()
   PoplarBudData dead(DEAD, 0.0, GetValue(d, LGAomega), 1.0);
   PoplarBudData dorm(DORMANT, 0.1, GetValue(d, LGAomega), 1.0);
   PoplarBudData d1(GetValue(d, LGAstate), 0.0, GetValue(d, LGAomega), 1.0);
-  PoplarBudData d2(GetValue(d, LGAstate), 0.1, GetValue(d, LGAomega)+1, 1.0);
+  PoplarBudData d2(GetValue(d, LGAstate), 0.1, GetValue(d, LGAomega), 1.0);
 
   LGMdouble o=GetValue(d, LGAomega);
   LGMdouble st = GetValue(d, LGAstate);
@@ -145,9 +146,9 @@ void End()
     if (GetValue(d,LGAomega) == 0)
          { Produce((ModuleIdType)(F_id));Produce((double)(r/10.0));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(Split_id));  Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d1));Produce((ModuleIdType)(B_id));}
     else if (GetValue(d,LGAomega) == 1)
-         { Produce((ModuleIdType)(F_id));Produce((double)(r/10.0));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(Split_id));  Produce((ModuleIdType)(Pitch_id));Produce((double)(-fac));Produce((ModuleIdType)(Pitch_id));Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d1));Produce((ModuleIdType)(B_id));}
+         { Produce((ModuleIdType)(F_id));Produce((double)(r/10.0));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(Split_id));  Produce((ModuleIdType)(Pitch_id));Produce((double)(fac));Produce((ModuleIdType)(Pitch_id));Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d2));Produce((ModuleIdType)(B_id));}
     else
-         { Produce((ModuleIdType)(F_id));Produce((double)(r/10.0));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(Split_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(-fac));Produce((ModuleIdType)(Pitch_id));Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d1));Produce((ModuleIdType)(B_id));}
+         { Produce((ModuleIdType)(F_id));Produce((double)(r/10.0));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(Split_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(fac));Produce((ModuleIdType)(Pitch_id));Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d2));Produce((ModuleIdType)(B_id));}
   }
   else
     { Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dead));Produce((ModuleIdType)(B_id));}
@@ -180,13 +181,13 @@ void End()
 else if (0.1<=s && s<0.2)
 {
  // cout<<s<<" :value of s(o=0)"<<endl;
-  { Produce((ModuleIdType)(F_id));Produce((double)(s/2));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I*PI_VALUE/180));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dorm));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id));
+  { Produce((ModuleIdType)(F_id));Produce((double)(s/2));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I*PI_VALUE/180.0));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dorm));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id));
         Produce((ModuleIdType)(F_id));Produce((double)(s/2));Produce((double)( o));Produce((ModuleIdType)(F_id));}
 }
 else 
 {
-{ Produce((ModuleIdType)(F_id));Produce((double)(s/3));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I*PI_VALUE/180));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dorm));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id));
-        Produce((ModuleIdType)(F_id));Produce((double)(s/3));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(A1*PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I1*PI_VALUE/180));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dorm));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id));
+{ Produce((ModuleIdType)(F_id));Produce((double)(s/3));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(A*PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I*PI_VALUE/180.0));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dorm));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id));
+        Produce((ModuleIdType)(F_id));Produce((double)(s/3));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(A1*PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(I1*PI_VALUE/180.0));Produce((ModuleIdType)(Pitch_id)); Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dorm));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id));
         Produce((ModuleIdType)(F_id));Produce((double)(s/3));Produce((double)( o));Produce((ModuleIdType)(F_id));}
 }
 

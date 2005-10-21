@@ -491,7 +491,6 @@ public:
 	SetValue(data,DGWs,GetValue(data,DGWs)+Wsnew);
 	//Total foliage
 	SetValue(data,DGWf,GetValue(data,DGWf)+GetValue(*ts,LGAWf));
-	
       }
     }
     return data;
@@ -510,86 +509,7 @@ class CreatePoplarLeaves{
   mutable double rlsize; //Relative leaf size (LGAstatus)
 };
 
-inline vector<PositionVector>& 
-    CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
-					       TreeCompartment<poplarsegment, poplarbud>* tc)const
-{ 
-      // double rlsize=0.1;
-       if (poplarbud* b = dynamic_cast<poplarbud*>(tc)){ 
-	 // cout<<"LGAstatus: the leaf size "<<GetValue(*b,LGAstatus)<<endl;
-	 if (GetValue(*b, LGAstate)!=DEAD &&GetValue(*b,LGAstatus)>0.0 && GetValue(*b, LGAage) == 0.0){    // == 1	     
-	  pdv.push_back(GetDirection(*b));
-          rlsize = GetValue(*b, LGAstatus);
-	  // SetValue(*b,LGAstatus,0);         
-	}
 
-      }
-      if (poplarsegment* ts = dynamic_cast<poplarsegment*>(tc)){
-	if(GetValue(*ts, LGAage) == 0.0){
-	Point origo(0,0,0);
-   	Point point = GetEndPoint(*ts);
-	PositionVector up(0,0,1);
-	PositionVector down(0,0,-1);
-	
-	static Uniform u; //uniform random number [0,1] for setting leaf
-	                  //normals;  static makes it  common throughout
-	                  //the  program and  not reinitialized  in each
-           	          //call.
-	int seed = 3267;
-	
-	 if (GetValue(*ts, LGAL)==0.0)
-           pdv.clear();
-	for (unsigned int i = 0; i <pdv.size(); i++){
-	  PositionVector pdir = pdv[i];
-	  //Leaves are  created at the end  of the segment  where the buds
-	  //are, second argument is the intial length of the petiole
-	  Petiole petiole(point,point + pl*(Point)pdir);
-	  //Randomize  the leaf blade  normal by  rotating in  around axis
-	  //that lies in the horizontal plane defined by cross product of
-	  //petiole direction and up-vector. Also it is direction towards  
-	  //right corner of the triangle
-
-	  PositionVector axis1 = Cross(pdir,up).normalize();
-	  //limit the rotation  of the leaf normal to  [-90,90] degrees so
-	  //that the leaf normal does not point downwards
-	  double ran = (-90.0 +180.0*u(seed))*2.0*PI_VALUE/360.0; //(radians)
-	  PositionVector leaf_normal(0,0,1);
-	  leaf_normal.rotate(origo,axis1,ran);
-	  //We need also the left corner of the triangle. Create a vector
-	  //towards it.
-	  PositionVector axis2 = Cross(pdir,down).normalize();
-	  //We yet need the direction towards the apex of the triangle
-	  //to set the apex point
-	  PositionVector axis3 = Cross(leaf_normal,axis1).normalize();
-	  //I hope I got the cross  products right, but we will see in
-	  //the visualization how the leaves settle themselves
-
-	  Point right = point + base*0.5*(Point)axis1;
-	  Point left  = point + base*0.5*(Point)axis2;
-	  Point apex  = point + height*(Point)axis3;
-	  Triangle shape(left,right,apex);
-	  BroadLeaf<Triangle>* leaf = new BroadLeaf<Triangle>(shape,petiole,leaf_normal);
-
-          SetValue(*leaf, LGAdof, 0.6); //GetValue(GetTree(*tc), LGPdof)); // cout<<"LGAdof: "<<GetValue(*leaf, LGAdof)<<endl;
-          SetValue(*leaf, LGAtauL, GetValue(GetTree(*tc), LGPtauL));
-          SetValue(*leaf, LGAsf, GetValue(GetTree(*tc), LGPsf));
-  
-	  double Af = rlsize * 0.01; //GetValue(GetTree(*ts), LGPaleafmax);
-	    //  cout<<"LGPaleafmax value: "<<GetValue(GetTree(*ts), LGPaleafmax)<<endl;
-	 
-	  SetValue(*leaf, LGAA, Af); // 0.02);   //set the leaf area value, which is used in DumpLeaf()
-
-	  //Insert leaf
-	  ts->addLeaf(leaf);	 
-         // Point p = GetCenterPoint(*leaf);
-         // cout<<p<<endl;
-	}
-	}
-	//clear the vector; don't create leaves twice
-	pdv.clear();
-      }
-      return pdv;
-    }
 
 template <class TS,class BUD>
 class KillPoplarBuds{
