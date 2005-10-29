@@ -44,11 +44,13 @@ TcData& poplarsegment::diameterGrowth(TcData& data)
    LGMdouble Af=As*20*10;
     list<BroadLeaf<Triangle> *> leaves=GetLeafList(*this);
     int nLeaves = leaves.size();
-    double la= min(Af/(double)(nLeaves), 0.005); 
-    cout<<"number of leaves: "<<nLeaves<<endl;
-    LeafResize f(la);
-    for_each(leaves.begin(), leaves.end(), f); 
-
+    double la;
+    if(nLeaves>=1 && Af>0)
+    {  la= min(Af/(double)(nLeaves), 0.005);
+    //cout<<"number of leaves: "<<nLeaves<<" leafArea: "<<la<<endl;
+       LeafResize f(la);
+       for_each(leaves.begin(), leaves.end(), f); 
+    }
   return data;
 }
 
@@ -74,7 +76,7 @@ int PoplarLeaf::photosynthesis()
 
   KGC Rd=2.21;
   KGC Photo =(KGC)((1-G/Ci) * min(Wc,Wj));        //(umole/m2/s)
-     
+  // cout<<"Q: "<<Q<<" <J: "<<J<<endl;
   //Emole = 2.176 *100000 joule/mole; umole = 0.2176 J 
   //  KGC A=Photo*0.01;          //0.01KG/MJ?? p0=0.001    
   // KGC A=Photo-Rd;//  Rd is (umolm-2s-1), so all photosynthesis have to multifilied by leaf area (0.01m-2) and time.
@@ -82,7 +84,7 @@ int PoplarLeaf::photosynthesis()
   //  KGC A=Photo*0.000001*30*60*0.5 *44 *0.001; //3 (umole/m2/s)* 0.000001Mole *30*60(s) * 0.1m2(should be all leaves in one new branch??no, only one leaf area) * 44 *0.001Kg
    
   KGC A=Photo * 30 *60 * 0.000001 *12 * 0.001;// * GetValue(*this, LGAA); //(umole/m2/s) * time * 0.000001mole * Carbon(12) *0.001Kg: LeafArea(* GetValue(*this, LGAA)) is not included here any more because it is already timed in VoxelSpaceI.h for Qabs.
-       // cout<<"leaf area: "<<GetValue(*this, LGAA)<<"Photo: "<<Photo<<endl;
+  // cout<<"leaf area: "<<GetValue(*this, LGAA)<<"Photo: "<<Photo<<endl;
        SetValue(*this, LGAP, A);     //(*this).bla.P=A;
 
       

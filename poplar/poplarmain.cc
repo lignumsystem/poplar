@@ -96,13 +96,13 @@ int main(int argc, char** argv)
    
    FILE * fFile;
    float a, b, c, d, e, ff, g, h;
-   float direct=0, diffuse=100;
+   float direct=0, diffuse=-1, structureFlag=-1;
 
    char * filename[12]={"jan.dat", "feb.dat", "mar.dat", "apr.dat", 
 			"may.dat", "jun.dat", "jul.dat", "aug.dat", 
 			"sep.dat", "oct.dat", "nov.dat", "dec.dat" };
 
-  for (int age=0; age<1; age++) // poplarL.derivationLength()--yearly
+  for (int age=0; age<3; age++) // poplarL.derivationLength()--yearly
   {
      cout << "age: " << age << endl;  
    
@@ -111,11 +111,10 @@ int main(int argc, char** argv)
         exit(1);   
 
        while (!feof(fFile))
-        {
-           vs.reset();  //reset the voxelbox to be initial, all Qabs, Qin to be 0.
-	   //  DumpHwTree(vs, poplartree);       // dumpPopTree(vs, poplartree);
+        {diffuse=-1, structureFlag=-1;
+	  vs.reset();  //reset the voxelbox to be initial, all Qabs, Qin to be 0.
        BoundingBox bBox;
-      bBox = Accumulate(poplartree, bBox,
+       bBox = Accumulate(poplartree, bBox,
 			FindHwBoundingBox<poplarsegment,
 			poplarbud,Triangle>()); 
       cout << bBox;
@@ -135,17 +134,17 @@ int main(int argc, char** argv)
 	nz = static_cast<int>(span.getZ()/0.3) + 1;
  
       vs.move(bBox.getMin());
-      vs.resize(0.3,0.3,0.3,nx,ny,nz);
-      cout<<"begin DumpHwTree. "<<endl;
+      vs.resize(0.3,0.3,0.3,nx,ny,nz);  
+	  
         DumpHwTree(vs,poplartree);
-     cout<<"end DumpHwTree. "<<endl;
+
 	LGMdouble treePhotosynthesis =0; 
 	LGMdouble treeRespiration = 0;
 
 	   for (int i=0; i<6*7*24*2; i++)
-	  {
-            direct=0;
-            diffuse=0;
+	     {
+             direct=0;
+             diffuse=0;
 	    if(!feof(fFile))
 	      {  //day, time, elevation, azimuth, diffuse, direct, Ta(temperature), VPD(pressure)
 	        fscanf(fFile, "%f %f %f %f %f %f %f %f\n", &a, &b, &c, &d, &e, &ff, &g, &h);
@@ -154,7 +153,7 @@ int main(int argc, char** argv)
 	      }
            else
 	     break;
-	    if (diffuse<1)
+	    if (diffuse<0.1)
 	      continue;
 
 	    //cout<<"direct and diffuse value: "<<direct<<" ,"<<diffuse<<endl;
@@ -162,15 +161,17 @@ int main(int argc, char** argv)
 	    a[0] = sin(d);
             a[1] = cos(d);
             a[2] = c;  
+
+	    vs.resetQinQabs();  //reset the voxelbox to be initial, all Qabs, Qin to be 0.
 	    f.setSunPosition(a); 
   
 	    f.setDirectRadiation(direct);
-	    f.setDiffuseRadiation(diffuse);  //diffuse
+	    // f.setDiffuseRadiation(diffuse);  //diffuse
 	    //Emole = 2.176 *100000 joule/mole; umole = 0.2176 J = 0.2176 * 10-6 MJ
             //radiation from data file is umole/m2/s
 
-	vs.calculatePoplarLight(); 
- 
+	vs.calculatePoplarLight((LGMdouble)diffuse, (LGMdouble)structureFlag); 
+ 	//    cout<<"diffuse: "<<diffuse<<" lastdiffuse: "<<lastdiffuse<<endl;
        SetHwTreeQabs(vs,poplartree); 
 
       LGMdouble maxQin = 0.0;
@@ -194,6 +195,7 @@ int main(int argc, char** argv)
  
     treePhotosynthesis += GetValue(poplartree,TreeP);
     //cout << "TreePhotosynthesis:  " << treePhotosynthesis << "  kg C" << endl;
+    structureFlag=1;
 	  }
  
      ForEach(poplartree, DoRespiration());
@@ -218,7 +220,7 @@ int main(int argc, char** argv)
     LGMdouble M = Accumulate(poplartree,m, SumTreeRespiration<poplarsegment, poplarbud>()) + GetValue(poplartree,LGPmr)* GetValue(poplartree,TreeWr) ;
     SetValue(poplartree,TreeM,M);
     SetValue(poplartree,TreeP,P);
-
+    cout<<"P: "<<P<<" M: "<<M<<endl;
     TreeGrowthAllocatorPropagateUp<poplarsegment, poplarbud,
       SetSegmentLength, TryDiameterGrowth, double> G(poplartree, 0.0);
    
