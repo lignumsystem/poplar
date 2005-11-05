@@ -167,12 +167,9 @@ int main(int argc, char** argv)
   
 	    f.setDirectRadiation(direct);
 	    // f.setDiffuseRadiation(diffuse);  //diffuse
-	    //Emole = 2.176 *100000 joule/mole; umole = 0.2176 J = 0.2176 * 10-6 MJ
-            //radiation from data file is umole/m2/s
 
 	vs.calculatePoplarLight((LGMdouble)diffuse, (LGMdouble)structureFlag); 
- 	//    cout<<"diffuse: "<<diffuse<<" lastdiffuse: "<<lastdiffuse<<endl;
-       SetHwTreeQabs(vs,poplartree); 
+        SetHwTreeQabs(vs,poplartree); 
 
       LGMdouble maxQin = 0.0;
       maxQin = Accumulate(poplartree, maxQin, GetQinMax<poplarsegment,poplarbud>() );
@@ -255,7 +252,12 @@ int main(int argc, char** argv)
     TcData data;     
     AccumulateDown(poplartree,data,
 		   TreeDiameterGrowth<poplarsegment, poplarbud>());
-
+    LGMdouble lMass = 0.0;
+    lMass = Accumulate(poplartree,lMass,
+                       CollectFoliageMass<poplarsegment,poplarbud>());
+    SetValue(poplartree, TreeWr, 
+             GetValue(poplartree,TreeWr)+GetValue(poplartree,LGPar)*lMass);
+   
     /////////do tree pruning
      double length=0.0;
       PropagateUp(poplartree, length, KillPoplarBuds<poplarsegment, poplarbud>());
