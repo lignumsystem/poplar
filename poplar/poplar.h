@@ -363,7 +363,7 @@ public:
 	 //double Lq = 1.0-(GetValue(*ts,LGAomega)-1.0)*GetValue(GetTree(*ts),q);
 	
 	 double vi=GetValue(*ts, LGAvi);
-	
+	 cout<<"vigorIndex: "<<vi<<endl;
 	 //In Tree Physiology for side branches fp is for example as follows: Lq = apical*(0.15+0.85*Lq);
 	 //experimental forest grown
 	 //** double Lq = pow(1.0 - GetValue(GetTree(*ts),q),GetValue(*ts,LGAomega)-1);
