@@ -57,9 +57,9 @@ TcData& poplarsegment::diameterGrowth(TcData& data)
 
 int PoplarLeaf::photosynthesis()
 {
-  // cout << "poplarleaf photosynthesis "<< endl;
+  //cout << "poplarleaf photosynthesis "<< endl;
 
-    LGMdouble T = 25; //temperature of leaf.l
+    LGMdouble T = temperature; //temperature of leaf.l
     double Ca=360, Kc=460, Ko=330;
     double Ci=0.7 * Ca * ((1.674-0.061294*T+0.0011688*pow(T,2)-0.0000088741*pow(T,3))/0.73547);
     double Oi=210*((0.047-0.0013087*T+0.000025603*pow(T, 2)-0.00000021441*pow(T,3))/0.026934);
