@@ -22,7 +22,7 @@
 //Impelements VisualizeLGMTree
 #include <GLSettings.h>
 #include <OpenGLUnix.h>
-
+#include <LGMVisualization.h>
 //Includes all kinds of stuff, turtle graphics etc.
 //Include this always for your program
 #include <lengine.h>
@@ -40,6 +40,9 @@ namespace poplar{
 namespace Erythrina{
 #include <LSystem.h>
 }
+
+
+double temperature;
 
 int main(int argc, char** argv)
 {
@@ -104,11 +107,10 @@ int main(int argc, char** argv)
    char * filename[12]={"jan.dat", "feb.dat", "mar.dat", "apr.dat", 
 			"may.dat", "jun.dat", "jul.dat", "aug.dat", 
 			"sep.dat", "oct.dat", "nov.dat", "dec.dat" };
-  
+   int drop_leaf_flag=1;
   for (int age=0; age<2; age++) // poplarL.derivationLength()--yearly
   {
      cout << "age: " << age << endl;  
-   
 	fFile = fopen("weatherdata.dat", "r"); // fFile = fopen(filename[month], "r");
        if (fFile==NULL)
         exit(1);   
@@ -157,7 +159,7 @@ int main(int argc, char** argv)
 	      }
            else
 	     break;
-
+	    temperature = (double)g;
 	    if (diffuse<0.1)
 	      continue;
 
@@ -179,7 +181,7 @@ int main(int argc, char** argv)
       LGMdouble maxQin = 0.0;
       maxQin = Accumulate(poplartree, maxQin, GetQinMax<poplarsegment,poplarbud>() );
       SetValue(poplartree, TreeQinMax, maxQin);
-        cout << "  TreeQinMax: " << maxQin << "  MJ/m2" << endl;
+      // cout << "  TreeQinMax: " << maxQin << "  MJ/m2" << endl;
 
     LGMdouble treeQabs = 0.0;
     treeQabs = Accumulate(poplartree,treeQabs,
@@ -187,9 +189,7 @@ int main(int argc, char** argv)
     LGMdouble treeLA = 0.0;
     treeLA = Accumulate(poplartree,treeLA,CollectFoliageArea<
 			  poplarsegment, poplarbud>());
-     cout << " Tree leaf area: " << treeLA
-     << "  m2,  Qabs: " << treeQabs << "  MJ,  Qabs/(Qin*LA): "
-	  << treeQabs/(treeLA*GetFirmament(poplartree).diffuseBallSensor()) << endl;
+    // cout << " Tree leaf area: " << treeLA << "  m2,  Qabs: " << treeQabs << "  MJ,  Qabs/(Qin*LA): " << treeQabs/(treeLA*GetFirmament(poplartree).diffuseBallSensor()) << endl;
     
   
     // ForEach(poplartree, DoPhotosynthesis()); 
@@ -199,6 +199,11 @@ int main(int argc, char** argv)
     //cout << "TreePhotosynthesis:  " << treePhotosynthesis << "  kg C" << endl;
     structureFlag=1;
 	  }
+    if(drop_leaf_flag==1)
+      {cout<<"drop leaves."<<endl;
+        ForEach(poplartree, DropAllLeaves<poplarsegment, poplarbud,Triangle>());
+        drop_leaf_flag=0;
+      }
      f.setDiffuseRadiation(last_diffuse);
      ForEach(poplartree, DoRespiration());
 	   //poplartree.respiration();
@@ -229,8 +234,6 @@ int main(int argc, char** argv)
     G.init();
     cout << "G.init finished." << endl;
     cout << "Bisection zero at:  " << Bisection(0.0, 10.0, G, GetValue(poplartree,LGPzbrentEpsilon)) << endl; //GetValue(poplartree,LGPzbrentEpsilon)=0.001
-
-     
 
      poplarL.lignumToLstring(poplartree,1, PoplarD);  
      rootL.rootSystemToLstring(poplartree);
@@ -281,22 +284,36 @@ int main(int argc, char** argv)
 	     GetValue(poplartree,TreeWr)-GetValue(poplartree,LGPsr)*
 	     GetValue(poplartree,TreeWr));
      
-       ForEach(poplartree, WakeupPoplarBuds<poplarsegment, poplarbud>());
-        poplarL.lignumToLstring(poplartree,1,PoplarD);  
-       poplarL.lstringToLignum(poplartree,1,PoplarD);  
+    ForEach(poplartree, WakeupPoplarBuds<poplarsegment, poplarbud>());
+    poplarL.lignumToLstring(poplartree,1,PoplarD);  
+    poplarL.lstringToLignum(poplartree,1,PoplarD);  
+    drop_leaf_flag=1;
   }
 
   //Some optional clean up see End in sym2d.L
   poplarL.end();  
   rootL.end();
-   
   PrintTreeInformation<poplarsegment, poplarbud, ostream> printPoplar;
   printPoplar(poplartree);    //print out tree information such as tree height, dbh
 
   // ForEach(poplartree, DropAllLeaves<poplarsegment, poplarbud,Triangle>());
 
+  /* //old version of visualization
   glutInit(&argc,argv);
   VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);  
+  */
+
+  //new version of visualization
+
+  LGMVisualization viz;
+  viz.InitVisualization(argc,argv);
+  //viz.OrderFoliage(true);
+  viz.AddHwTree<poplarsegment,poplarbud, Triangle>(poplartree,string("koivu.bmp"), string("lehti.tga"));
+							 
+  viz.SetMode(SOLID);
+  viz.StartVisualization();
+
+
 
 }
 
