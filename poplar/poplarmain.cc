@@ -85,8 +85,11 @@ int main(int argc, char** argv)
   */
 
   //Start by evaluating the axiom (see start in sym2d.L)
+ 
   poplarL.start();
+  //cout << "Start" <<endl;
   rootL.start();
+  //cout << "RootStart" <<endl;
   poplarL.lstringToLignum(poplartree, 1, PoplarD);
 
    vector<PositionVector> pv;
@@ -101,8 +104,8 @@ int main(int argc, char** argv)
    char * filename[12]={"jan.dat", "feb.dat", "mar.dat", "apr.dat", 
 			"may.dat", "jun.dat", "jul.dat", "aug.dat", 
 			"sep.dat", "oct.dat", "nov.dat", "dec.dat" };
-
-  for (int age=0; age<3; age++) // poplarL.derivationLength()--yearly
+  
+  for (int age=0; age<2; age++) // poplarL.derivationLength()--yearly
   {
      cout << "age: " << age << endl;  
    
@@ -138,9 +141,10 @@ int main(int argc, char** argv)
 	  
         DumpHwTree(vs,poplartree);
 
-	LGMdouble treePhotosynthesis =0; 
-	LGMdouble treeRespiration = 0;
-
+	LGMdouble tree_photosynthesis =0; 
+	LGMdouble tree_respiration = 0;
+	LGMdouble last_diffuse=0;
+	f.setDiffuseRadiation(1200);
 	   for (int i=0; i<6*7*24*2; i++)
 	     {
              direct=0;
@@ -153,6 +157,7 @@ int main(int argc, char** argv)
 	      }
            else
 	     break;
+
 	    if (diffuse<0.1)
 	      continue;
 
@@ -167,14 +172,14 @@ int main(int argc, char** argv)
   
 	    f.setDirectRadiation(direct);
 	    // f.setDiffuseRadiation(diffuse);  //diffuse
-
+	    last_diffuse = diffuse;
 	vs.calculatePoplarLight((LGMdouble)diffuse, (LGMdouble)structureFlag); 
         SetHwTreeQabs(vs,poplartree); 
-
+  
       LGMdouble maxQin = 0.0;
       maxQin = Accumulate(poplartree, maxQin, GetQinMax<poplarsegment,poplarbud>() );
       SetValue(poplartree, TreeQinMax, maxQin);
-      //  cout << "  TreeQinMax: " << maxQin << "  MJ/m2" << endl;
+        cout << "  TreeQinMax: " << maxQin << "  MJ/m2" << endl;
 
     LGMdouble treeQabs = 0.0;
     treeQabs = Accumulate(poplartree,treeQabs,
@@ -182,19 +187,19 @@ int main(int argc, char** argv)
     LGMdouble treeLA = 0.0;
     treeLA = Accumulate(poplartree,treeLA,CollectFoliageArea<
 			  poplarsegment, poplarbud>());
-    //  cout << " Tree leaf area: " << treeLA
-    // << "  m2,  Qabs: " << treeQabs << "  MJ,  Qabs/(Qin*LA): "
-    // << treeQabs/(treeLA*GetFirmament(poplartree).diffuseBallSensor()) << endl;
-
+     cout << " Tree leaf area: " << treeLA
+     << "  m2,  Qabs: " << treeQabs << "  MJ,  Qabs/(Qin*LA): "
+	  << treeQabs/(treeLA*GetFirmament(poplartree).diffuseBallSensor()) << endl;
+    
   
     // ForEach(poplartree, DoPhotosynthesis()); 
     poplartree.photosynthesis();
  
-    treePhotosynthesis += GetValue(poplartree,TreeP);
+    tree_photosynthesis += GetValue(poplartree,TreeP);
     //cout << "TreePhotosynthesis:  " << treePhotosynthesis << "  kg C" << endl;
     structureFlag=1;
 	  }
- 
+     f.setDiffuseRadiation(last_diffuse);
      ForEach(poplartree, DoRespiration());
 	   //poplartree.respiration();
 
@@ -213,7 +218,7 @@ int main(int argc, char** argv)
     // cout << "Vigour index" << endl;
      
     LGMdouble p = 0.0, m = 0.0;
-    LGMdouble P = treePhotosynthesis;
+    LGMdouble P = tree_photosynthesis;
     LGMdouble M = Accumulate(poplartree,m, SumTreeRespiration<poplarsegment, poplarbud>()) + GetValue(poplartree,LGPmr)* GetValue(poplartree,TreeWr) ;
     SetValue(poplartree,TreeM,M);
     SetValue(poplartree,TreeP,P);
@@ -246,8 +251,9 @@ int main(int argc, char** argv)
            CreatePoplarLeaves(0.0,0.0001,0.0001));   //CreateTriangleLeaves<poplarsegment,poplarbud,Triangle>
       
      ForEach(poplartree,SubAging<poplarsegment,poplarbud>()); 
-      double r0 = 0.0;
-    PropagateUp(poplartree,r0,ForwardR0());
+     pair<double, double> r0Qin(0.0, 0.0);
+     //   double r0Qin = 0.0;
+     PropagateUp(poplartree,r0Qin,ForwardR0Qin());
     // DiameterGrowthData data;  
     TcData data;     
     AccumulateDown(poplartree,data,
