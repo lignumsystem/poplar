@@ -199,7 +199,10 @@ class PoplarTree: public Tree<poplarsegment, poplarbud>{
 
 
 class poplarsegment : public HwTreeSegment<poplarsegment,poplarbud,Triangle>
-{
+{  
+
+  friend LGMdouble GetValue(const poplarsegment& ps, LGMAD name);
+  friend LGMdouble SetValue(poplarsegment& ps, LGMAD name, LGMdouble value);
   friend LGMdouble SetValue(poplarsegment& ps, poplar_attributes name, 
 			    LGMdouble value){
     LGMdouble tmp = GetValue(ps,name);
@@ -211,7 +214,7 @@ class poplarsegment : public HwTreeSegment<poplarsegment,poplarbud,Triangle>
       cerr << "Poplar segment Set Value Unknown attribute: " << name << endl; 
     return tmp;
   }
-  friend LGMdouble GetValue(poplarsegment& ps, poplar_attributes name){
+  friend LGMdouble GetValue(const poplarsegment& ps, poplar_attributes name){
     if (name == P1)
       return ps.p1;
     else if (name == SUBAGE)
@@ -240,10 +243,52 @@ public:
   double subAge;
 
 private:
+   LGMdouble qin;
   //poplar specific segment attributes and structures here
   //initialize in constructor. p1 is just an example.
   LGMdouble p1;
 };
+
+
+inline LGMdouble GetValue(const poplarsegment& ts, LGMAD name)
+{
+  if (name == LGAQin){
+    //The Qin is ts.qin if a newly created segment
+    //    (GetValue(dynamic_cast<const HwTreeSegment<poplarsegment, poplarbud>&>(ts),LGAage) == 0)
+    if(GetValue(ts, SUBAGE)== 0.0)
+    {
+      return ts.qin;
+    }
+    else{//return Qin as a sum of Qin of leaves
+      return GetValue(dynamic_cast<const HwTreeSegment<poplarsegment,
+                        poplarbud, Triangle> & >(ts),name);
+    }
+  }
+  else{//fall down to GetValue for HwTreeSegments
+    return GetValue(dynamic_cast<const HwTreeSegment<poplarsegment, poplarbud, Triangle> & >(ts),name);
+  }
+ 
+}
+
+inline LGMdouble SetValue(poplarsegment& ts, LGMAD name, LGMdouble value)
+{
+  LGMdouble old_value = GetValue(ts,name);
+  if (name == LGAQin){
+      //The Qin is ts.qin if a newly created segment
+   if(GetValue(ts, SUBAGE)== 0.0){
+      ts.qin = value;
+    }
+    else{
+      LGMMessage("SetValue(smts,LGAQin) not meaningful for leaves");
+      }
+  }
+  else{//Fall down to SetValue for HwTreeSegment
+    old_value = SetValue(dynamic_cast<HwTreeSegment<poplarsegment,
+                         poplarbud, Triangle> & >(ts),name,value);
+  }
+  return old_value;
+}
+
 
 
 class poplarbud : public Bud<poplarsegment, poplarbud>
@@ -352,9 +397,11 @@ public:
          if (GetValue(*ts, SUBAGE) > 0.5){
             qin=GetValue(*ts, LGAQin);//Take the Qin, it will be passed to segment in front
 	  }
-	 else {	
+	 else {
+             SetValue(*ts, LGAQin, qin);
 	     Firmament& f = GetFirmament(GetTree(*ts));
 	 double B = f.diffuseBallSensor();
+         cout<<"qin of segment: "<<qin<<" B: "<<B<<" and the ratio: "<<qin/B<<endl;
 	 const ParametricCurve& fip = GetFunction(GetTree(*ts),LGMIP);
 	 //Omega starts from 1 
 	 //TreeQinMax should work also for open trees: TreeQinMax should then equal to 
@@ -363,7 +410,7 @@ public:
 	 //double Lq = 1.0-(GetValue(*ts,LGAomega)-1.0)*GetValue(GetTree(*ts),q);
 	
 	 double vi=GetValue(*ts, LGAvi);
-	 cout<<"vigorIndex: "<<vi<<endl;
+	
 	 //In Tree Physiology for side branches fp is for example as follows: Lq = apical*(0.15+0.85*Lq);
 	 //experimental forest grown
 	 //** double Lq = pow(1.0 - GetValue(GetTree(*ts),q),GetValue(*ts,LGAomega)-1);
@@ -378,8 +425,8 @@ public:
 	     apical = 0.1;  //double(double(qin)/double(B));
 	     // cout<<apical<<" : the value of apical."<<endl;
 	 }
-     
-	 double L_new=l * apical * (0.1+0.9*vi);  //0.0008* l will be too big so that the voxel space can not hold all compartments.
+         cout<<"light function value: "<<fip(qin/B)<<endl;
+	 double L_new=l * apical * (0.1+0.9*vi); //* fip(qin/B);  
          L_new = max(L_new,0.0);
 	
          if (L_new<0.005)
@@ -567,6 +614,7 @@ class SubAging{
 //This propagates the  Radius of the first part  of the split segments
 //to the rest of the  segments in the sequence maintaining the sapwood
 //allocated.
+/*
 class ForwardR0{
  public:
   double& operator()(double& r0,
@@ -587,6 +635,33 @@ class ForwardR0{
     return r0;
   }
 };
+*/
 
+class ForwardR0Qin{
+ public:
+  pair<double, double>& operator()(pair<double, double>& r0qin,
+		  TreeCompartment<poplarsegment, poplarbud>* tc)const
+  {
+    if (poplarsegment* ts = dynamic_cast<poplarsegment*>(tc)){
+      //Ages are zero
+      if (GetValue(*ts,SUBAGE) == 0.0){   //SUBAGE
+	//If the r0 is not set
+	if (r0qin.first == 0.0)
+	  {
+	  //This is the first part of the split segment
+	  r0qin.first = GetValue(*ts,LGAR);
+	  r0qin.second = GetValue(*ts, LGAQin);
+	  }
+	else
+	  {
+	  //These are the other segments resulting from the split
+	  SetValue(*ts,LGAR,r0qin.first);
+	  SetValue(*ts,LGAQin,r0qin.second);
+	  }
+      }
+    }
+    return r0qin;
+  }
+};
 
 #endif
