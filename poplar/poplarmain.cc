@@ -23,6 +23,7 @@
 #include <GLSettings.h>
 #include <OpenGLUnix.h>
 #include <LGMVisualization.h>
+#include <XMLTree.h>
 //Includes all kinds of stuff, turtle graphics etc.
 //Include this always for your program
 #include <lengine.h>
@@ -297,6 +298,9 @@ int main(int argc, char** argv)
   printPoplar(poplartree);    //print out tree information such as tree height, dbh
 
   // ForEach(poplartree, DropAllLeaves<poplarsegment, poplarbud,Triangle>());
+
+  XMLDomTreeWriter<poplarsegment,poplarbud> writer;
+  writer.writeTreeToXML(poplartree, "test.xml");
 
   /* //old version of visualization
   glutInit(&argc,argv);

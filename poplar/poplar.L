@@ -71,7 +71,7 @@ Start:
   //Axillary buds assoaciated with a leaf
   PoplarBudData d2(ALIVE,0.1,1.0,1.0);
 
- produce Roll(30.0 * PI_VALUE/180.0) F(0.05, 0) SB() Pitch(-PI_VALUE/4.0)B(d2) EB() Roll(roll)  B(d1);    
+ produce Roll(30.0 * PI_VALUE/180.0) F(0.05, 0) SB() Pitch(PI_VALUE/4.0)B(d2) EB() Roll(roll)  B(d1);    
 }
 
 
@@ -140,9 +140,9 @@ F(s,od)  < B(d):
     if (GetValue(d,LGAomega) == 0)
          produce F(r/10.0, o) Split()  B(d1);
     else if (GetValue(d,LGAomega) == 1)
-         produce F(r/10.0, o) Split()  Pitch(fac)B(d2);
+         produce F(r/10.0, o) Split()  Pitch(-fac)B(d2);
     else
-         produce F(r/10.0, o) Split() Pitch(fac)B(d2);
+         produce F(r/10.0, o) Split() Pitch(-fac)B(d2);
   }
   else
     produce B(dead);

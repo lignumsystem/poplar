@@ -77,7 +77,7 @@ void Start()
   //Axillary buds assoaciated with a leaf
   PoplarBudData d2(ALIVE,0.1,1.0,1.0);
 
- { Produce((ModuleIdType)(Roll_id));Produce((double)(30.0 * PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(F_id));Produce((double)(0.05));Produce((double)( 0));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(-PI_VALUE/4.0));Produce((ModuleIdType)(Pitch_id));Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d2));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(roll));Produce((ModuleIdType)(Roll_id));  Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d1));Produce((ModuleIdType)(B_id));}    
+ { Produce((ModuleIdType)(Roll_id));Produce((double)(30.0 * PI_VALUE/180.0));Produce((ModuleIdType)(Roll_id)); Produce((ModuleIdType)(F_id));Produce((double)(0.05));Produce((double)( 0));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(SB_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(PI_VALUE/4.0));Produce((ModuleIdType)(Pitch_id));Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d2));Produce((ModuleIdType)(B_id)); Produce((ModuleIdType)(EB_id)); Produce((ModuleIdType)(Roll_id));Produce((double)(roll));Produce((ModuleIdType)(Roll_id));  Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d1));Produce((ModuleIdType)(B_id));}    
 }
 
 
@@ -146,9 +146,9 @@ void End()
     if (GetValue(d,LGAomega) == 0)
          { Produce((ModuleIdType)(F_id));Produce((double)(r/10.0));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(Split_id));  Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d1));Produce((ModuleIdType)(B_id));}
     else if (GetValue(d,LGAomega) == 1)
-         { Produce((ModuleIdType)(F_id));Produce((double)(r/10.0));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(Split_id));  Produce((ModuleIdType)(Pitch_id));Produce((double)(fac));Produce((ModuleIdType)(Pitch_id));Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d2));Produce((ModuleIdType)(B_id));}
+         { Produce((ModuleIdType)(F_id));Produce((double)(r/10.0));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(Split_id));  Produce((ModuleIdType)(Pitch_id));Produce((double)(-fac));Produce((ModuleIdType)(Pitch_id));Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d2));Produce((ModuleIdType)(B_id));}
     else
-         { Produce((ModuleIdType)(F_id));Produce((double)(r/10.0));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(Split_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(fac));Produce((ModuleIdType)(Pitch_id));Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d2));Produce((ModuleIdType)(B_id));}
+         { Produce((ModuleIdType)(F_id));Produce((double)(r/10.0));Produce((double)( o));Produce((ModuleIdType)(F_id)); Produce((ModuleIdType)(Split_id)); Produce((ModuleIdType)(Pitch_id));Produce((double)(-fac));Produce((ModuleIdType)(Pitch_id));Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(d2));Produce((ModuleIdType)(B_id));}
   }
   else
     { Produce((ModuleIdType)(B_id));Produce((PoplarBudData)(dead));Produce((ModuleIdType)(B_id));}

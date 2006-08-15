@@ -3,7 +3,8 @@
 
 #include <Lignum.h>
 using namespace cxxadt;
-
+extern double temperature;
+ 
 class poplarbud;
 class poplarleaf;
 class poplarsegment;
@@ -401,7 +402,7 @@ public:
              SetValue(*ts, LGAQin, qin);
 	     Firmament& f = GetFirmament(GetTree(*ts));
 	 double B = f.diffuseBallSensor();
-         cout<<"qin of segment: "<<qin<<" B: "<<B<<" and the ratio: "<<qin/B<<endl;
+	 // cout<<"qin of segment: "<<qin<<" B: "<<B<<" and the ratio: "<<qin/B<<endl;
 	 const ParametricCurve& fip = GetFunction(GetTree(*ts),LGMIP);
 	 //Omega starts from 1 
 	 //TreeQinMax should work also for open trees: TreeQinMax should then equal to 
@@ -425,7 +426,7 @@ public:
 	     apical = 0.1;  //double(double(qin)/double(B));
 	     // cout<<apical<<" : the value of apical."<<endl;
 	 }
-         cout<<"light function value: "<<fip(qin/B)<<endl;
+         //cout<<"light function value: "<<fip(qin/B)<<endl;
 	 double L_new=l * apical * (0.1+0.9*vi); //* fip(qin/B);  
          L_new = max(L_new,0.0);
 	
