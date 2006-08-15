@@ -299,6 +299,10 @@ int main(int argc, char** argv)
 
   // ForEach(poplartree, DropAllLeaves<poplarsegment, poplarbud,Triangle>());
 
+  XMLDomTreeReader<poplarsegment,poplarbud> reader;
+  Tree<poplarsegment,poplarbud> poplar(Point(0,0,0),PositionVector(0,0,1));
+  reader.readXMLToTree(poplar,"testi2.xml");
+
   XMLDomTreeWriter<poplarsegment,poplarbud> writer;
   writer.writeTreeToXML(poplartree, "test.xml");
 
