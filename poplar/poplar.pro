@@ -8,8 +8,8 @@ TEMPLATE = app
 TARGET = poplar
 DEPENDPATH += .
 INCLUDEPATH += .  ../c++adt/include ../stl-lignum/include ../Firmament/include ../stl-voxelspace/include ../LEngine/include ../Pine ../XMLTree  
-unix:LIBS += -L../c++adt/lib -L../stl-lignum/lib -L../Firmament/lib -L../LEngine/lib -L../stl-voxelspace/lib  -lsky -lL -lvoxel -lLGM  -lc++adt 
-win32:LIBS +=  ../LEngine/lib/L.lib ../stl-voxelspace/lib/voxel.lib  ../Firmament/lib/sky.lib ../stl-lignum/lib/LGM.lib ../c++adt/lib/c++adt.lib 
+unix:LIBS += -L../c++adt/lib -L../stl-lignum/lib -L../Firmament/lib -L../LEngine/lib -L../stl-voxelspace/lib  -lsky -lL -lvoxel -lLGM  -lcxxadt 
+win32:LIBS +=  ../LEngine/lib/L.lib ../stl-voxelspace/lib/voxel.lib  ../Firmament/lib/sky.lib ../stl-lignum/lib/LGM.lib ../c++adt/lib/cxxadt.lib 
 # Input
 system(../LEngine/bin/l2c poplar.L poplar.cpp){
    SOURCES += poplar.cpp
