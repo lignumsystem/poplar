@@ -19,10 +19,6 @@
 #include <VoxelSpace.h>
 #include <VisualFunctor.h>
 #include <Polygon.h>
-//Impelements VisualizeLGMTree
-#include <GLSettings.h>
-#include <OpenGLUnix.h>
-#include <LGMVisualization.h>
 #include <XMLTree.h>
 //Includes all kinds of stuff, turtle graphics etc.
 //Include this always for your program
@@ -305,23 +301,6 @@ int main(int argc, char** argv)
 
   XMLDomTreeWriter<poplarsegment,poplarbud> writer;
   writer.writeTreeToXML(poplartree, "test.xml");
-
-  /* //old version of visualization
-  glutInit(&argc,argv);
-  VisualizeHwTree<poplarsegment,poplarbud,Triangle>(poplartree);  
-  */
-
-  //new version of visualization
-
-  LGMVisualization viz;
-  viz.InitVisualization(argc,argv);
-  //viz.OrderFoliage(true);
-  viz.AddHwTree<poplarsegment,poplarbud, Triangle>(poplartree,string("koivu.bmp"), string("lehti.tga"));
-							 
-  viz.SetMode(SOLID);
-  viz.StartVisualization();
-
-
 
 }
 
