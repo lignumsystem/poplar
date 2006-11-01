@@ -34,8 +34,8 @@ open poplar;
 const double roll = 137.5*PI_VALUE/180.0;
 //main stem branching angle
 const double ba = 60.0*PI_VALUE/180.0;
-const double bendUp = 10.0*PI_VALUE/180.0;
-const double maxIncl =PI_VALUE/2.0;
+const double bendUp = 2.0*PI_VALUE/180.0;     //10.0*PI_VALUE/180.0;
+const double maxIncl =8.0/9.0*PI_VALUE/2.0;
 
 //Functions for the number of leaf pairs and leaf sizes
 ParametricCurve fleaf_pair("fleafpair.fun");
@@ -67,11 +67,13 @@ ignore: Roll Pitch Turn HRoll;
 Start:
 {
   //Terminating bud not creating leaves
-  PoplarBudData d1(ALIVE,0.0,0.0,1.0);
+  PoplarBudData d1(ALIVE,0.1,0.0,1.0);
   //Axillary buds assoaciated with a leaf
   PoplarBudData d2(ALIVE,0.1,1.0,1.0);
 
- produce Roll(30.0 * PI_VALUE/180.0) F(0.05, 0) SB() Pitch(PI_VALUE/4.0)B(d2) EB() Roll(roll)  B(d1);    
+  produce Roll(30.0 * PI_VALUE/180.0) F(0.2, 0)  Roll(roll)  B(d1);  
+//  produce Roll(30.0 * PI_VALUE/180.0) F(0.2, 0) SB() Pitch(PI_VALUE/4.0)B(d2) EB() Roll(roll)  B(d1);    
+
 }
 
 
@@ -109,13 +111,13 @@ F(s,od)  < B(d):
 {  
   PoplarBudData dead(DEAD, 0.0, GetValue(d, LGAomega), 1.0);
   PoplarBudData dorm(DORMANT, 0.1, GetValue(d, LGAomega), 1.0);
-  PoplarBudData d1(GetValue(d, LGAstate), 0.0, GetValue(d, LGAomega), 1.0);
+  PoplarBudData d1(GetValue(d, LGAstate), 0.1, GetValue(d, LGAomega), 1.0);
   PoplarBudData d2(GetValue(d, LGAstate), 0.1, GetValue(d, LGAomega), 1.0);
 
   LGMdouble o=GetValue(d, LGAomega);
   LGMdouble st = GetValue(d, LGAstate);
 
-//Bend branches upwards
+//Bend branches upwards 0<=asin(direct.getZ()) &&
 
   PositionVector direct = GetDirection(d);
   direct.normalize();
@@ -126,6 +128,9 @@ F(s,od)  < B(d):
     PositionVector cr = Cross(up, direct);
     fac = cr.length();
     fac *= bendUp;
+    if (o>1)
+       fac *= 5.0;
+    //fac = abs(fac);
   }
 
  if (GetValue(d, LGAstate)==DEAD)
@@ -152,9 +157,9 @@ F(s,od)  < B(d):
 //split the segment main axis
 F(s,o) > Split():
 {
-   //cout<<"s: "<<s<<endl;
+  // cout<<"s: "<<s<<endl;
    PoplarBudData dorm(DORMANT, 0.1, o+1, 1.0);
-   PoplarBudData d1(1.0, 0.0, o+1, 1.0);
+   PoplarBudData d1(1.0, 0.1, o+1, 1.0);
    PoplarBudData d2(1.0, 0.1, o+1, 1.0);
 
    double A  = rand()%360;  //360.0*(u(seed++)-0.5);
@@ -163,11 +168,13 @@ F(s,o) > Split():
    double A3 = rand()%360;   //45-90;  //360.0*(u(seed++)-0.5);
    double A4 = rand()%360;   
 
-   double I  = rand()%30+20;  //100.0*(u(seed++)-0.5);
-   double I1 = rand()%30+20;  //100.0*(u(seed++)-0.5);
-   double I2 = rand()%30+20;  //-180;  //100.0*(u(seed++)-0.5);
-   double I3 = rand()%30+20;  //-180;  //100.0*(u(seed++)-0.5);
-   double I4 = rand()%30+20;
+   double I  = rand()%30+28;  //100.0*(u(seed++)-0.5);Single/rand()%40+25; stand/23+25;
+   double I1 = rand()%30+28;  //100.0*(u(seed++)-0.5);
+   double I2 = rand()%30+28;  //-180;  //100.0*(u(seed++)-0.5);
+   double I3 = rand()%30+28;  //-180;  //100.0*(u(seed++)-0.5);
+   double I4 = rand()%30+28;
+  //cout<<"angle A:"<<A<<" "<<A1<<" "<<A2<<" "<<A3<<" "<<A4<<endl;
+ // cout<<"angle I:"<<I<<" "<<I1<<" "<<I2<<" "<<I3<<" "<<I4<<endl;
 
   if (s<0.1){
     produce F(s, o);
@@ -178,13 +185,27 @@ else if (0.1<=s && s<0.2)
   produce F(s/2, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
         F(s/2, o);
 }
-else 
+else if (0.2<=s && s<0.3)
 {
 produce F(s/3, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
         F(s/3, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
         F(s/3, o);
 }
-
+else if (0.3<=s && s<0.4)
+{
+produce F(s/4, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/4, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/4, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/4, o);
+}
+else
+{
+produce F(s/5, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/5, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/5, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/5, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/5, o);
+}
 }
 
 
