@@ -337,16 +337,8 @@ int main(int argc, char** argv)
 
   XMLDomTreeWriter<poplarsegment,poplarbud> writer;
   writer.writeTreeToXML(poplartree, "test.xml");
-
-
-  LGMVisualization viz;
-  viz.InitVisualization(argc,argv);
-  //viz.OrderFoliage(true);
-  viz.AddHwTree<poplarsegment,poplarbud, Triangle>(poplartree,string("koivu.bmp"), string("lehti.tga"));
-							 
-  viz.SetMode(SOLID);
-  viz.StartVisualization();
-  }
+  return 0;
+}
 
 
 
