@@ -230,8 +230,8 @@ int main(int argc, char** argv)
     LGMdouble p = 0.0, m = 0.0;
     LGMdouble P = tree_photosynthesis;
     LGMdouble M = Accumulate(poplartree,m, SumTreeRespiration<poplarsegment, poplarbud>())+ GetValue(poplartree,LGPmr)* GetValue(poplartree,TreeWr);  //0.1 * GetValue(poplartree,TreeWr) * 0.15;   // GetValue(poplartree,LGPmr)* GetValue(poplartree,TreeWr);   
-    if (M>P) P=M;
-    SetValue(poplartree,TreeM,M);  //should be M
+    if (M>P) P=M+0.001;
+    SetValue(poplartree,TreeM,M);  
     SetValue(poplartree,TreeP,P);
     cout<<"P: "<<P<<" M: "<<M<<endl;
     TreeGrowthAllocatorPropagateUp<poplarsegment, poplarbud,
