@@ -92,7 +92,7 @@ int main(int argc, char** argv)
   rootL.start();
   //cout << "RootStart" <<endl;
   poplarL.lstringToLignum(poplartree, 1, PoplarD);
-
+  //DisplayStructure(poplartree);
    vector<PositionVector> pv;
     AccumulateDown(poplartree,pv,
   	 AppendSequence<vector<PositionVector> >(),
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 
    int derivation=4;
    srand(time(NULL));
-  for (int age=0; age<derivation; age++) // poplarL.derivationLength()--yearly
+  for (int age=0; age<2 /*derivation*/; age++) // poplarL.derivationLength()--yearly
   {   day1=0; day2=0;
      cout << "age: " << age << endl;  
 	fFile = fopen("weatherdata.dat", "r"); // fFile = fopen(filename[month], "r");
@@ -223,7 +223,7 @@ int main(int argc, char** argv)
     poplarL.lstringToLignum(poplartree,1, PoplarD);
     rootL.lstringToRootSystem(poplartree);
     cout << "lstringToLignum done " << endl;
-    
+    //DisplayStructure(poplartree);   
     TreePhysiologyVigourIndex(poplartree);
     // cout << "Vigour index" << endl;
      
@@ -263,7 +263,7 @@ int main(int argc, char** argv)
     poplarL.lstringToLignum(poplartree,1, PoplarD);
     rootL.lstringToRootSystem(poplartree);
     // cout << "lstringToLignum done " << endl;
-
+    //DisplayStructure(poplartree); 
     pv.clear();
         AccumulateDown(poplartree,pv,
      	   AppendSequence<vector<PositionVector> >(),
@@ -329,13 +329,7 @@ int main(int argc, char** argv)
   // ForEach(poplartree, DropAllLeaves<poplarsegment, poplarbud,Triangle>());
 
 
-  XMLDomTreeReader<poplarsegment,poplarbud> reader;
-  Tree<poplarsegment,poplarbud> poplar(Point(0,0,0),PositionVector(0,0,1));
-  reader.readXMLToTree(poplar,"testi2.xml");
-
-
-
-  XMLDomTreeWriter<poplarsegment,poplarbud> writer;
+  XMLDomTreeWriter<poplarsegment,poplarbud,Triangle> writer;
   writer.writeTreeToXML(poplartree, "test.xml");
   return 0;
 }
