@@ -45,15 +45,15 @@ float day1=0, day2=0;
 int main(int argc, char** argv)
 {
   string metafile = "MetaFile.txt";
-  string xmlfile;
+  string xmlfile;//tree output file
   Lex l;
 
   poplar::LSystem<poplarsegment,poplarbud,PoplarBD, PoplarBudData> poplarL;
   Erythrina::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> rootL;
  
-  //Save the simulated poplar
+  //Save the simulated poplar to xmlfile
   ParseCommandLine(argc,argv,"-xml",xmlfile);
-
+ 
   //Create the tree.
    Tree<poplarsegment,poplarbud> poplartree(Point(5.0, 5.0, 0),
   			   PositionVector(0,0,1.0));
