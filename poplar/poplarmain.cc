@@ -45,12 +45,15 @@ float day1=0, day2=0;
 int main(int argc, char** argv)
 {
   string metafile = "MetaFile.txt";
-
+  string xmlfile;
   Lex l;
 
-   poplar::LSystem<poplarsegment,poplarbud,PoplarBD, PoplarBudData> poplarL;
-   Erythrina::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> rootL;
+  poplar::LSystem<poplarsegment,poplarbud,PoplarBD, PoplarBudData> poplarL;
+  Erythrina::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> rootL;
  
+  //Save the simulated poplar
+  ParseCommandLine(argc,argv,"-xml",xmlfile);
+
   //Create the tree.
    Tree<poplarsegment,poplarbud> poplartree(Point(5.0, 5.0, 0),
   			   PositionVector(0,0,1.0));
@@ -328,9 +331,10 @@ int main(int argc, char** argv)
 
   // ForEach(poplartree, DropAllLeaves<poplarsegment, poplarbud,Triangle>());
 
-
-  XMLDomTreeWriter<poplarsegment,poplarbud,Triangle> writer;
-  writer.writeTreeToXML(poplartree, "test.xml");
+  if (xmlfile.length() > 0){
+    XMLDomTreeWriter<poplarsegment,poplarbud,Triangle> writer;
+    writer.writeTreeToXML(poplartree,xmlfile);
+  }
   return 0;
 }
 
