@@ -351,11 +351,12 @@ class PoplarLeaf:public BroadLeaf<Triangle>{
  public:
 
   PoplarLeaf(LGMdouble sf,LGMdouble tauL,LGMdouble dof,int number_of_sectors,
-	    const Petiole& petiole, const PositionVector& leaf_normal,
-	       const Triangle& shap): BroadLeaf<Triangle>(sf, tauL, dof, number_of_sectors, petiole, leaf_normal, shap), T(25.0){}
+	     const Petiole& petiole, const PositionVector& leaf_normal,
+	     const Triangle& shap): BroadLeaf<Triangle>(sf, tauL, dof, number_of_sectors, petiole, 
+							shap), T(25.0){}
 
    PoplarLeaf(const Triangle& shape, const Petiole& petiole, 
-		const PositionVector& leaf_normal): BroadLeaf<Triangle>(shape, petiole, leaf_normal), T(25.0){}
+		const PositionVector& leaf_normal): BroadLeaf<Triangle>(shape, petiole), T(25.0){}
 
   int photosynthesis();
   void respiration();

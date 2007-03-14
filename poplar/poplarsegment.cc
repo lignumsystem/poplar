@@ -1,5 +1,5 @@
 #include <poplar.h>
-#include <poplarstand.h>
+//#include <poplarstand.h>
 #include <poplarmetabolism.h>
 
 // declared in poplar.h poplarsegment class.
@@ -239,7 +239,7 @@ CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
 	Point left  = point + base*0.5*(Point)axis2;
 	Point apex  = point + height*(Point)axis3;
 	Triangle shape(left,right,apex);
-	BroadLeaf<Triangle>* leaf = new BroadLeaf<Triangle>(shape,petiole,leaf_normal);
+	BroadLeaf<Triangle>* leaf = new BroadLeaf<Triangle>(shape,petiole);
 
 	SetValue(*leaf, LGAdof, 0.6); //GetValue(GetTree(*tc), LGPdof)); // cout<<"LGAdof: "<<GetValue(*leaf, LGAdof)<<endl;
 	SetValue(*leaf, LGAtauL, GetValue(GetTree(*tc), LGPtauL));
