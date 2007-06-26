@@ -42,21 +42,46 @@ namespace Erythrina{
 double temperature;
 float day1=0, day2=0;
 
+void Usage()
+{
+  cout << "Usage: ./poplar -iter <iter> -x <xcoord> -y <ycoord> -xml <file>" <<endl; 
+}
 int main(int argc, char** argv)
 {
+  string iterations;
+  int iter=0;
   string metafile = "MetaFile.txt";
   string xmlfile;//tree output file
-  Lex l;
+  string xcoord;
+  double x=0.0;
+  string ycoord;
+  double y=0.0;
 
+  Lex l;
+  
+  if (argc < 2){
+    Usage();
+    exit(0);
+  }
+   
   poplar::LSystem<poplarsegment,poplarbud,PoplarBD, PoplarBudData> poplarL;
   Erythrina::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> rootL;
  
+  if (ParseCommandLine(argc,argv,"-iter",iterations))
+    iter = atoi(iterations.c_str());
+
+  if (ParseCommandLine(argc,argv,"-x",xcoord))
+    x = atof(xcoord.c_str());
+  if (ParseCommandLine(argc,argv,"-y",xcoord))
+    y = atof(xcoord.c_str());
+
+
   //Save the simulated poplar to xmlfile
   ParseCommandLine(argc,argv,"-xml",xmlfile);
- 
+  
   //Create the tree.
-   Tree<poplarsegment,poplarbud> poplartree(Point(5.0, 5.0, 0),
-  			   PositionVector(0,0,1.0));
+   Tree<poplarsegment,poplarbud> poplartree(Point(x, y, 0),
+					    PositionVector(0,0,1.0));
    /* PoplarTree poplartree("fleafpair.fun","fleafsize.fun",
 			"fbudsize.fun","fbudflush.fun",
 			"fapical.fun","fvigorindex.fun",
@@ -111,7 +136,7 @@ int main(int argc, char** argv)
 
    int derivation=4;
    srand(time(NULL));
-  for (int age=0; age<2 /*derivation*/; age++) // poplarL.derivationLength()--yearly
+  for (int age=0; age<iter /*derivation*/; age++) // poplarL.derivationLength()--yearly
   {   day1=0; day2=0;
      cout << "age: " << age << endl;  
 	fFile = fopen("weatherdata.dat", "r"); // fFile = fopen(filename[month], "r");
