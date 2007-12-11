@@ -1,22 +1,22 @@
 
-LGPaleafmax 0.0045     #Max size of poplar leaf
+LGPaleafmax 0.0045     #Max size of poplar leaf,  used to be 0.0045 for each leaf
 LGPaf      1.30        #Needle mass - tree segment area (kg/m^2)relationship
-LGPar      0.50        #Foliage - root relationship 
+LGPar      0.5        #Foliage - root relationship used to be 0.50; Root/shoot=0.225(Pallardy)
 LGPdof     0.80        #Degree of filling of leaf
 LGPlr      0.01        #Length - radius relationship (R=lr*L) of a tree segment
-LGPmf      0.10        #Maintenance respiration rate of foliage 0.24, [0.25 fromRauscher(Ecophy, 1990)]
-LGPmr      0.100       #Maintenance respiration rate of roots 0.240
-LGPms      0.015      #Maintenance respiration rate of sapwood 0.024 [0.015 fromRauscher(Ecophy, 1990)]
+LGPmf      0.0075        #Maintenance respiration rate of foliage 0.24, [0.25 fromRauscher(Ecophy, 1990)]
+LGPmr      0.0075       #Maintenance respir rate of roots 0.24,0.1[0.25 for both growth and maintenance, fromRauscher]
+LGPms      0.0075      #Maintenance respiration rate of sapwood 0.024 [0.015 fromRauscher(Ecophy, 1990)] 0.015/2=0.0075
 LGPna      0.7854      #Needle angle (pi/4)
 LGPnl      0.04        #Needle length (10 cm = 0.10 m) 
 LGPq       1.0        #Tree segment shortening factor
-LGPsr      0.330       #Senescence rate of roots
+LGPsr      0.20       #Senescence rate of roots 0.33
 LGPss      0.07        #Senescence rate of sapwood
-LGPrhoW     400.0       #Density (kg/m3) of wood in tree segment
+LGPrhoW    350       #Density (kg/m3) of wood in tree segment 400, 350(435.5, 262.5)
 LGPpr      0.0010      #Proportion of bound solar radiation that is
-                    #used in photosynthesis
+                    #used in photosynthesis (p0)
 LGPxi      0.00        #Fraction of heartwood in tree segments
 LGPyc      123.8       #Foliage mass (kgC) supported by 1m^2 of sapwood
 	               #unit is kgC/m2
 LGPzbrentEpsilon    0.001    #Accuracy for finding root of P-M-dW(lambda)
-LGPsf      28.0        #Foliage m2/kg
+LGPsf      15        #Foliage m2/kg, specific leaf area=LeafArea/LeafWeight 15(11.25, 18.75)

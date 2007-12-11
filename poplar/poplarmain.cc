@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
-
+    
 //Include Lignum implementation 
 #include <Lignum.h>
 #include <RootFunctor.h>
@@ -19,7 +19,12 @@
 #include <VoxelSpace.h>
 #include <VisualFunctor.h>
 #include <Polygon.h>
-#include <XMLTree.h>
+
+//Implement VisualizeLGMTree
+#include <GLSettings.h>
+#include <OpenGLUnix.h>
+#include <LGMVisualization.h>
+
 //Includes all kinds of stuff, turtle graphics etc.
 //Include this always for your program
 #include <lengine.h>
@@ -51,37 +56,20 @@ int main(int argc, char** argv)
   string iterations;
   int iter=0;
   string metafile = "MetaFile.txt";
-  string xmlfile;//tree output file
-  string xcoord;
-  double x=0.0;
-  string ycoord;
-  double y=0.0;
 
+  srand(time(NULL));
   Lex l;
-  
-  if (argc < 2){
-    Usage();
-    exit(0);
-  }
-   
-  poplar::LSystem<poplarsegment,poplarbud,PoplarBD, PoplarBudData> poplarL;
-  Erythrina::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> rootL;
- 
-  if (ParseCommandLine(argc,argv,"-iter",iterations))
-    iter = atoi(iterations.c_str());
-
-  if (ParseCommandLine(argc,argv,"-x",xcoord))
-    x = atof(xcoord.c_str());
-  if (ParseCommandLine(argc,argv,"-y",xcoord))
-    y = atof(xcoord.c_str());
 
 
-  //Save the simulated poplar to xmlfile
-  ParseCommandLine(argc,argv,"-xml",xmlfile);
-  
+
+   poplar::LSystem<poplarsegment,poplarbud,PoplarBD, PoplarBudData> poplarL;
+   Erythrina::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> rootL;
+
   //Create the tree.
-   Tree<poplarsegment,poplarbud> poplartree(Point(x, y, 0),
-					    PositionVector(0,0,1.0));
+
+   Tree<poplarsegment,poplarbud> poplartree(Point(5.0, 5.0, 0),
+  			   PositionVector(0,0,1.0));
+
    /* PoplarTree poplartree("fleafpair.fun","fleafsize.fun",
 			"fbudsize.fun","fbudflush.fun",
 			"fapical.fun","fvigorindex.fun",
@@ -92,26 +80,19 @@ int main(int argc, char** argv)
 
   //initialization of parameters and functions
   InitializeTree<poplarsegment, poplarbud> init_poplar(metafile, VERBOSE);
+
   init_poplar.initialize(poplartree);
 
   // SetValue(poplartree,TreeRefRadiation,2480.0);
 
   Firmament& f = GetFirmament(poplartree);
-  f.resize(40,20,1200); //resize:  inclinations,  azimuths,  1200 MJ/year for previous tree,  
-
+  
+  // f.resize(40,20,1200); //resize:  inclinations,  azimuths,  1200 MJ/year for previous tree,  
+ 
   //create voxel space 
   // VoxelSpace vs(Point(0,0,0), Point(10, 10, 10), 0.2, 0.2, 0.2, 50, 50, 50,  GetFirmament(poplartree)); 
     VoxelSpace vs(Point(0,0,0), Point(50, 50, 18), 1, 1, 1, 50, 50, 18,  GetFirmament(poplartree));
 
-  /*  string voxelfile="VoxelSpace.txt";
-  ifstream vf(voxelfile.c_str());
-   int vx,vy,vz; vx = vy = vz = 0;
-  LGMdouble s1,s2,s3; s1 = s2 = s3 = 1.0;
-    vf >> vx >> vy >> vz >> s1 >> s2 >> s3;
-    cout << "Voxel Space: " << vx << " " << vy << " " << vz << " " 
-       << s1 << " " << s2 << " " << s3 << endl;
-    VoxelSpace vs(Point(0,0,0),Point(vx,vy,vz), s1,s2,s3, static_cast<int>(vx/s1),	static_cast<int>(vy/s2),	static_cast<int>(vz/s3), GetFirmament(poplartree));
-  */
 
   //Start by evaluating the axiom (see start in sym2d.L)
  
@@ -135,18 +116,20 @@ int main(int argc, char** argv)
 			"sep.dat", "oct.dat", "nov.dat", "dec.dat" };
 
    int derivation=4;
-   srand(time(NULL));
-  for (int age=0; age<iter /*derivation*/; age++) // poplarL.derivationLength()--yearly
+  
+  for (int age=0; age<derivation; age++) // poplarL.derivationLength()--yearly
   {   day1=0; day2=0;
+
      cout << "age: " << age << endl;  
 	fFile = fopen("weatherdata.dat", "r"); // fFile = fopen(filename[month], "r");
        if (fFile==NULL)
         exit(1);   
   
        while (!feof(fFile))
-        { 
-           diffuse=-1, structureFlag=-1;
+
+        {  diffuse=-1, structureFlag=-1;
 	  vs.reset();  //reset the voxelbox to be initial, all Qabs, Qin, leafarea to be 0.
+
        BoundingBox bBox;
        bBox = Accumulate(poplartree, bBox,
 			FindHwBoundingBox<poplarsegment,
@@ -177,8 +160,9 @@ int main(int argc, char** argv)
 	LGMdouble tree_photosynthesis =0; 
 	LGMdouble tree_respiration = 0;
 	LGMdouble last_diffuse=0;
-	f.setDiffuseRadiation(1200);
+	//	f.setDiffuseRadiation(1200);
 	//int day=0;
+
 	   for (int i=0; i<6*7*24*2; i++)
 	     { 
              direct=0;
@@ -206,11 +190,12 @@ int main(int argc, char** argv)
 	    f.setSunPosition(a); 
   
 	    f.setDirectRadiation(direct);
+	    //  f.setDiffuseRadiation(1200);
 	    // f.setDiffuseRadiation(diffuse);  //diffuse
 	    last_diffuse = diffuse;
-       
-	vs.calculatePoplarLight((LGMdouble)(diffuse), (LGMdouble)structureFlag); 
-	
+	   
+       	vs.calculatePoplarLight((LGMdouble)(diffuse), (LGMdouble)structureFlag); 
+	   
         SetHwTreeQabs(vs,poplartree); 
 	// cout<<" setHwTree."<<endl;
       LGMdouble maxQin = 0.0;
@@ -234,13 +219,15 @@ int main(int argc, char** argv)
     // cout << "Photosynthesis in 30 minutes:  " << GetValue(poplartree,TreeP) << endl;
     structureFlag=1;
 	  }
+
     cout << "TreePhotosynthesis:  " << tree_photosynthesis<<endl;
-     f.setDiffuseRadiation(last_diffuse);
+    //    f.setDiffuseRadiation(last_diffuse);
  
     ForEach(poplartree, DoRespiration()); //poplartree.respiration(); //
  
     ForEach(poplartree,SubAging<poplarsegment,poplarbud>()); 
   
+
     //One derivation of L-string, above ground trunk and tree crown
     poplarL.derive();
     //below ground roots
@@ -250,21 +237,31 @@ int main(int argc, char** argv)
  
     poplarL.lstringToLignum(poplartree,1, PoplarD);
     rootL.lstringToRootSystem(poplartree);
+
     cout << "lstringToLignum done " << endl;
     //DisplayStructure(poplartree);   
+
     TreePhysiologyVigourIndex(poplartree);
     // cout << "Vigour index" << endl;
      
     LGMdouble p = 0.0, m = 0.0;
     LGMdouble P = tree_photosynthesis;
-    LGMdouble M = Accumulate(poplartree,m, SumTreeRespiration<poplarsegment, poplarbud>())+ GetValue(poplartree,LGPmr)* GetValue(poplartree,TreeWr);  //0.1 * GetValue(poplartree,TreeWr) * 0.15;   // GetValue(poplartree,LGPmr)* GetValue(poplartree,TreeWr);   
-    if (M>P) P=M+0.001;
-    SetValue(poplartree,TreeM,M);  
+
+    LGMdouble M = Accumulate(poplartree,m, SumTreeRespiration<poplarsegment, poplarbud>())+ 0.8*GetValue(poplartree,LGPmr)* GetValue(poplartree,TreeWr)+0.2*GetValue(poplartree,TreeWr)*0.125;  //0.1 * GetValue(poplartree,TreeWr) * 0.15;   // GetValue(poplartree,LGPmr)* GetValue(poplartree,TreeWr); //fineroot:coarseroot=1:4  
+    if (M>P) P=M+0.0001;
+    SetValue(poplartree,TreeM,M);  //should be M
+
     SetValue(poplartree,TreeP,P);
     cout<<"P: "<<P<<" M: "<<M<<endl;
     TreeGrowthAllocatorPropagateUp<poplarsegment, poplarbud,
       SetSegmentLength, TryDiameterGrowth, double> G(poplartree, 0.0);
-   
+
+
+          LGMdouble sMass = 0.0;
+	  /*     sMass = Accumulate(poplartree,sMass,
+                       CollectSapwoodMass<poplarsegment,poplarbud>());
+                 SetValue(poplartree, LGAWs, sMass);
+	  */
     G.init();
     cout << "G.init finished." << endl;
     cout << "Bisection zero at:  " << Bisection(0.0, 10.0, G, GetValue(poplartree,LGPzbrentEpsilon)) << endl; //GetValue(poplartree,LGPzbrentEpsilon)=0.001
@@ -290,8 +287,7 @@ int main(int argc, char** argv)
 
     poplarL.lstringToLignum(poplartree,1, PoplarD);
     rootL.lstringToRootSystem(poplartree);
-    // cout << "lstringToLignum done " << endl;
-    //DisplayStructure(poplartree); 
+
     pv.clear();
         AccumulateDown(poplartree,pv,
      	   AppendSequence<vector<PositionVector> >(),
@@ -304,48 +300,44 @@ int main(int argc, char** argv)
     TcData data;     
     AccumulateDown(poplartree,data,
 		   TreeDiameterGrowth<poplarsegment, poplarbud>());
-    LGMdouble lMass = 0.0;
-    lMass = Accumulate(poplartree,lMass,
-                       CollectFoliageMass<poplarsegment,poplarbud>());
+
+      //  LGMdouble lMass = 0.0;
+    // lMass = Accumulate(poplartree,lMass,CollectFoliageMass<poplarsegment,poplarbud>());
     //*cout<<"TreeWr: "<<GetValue(poplartree,TreeWr)<<" : "<<GetValue(poplartree,LGPar)*lMass<<endl;
-    SetValue(poplartree, TreeWr, 
-             GetValue(poplartree,TreeWr)+GetValue(poplartree,LGPar)*lMass);
- 
+    // SetValue(poplartree, TreeWr,GetValue(poplartree,TreeWr)+GetValue(poplartree,LGPar)*lMass);
+
+     sMass = 0.0;
+     sMass = Accumulate(poplartree,sMass,
+                       CollectSapwoodMass<poplarsegment,poplarbud>());
+  SetValue(poplartree, TreeWr, sMass*0.3);
+
           /////////do tree pruning
+
      double length=0.0;
       PropagateUp(poplartree, length, KillPoplarBuds<poplarsegment, poplarbud>());
       poplarL.lignumToLstring(poplartree,1,PoplarD);  
       poplarL.lstringToLignum(poplartree,1,PoplarD);
+
       poplarL.prune(poplartree);
 	 
-
-      /*      bBox = Accumulate(poplartree, bBox,
-			FindHwBoundingBox<poplarsegment,
-			poplarbud,Triangle>()); 
-      cout << bBox;
-      span = bBox.getMax()-bBox.getMin();
-      cout<<"span: "<<span.getX()<<" "<<span.getY()<<" "<<span.getZ()<<endl;*/
 }
      fclose(fFile);
     if (age==derivation-1)
       cout<<"root mass age of "<<derivation<<": "<<GetValue(poplartree,TreeWr)<<endl;
+
     //sapwood senescence
-      ForEach(poplartree,TreeAging<poplarsegment,poplarbud>());   //use this if using subage
+
+     ForEach(poplartree,TreeAging<poplarsegment,poplarbud>());   //use this if using subage
+
     //Root mortality
-    SetValue(poplartree,TreeWr, 
-	     GetValue(poplartree,TreeWr)-GetValue(poplartree,LGPsr)/4 *
-	     GetValue(poplartree,TreeWr));
-     
+
+     // SetValue(poplartree,TreeWr,GetValue(poplartree,TreeWr)-GetValue(poplartree,LGPsr)/4 * GetValue(poplartree,TreeWr));
+     SetValue(poplartree,TreeWr,0.8*GetValue(poplartree,TreeWr)*(1-GetValue(poplartree,LGPsr)));
+
     ForEach(poplartree, WakeupPoplarBuds<poplarsegment, poplarbud>());
     poplarL.lignumToLstring(poplartree,1,PoplarD);  
     poplarL.lstringToLignum(poplartree,1,PoplarD);  
     drop_leaf_flag=1;
-
-  
-    // ForEach(poplartree, DropAllLeaves<poplarsegment, poplarbud,Triangle>());
-  
-    // PrintTreeInformation<poplarsegment, poplarbud, ostream> printPoplar;
-    // printPoplar(poplartree);    //print out tree information such as tree height, dbh
   }
 
   //Some optional clean up see End in sym2d.L
@@ -356,12 +348,19 @@ int main(int argc, char** argv)
 
   // ForEach(poplartree, DropAllLeaves<poplarsegment, poplarbud,Triangle>());
 
-  if (xmlfile.length() > 0){
-    XMLDomTreeWriter<poplarsegment,poplarbud,Triangle> writer;
-    writer.writeTreeToXML(poplartree,xmlfile);
+ //new version of visualization
+  
+  LGMVisualization viz;
+  viz.InitVisualization(argc,argv);
+  //viz.OrderFoliage(true);
+  viz.AddHwTree<poplarsegment,poplarbud, Triangle>(poplartree,string("koivu.bmp"), string("lehti.tga"));
+							 
+  viz.SetMode(SOLID);
+  viz.StartVisualization();
+  
+
   }
-  return 0;
-}
+
 
 
 

@@ -1,7 +1,7 @@
 //Your  L-system will be similar to this. See 
 //LEngine README for user caveats, e.g. please do not
 //use C++ keywords in comments.
-
+    
 #include <Uniform.h>
 #include <Gauss.h> 
 #include <Bernoulli.h>
@@ -71,8 +71,9 @@ Start:
   //Axillary buds assoaciated with a leaf
   PoplarBudData d2(ALIVE,0.1,1.0,1.0);
 
-  produce Roll(30.0 * PI_VALUE/180.0) F(0.2, 0)  Roll(roll)  B(d1);  
-//  produce Roll(30.0 * PI_VALUE/180.0) F(0.2, 0) SB() Pitch(PI_VALUE/4.0)B(d2) EB() Roll(roll)  B(d1);    
+
+ // produce Roll(30.0 * PI_VALUE/180.0) F(0.2, 0)  Roll(roll)  B(d1);  
+  produce Roll(30.0 * PI_VALUE/180.0) F(0.2, 0) SB() Pitch(PI_VALUE/4.0)B(d2) EB() Roll(roll)  B(d1);    
 
 }
 

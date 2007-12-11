@@ -1,17 +1,21 @@
 #include <poplar.h>
-//#include <poplarstand.h>
-#include <poplarmetabolism.h>
 
+#include <poplarstand.h>
+
+#include <poplarmetabolism.h>
+    
 // declared in poplar.h poplarsegment class.
 
 class LeafResize
 {
  public:
   LeafResize(double la){leafArea=la;}
+
   LeafResize(){}
-  void LeafResize :: operator()(BroadLeaf<Triangle>* b)  
-  {  leafArea=min((GetValue(*b, LGAA)+0.00000128), 0.007);
+  void operator()(BroadLeaf<Triangle>* b)  
+  {  leafArea=min((GetValue(*b, LGAA)+0.0000055), 0.007); //+0.00002; 0.001
   // cout<<"leafarea: "<<leafArea<<endl;
+
      SetValue(*b, LGAA, leafArea); 
   }
   double leafArea;
@@ -66,22 +70,28 @@ int PoplarLeaf::photosynthesis()
     double Ca=360, Kc=460, Ko=330;
     double Ci=0.7 * Ca * ((1.674-0.061294*T+0.0011688*pow(T,2)-0.0000088741*pow(T,3))/0.73547);
     double Oi=210*((0.047-0.0013087*T+0.000025603*pow(T, 2)-0.00000021441*pow(T,3))/0.026934);
+
     double kvc=exp((T-25)*68000/(8.314*298*(273+T)));
     double kjmax=exp(((T-25)*65330)/(298*8.314*(273+T)))*(1+exp((298*650-200000)/(298*8.314)))/(1+exp(((273+T)*650-200000)/(8.314*(273+T))));
-    double Vcmax=30.83 * kvc*0.75;    //30.83; 93 from Turnbull
+    double Vcmax=42.12 * kvc;    //30.83; 93 from Turnbull,revised young 52.65, revised old 42.12
+
     double Vomax=0.21*Vcmax;
     double Wc=(Vcmax*Ci)/(Ci+Kc*(1+Oi/Ko));
     double G = (0.5*Vomax*Kc*Oi)/(Vcmax*Ko);
 
-    double Jmax= 86.75 * kjmax*1.25;    //86.75; 117 from turnbull
+    double Jmax= 88.01 * kjmax;    //86.75; 117 from turnbull, revised young 96.87, revised old 88.01
+
     double Q=GetValue((*this), LGAQabs);  //(*this).bla.Q_in;  //Qabs-absorbed radiation
       double a = 0.0551;
       double J = Jmax *Q*0.23/(Q*0.23+2.1*Jmax);  //=a* Q *pow((1+pow(a, 2)*pow(Q,2)/pow(Jmax, 2)), 0.5);
        double Wj = (J*Ci)/(4.5*Ci+10.5*G);
 
-       KGC Rd=2.21*pow(1.78, (T-25)/10);  //Rd=2.21;
+
+       KGC Rd=1.09*pow(1.78, (T-25)/10);  //Rd=2.21; revised young 1.25,revised old 1.09
+
   KGC Photo =(KGC)((1-G/Ci) * min(Wc,Wj));        //(umole/m2/s)
-  // cout<<"Q: "<<Q<<" <J: "<<J<<endl;
+  //   cout<<"Q: "<<Q<<" temperature: "<<T<<" Wc: "<<Wc<<" Wj: "<<Wj<<" Rd: "<<Rd<<endl;
+ // cout<<"Q: "<<Q<<" <J: "<<J<<endl;
   //Emole = 2.176 *100000 joule/mole; umole = 0.2176 J 
   //  KGC A=Photo*0.01;          //0.01KG/MJ?? p0=0.001  
   // cout<<"Q: "<<Q<<" Photo: "<<Photo<<" temperature: "<<T<<" Wc: "<<Wc<<" Wj: "<<Wj<<" Ci: "<<Ci<<" Oi: "<<Oi<<" J: "<<J<<" Vomax: "<<Vomax<<" G: "<<G<<endl; 
