@@ -17,14 +17,9 @@
 #include <poplar.h>
 #include <poplarmetabolism.h>
 #include <VoxelSpace.h>
-#include <VisualFunctor.h>
 #include <Polygon.h>
 
-//Implement VisualizeLGMTree
-#include <GLSettings.h>
-#include <OpenGLUnix.h>
-#include <LGMVisualization.h>
-
+#include <XMLTree.h>
 //Includes all kinds of stuff, turtle graphics etc.
 //Include this always for your program
 #include <lengine.h>
@@ -56,10 +51,13 @@ int main(int argc, char** argv)
   string iterations;
   int iter=0;
   string metafile = "MetaFile.txt";
-
+  string xmlfile;//tree outputfile
   srand(time(NULL));
   Lex l;
 
+
+  //Save the simulated poplar to xmlfile
+  ParseCommandLine(argc,argv,"-xml",xmlfile);
 
 
    poplar::LSystem<poplarsegment,poplarbud,PoplarBD, PoplarBudData> poplarL;
@@ -350,14 +348,11 @@ int main(int argc, char** argv)
 
  //new version of visualization
   
-  LGMVisualization viz;
-  viz.InitVisualization(argc,argv);
-  //viz.OrderFoliage(true);
-  viz.AddHwTree<poplarsegment,poplarbud, Triangle>(poplartree,string("koivu.bmp"), string("lehti.tga"));
-							 
-  viz.SetMode(SOLID);
-  viz.StartVisualization();
-  
+  if (xmlfile.length() > 0){
+    XMLDomTreeWriter<poplarsegment,poplarbud,Triangle> writer;
+    writer.writeTreeToXML(poplartree,xmlfile);
+  }
+  return 0;  
 
   }
 
