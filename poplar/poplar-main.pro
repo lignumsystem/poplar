@@ -4,13 +4,15 @@
 CONFIG -= app_bundle
 CONFIG += qt
 QT += xml
+win32: CONFIG += console
 TEMPLATE = app
 TARGET = poplar
 DEPENDPATH += .
 INCLUDEPATH += .  ../c++adt/include ../stl-lignum/include ../Firmament/include ../stl-voxelspace/include ../LEngine/include ../Pine ../XMLTree  
-unix:LIBS += -L../c++adt/lib -L../stl-lignum/lib -L../Firmament/lib -L../LEngine/lib -L../stl-voxelspace/lib  -lsky -lL -lvoxel -lLGM  -lcxxadt 
-win32:LIBS +=  ../LEngine/lib/L.lib ../stl-voxelspace/lib/voxel.lib  ../Firmament/lib/sky.lib ../stl-lignum/lib/LGM.lib ../c++adt/lib/cxxadt.lib 
+LIBS += -L../c++adt/lib -L../stl-lignum/lib -L../Firmament/lib -L../LEngine/lib -L../stl-voxelspace/lib  -lsky -lL -lvoxel -lLGM  -lcxxadt 
+
 # Input
+unix{
 system(../LEngine/bin/l2c poplar.L poplar.cpp){
    SOURCES += poplar.cpp
 }
@@ -22,6 +24,22 @@ system(../LEngine/bin/l2c ErythrinaRoots.L ErythrinaRoots.cpp){
 }
 else{
    message("ErythrinaRoots.L failed")
+}
+}
+
+win32{
+system(..\LEngine\bin\l2c poplar.L poplar.cpp){
+   SOURCES += poplar.cpp
+}
+else{
+   message("poplar.L failed")
+}
+system(..\LEngine\bin\l2c ErythrinaRoots.L ErythrinaRoots.cpp){
+   SOURCES += ErythrinaRoots.cpp
+}
+else{
+   message("ErythrinaRoots.L failed")
+}
 }
 
 # Input
