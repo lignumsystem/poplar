@@ -106,7 +106,7 @@ int PoplarLeaf::photosynthesis()
   //  cout<<"Rd respiration: "<<2.21* 30 *60 * 0.000001 *12 * 0.001 * GetValue(*this, LGAA)<<endl;;
   //  KGC A=Photo*0.000001*30*60*0.5 *44 *0.001; //3 (umole/m2/s)* 0.000001Mole *30*60(s) * 0.1m2(should be all leaves in one new branch??no, only one leaf area) * 44 *0.001Kg
    
-  KGC A=Photo * 30 *60 * 0.000001 * (44*0.67) * 0.001 * GetValue(*this, LGAA);// * GetValue(*this, LGAA); //(umole/m2/s) * time * 0.000001mole * Carbon(12) *0.001Kg: LeafArea(* GetValue(*this, LGAA)) is not included here any more because it is already timed in VoxelSpaceI.h for Qabs.
+  KGC A=Photo * 30.0 *60.0 * 0.000001 * (12.0) * 0.001 * GetValue(*this, LGAA);// * GetValue(*this, LGAA); //(umole/m2/s) * time * 0.000001mole * Carbon(12) *0.001Kg: LeafArea(* GetValue(*this, LGAA)) is not included here any more because it is already timed in VoxelSpaceI.h for Qabs.
   //  cout<<"leaf area: "<<GetValue(*this, LGAA)<<"Photo: "<<Photo<<endl;
   SetValue(*this, LGAP, A);     //(*this).bla.P=A;
 
