@@ -1,22 +1,18 @@
 #include <poplar.h>
-
 #include <poplarstand.h>
-
 #include <poplarmetabolism.h>
-    
+
 // declared in poplar.h poplarsegment class.
 
 class LeafResize
 {
- public:
+public:
   LeafResize(double la){leafArea=la;}
-
   LeafResize(){}
   void operator()(BroadLeaf<Triangle>* b)  
   {  leafArea=min((GetValue(*b, LGAA)+0.0000055), 0.007); //+0.00002; 0.001
-  // cout<<"leafarea: "<<leafArea<<endl;
-
-     SetValue(*b, LGAA, leafArea); 
+    // cout<<"leafarea: "<<leafArea<<endl;
+    SetValue(*b, LGAA, leafArea); 
   }
   double leafArea;
 };
@@ -30,7 +26,8 @@ TcData& poplarsegment::diameterGrowth(TcData& data)
     LGMdouble Asu = GetValue(data,LGAAs); //sapwood area from above
     LGMdouble Ahown  = GetValue(*this,LGAAh);//own heartwood
     //Sapwood  requirement  of  remaining  foliage,  assume  fm  returns
-    //proportion initial  foliage present, declining function  from 1 to 0.
+    //proportion initial  foliage present, declining function  from 1 to
+    //0.
     LGMdouble Asr = fm(GetValue(*this,LGAage))*GetValue(*this,LGAAs0);
     // cout<<GetValue(*this,LGAage)<<": the value of age and As0:"<<GetValue(*this,LGAAs0)<<endl; 
     //**cout<<"the value of Asr:"<<Asr<<endl;
@@ -46,18 +43,18 @@ TcData& poplarsegment::diameterGrowth(TcData& data)
   SetValue(data,LGAAs,GetValue(*this,LGAAs)); 
 
   /*   
-   LGMdouble As=GetValue(*this, LGAAs);
-   LGMdouble Af=As*20*10;
-    list<BroadLeaf<Triangle> *> leaves=GetLeafList(*this);
-    int nLeaves = leaves.size();
-    double la;
-    if(nLeaves>=1 && Af>0)
-      {  la= min(Af/(double)(nLeaves), 0.008); // min(Af/(double)(nLeaves), 0.05);
-      // cout<<"number of leaves: "<<nLeaves<<" leafArea: "<<la<<endl;
+       LGMdouble As=GetValue(*this, LGAAs);
+       LGMdouble Af=As*20*10;
+       list<BroadLeaf<Triangle> *> leaves=GetLeafList(*this);
+       int nLeaves = leaves.size();
+       double la;
+       if(nLeaves>=1 && Af>0)
+       {  la= min(Af/(double)(nLeaves), 0.008); // min(Af/(double)(nLeaves), 0.05);
+       // cout<<"number of leaves: "<<nLeaves<<" leafArea: "<<la<<endl;
        LeafResize f(la);
        for_each(leaves.begin(), leaves.end(), f); 
        }
-     */
+  */
   return data;
 }
 
@@ -66,49 +63,102 @@ int PoplarLeaf::photosynthesis()
 {
   //cout << "poplarleaf photosynthesis "<< endl;
 
-    LGMdouble T = temperature; //temperature of leaf.l
-    double Ca=360, Kc=460, Ko=330;
-    double Ci=0.7 * Ca * ((1.674-0.061294*T+0.0011688*pow(T,2)-0.0000088741*pow(T,3))/0.73547);
-    double Oi=210*((0.047-0.0013087*T+0.000025603*pow(T, 2)-0.00000021441*pow(T,3))/0.026934);
+  double const T = temperature; //temperature of leaf.l
+  double const Q = GetValue(*this,LGAQabs); //Absorbed radiation
 
-    double kvc=exp((T-25)*68000/(8.314*298*(273+T)));
-    double kjmax=exp(((T-25)*65330)/(298*8.314*(273+T)))*(1+exp((298*650-200000)/(298*8.314)))/(1+exp(((273+T)*650-200000)/(8.314*(273+T))));
-    double Vcmax=42.12 * kvc;    //30.83; 93 from Turnbull,revised young 52.65, revised old 42.12
+  double const Ca =380.0;  //MS: Table 2 (350) 360.0
+  double const Dj = 200.0e3;//MS: A3-10
+  double const Jmax25 = 88.01; //(86.75);//MS: Table 2
+  double const Kc = 460.0;//MS: Table 2
+  double const Ko = 330.0;//MS: Table 2
+  double const Oa = 210.0;//MS: Table 2
+  double const Q10 = 1.78;//MS: A3-12
+  double const Rd25 = 1.09; //(2.21); //MS: Table 2
+  double const R = 8.314; //MS: A3-5
+  double const Sj = 650.0; //MS: A3-10
+  double const Vcmax25 = 42.12; //MS: Table 2 (30.83)
 
-    double Vomax=0.21*Vcmax;
-    double Wc=(Vcmax*Ci)/(Ci+Kc*(1+Oi/Ko));
-    double G = (0.5*Vomax*Kc*Oi)/(Vcmax*Ko);
+  //Implementing Appendix 3 in the manuscript
+  double Ci = 0.7*Ca*((1.6740-6.1294e-2*T+1.1688e-3*pow(T,2.0)-8.8741e-6*pow(T,3.0))/0.73547);//MS: A3-2
+  double Oi = Oa*((4.700e-2-1.3087e-3*T+2.5603e-5*pow(T,2.0)-2.1441e-7*pow(T,3.0))/2.6934e-2); //MS: A3-4
+  double Vcmax = Vcmax25*exp((T-25.0)*68000.0/(R*298.0*(273.0+T))); //MS: A3-5
+  double Wc = (Ci*Vcmax)/(Ci+Kc*(1.0+Oi/Ko)); //MS: A3-7
+  double exp1 = exp(((T-25.0)*65330.0)/(298.0*R*(T+273.0)));
+  double exp2 = exp((298.0*Sj-Dj)/(298.0*R));
+  double exp3 = exp(((T+273.0)*Sj-Dj)/(R*(T+273.0)));
+  double Jmax = Jmax25*exp1*((1.0+exp2)/(1.0+exp3));//MS: A3-10
+  double J = (Jmax*Q)/(Q+2.1*Jmax); //MS: A3-9
+  double Vomax = 0.21*Vcmax; //MS: A3-6
+  double G = (0.5*Vomax*Kc*Oi)/(Vcmax*Ko);//MS: A3-3
+  double Wj = J/(4.5+(10.5*G/Ci)); //MS: A3-8
+  double Rd = Rd25*pow(Q10,(T-25.0)/10.0); //MS: A3-12
+  double Vc = min(Wc,Wj); //MS: A3-11
+  double AlGross = (1-G/Ci)*Vc;
+  double Al = (1-G/Ci)*Vc-Rd; //MS: A3-1
 
-    double Jmax= 88.01 * kjmax;    //86.75; 117 from turnbull, revised young 96.87, revised old 88.01
+  
+  /*
+  double Ci=0.7 * Ca * ((1.674-0.061294*T+0.0011688*pow(T,2.0)-0.0000088741*pow(T,3.0))/0.73547);
+  //double Oi=210*((0.047-0.0013087*T+0.000025603*pow(T, 2.0)-0.00000021441*pow(T,3))/0.026934);
+  double Oi=210*((0.047-0.0013087*T+0.000025603*pow(T, 2.0)-0.0000088741*pow(T,3))/0.026934);
+  double kvc=exp((T-25)*68000/(8.314*298*(273+T)));
+  double kjmax=exp(((T-25)*65330)/(298*8.314*(273+T)))*(1+exp((298*650-200000)/(298*8.314)))/(1+exp(((273+T)*650-200000)/(8.314*(273+T))));
+  //double Vcmax=30.83 * kvc;    //30.83; 93 from Turnbull
+  double Vcmax = 42.12*kvc;
+  double Vomax=0.21*Vcmax;
+  double Wc=(Vcmax*Ci)/(Ci+Kc*(1+Oi/Ko));
+  double G = (0.5*Vomax*Kc*Oi)/(Vcmax*Ko);
 
-    double Q=GetValue((*this), LGAQabs);  //(*this).bla.Q_in;  //Qabs-absorbed radiation
-      double a = 0.0551;
-      double J = Jmax *Q*0.23/(Q*0.23+2.1*Jmax);  //=a* Q *pow((1+pow(a, 2)*pow(Q,2)/pow(Jmax, 2)), 0.5);
-       double Wj = (J*Ci)/(4.5*Ci+10.5*G);
+  //double Jmax= 86.75 * kjmax;    //86.75; 117 from turnbull
+  double Jmax = 88.01*kjmax;
+  double Q=GetValue((*this), LGAQabs);  //(*this).bla.Q_in;  //Qabs-absorbed radiation
+  double a = 0.0551;
+  double J = Jmax *Q*0.23/(Q*0.23+2.1*Jmax);  //=a* Q *pow((1+pow(a, 2)*pow(Q,2)/pow(Jmax, 2)), 0.5);
+  double Wj = (J*Ci)/(4.5*Ci+10.5*G);
 
-
-       KGC Rd=1.09*pow(1.78, (T-25)/10);  //Rd=2.21; revised young 1.25,revised old 1.09
-
-  KGC Photo =(KGC)((1-G/Ci) * min(Wc,Wj));        //(umole/m2/s)
-  //   cout<<"Q: "<<Q<<" temperature: "<<T<<" Wc: "<<Wc<<" Wj: "<<Wj<<" Rd: "<<Rd<<endl;
- // cout<<"Q: "<<Q<<" <J: "<<J<<endl;
+  //KGC Rd=2.21*pow(1.78, (T-25)/10);  //Rd=2.21;
+  double Rd = 1.09*pow(1.78, (T-25)/10.0); 
+  double GrossPhoto =(KGC)((1-G/Ci) * min(Wc,Wj));        //(umole/m2/s)
+  // cout<<"Q: "<<Q<<" <J: "<<J<<endl;
   //Emole = 2.176 *100000 joule/mole; umole = 0.2176 J 
   //  KGC A=Photo*0.01;          //0.01KG/MJ?? p0=0.001  
   // cout<<"Q: "<<Q<<" Photo: "<<Photo<<" temperature: "<<T<<" Wc: "<<Wc<<" Wj: "<<Wj<<" Ci: "<<Ci<<" Oi: "<<Oi<<" J: "<<J<<" Vomax: "<<Vomax<<" G: "<<G<<endl; 
  
   //  if (Photo>Rd)
   // cout<<"Photo: "<<Photo<<" Rd: "<<Rd<<endl; 
-      Photo = Photo-Rd;
-      //  else
-      //   Photo = 0 ; 
+  double Photo = GrossPhoto-Rd;
+  */
+  //  else
+  //   Photo = 0 ; 
   
-//  Rd is (umolm-2s-1), so all photosynthesis have to multifilied by leaf area (0.01m-2) and time.
+  //  Rd is (umolm-2s-1), so all photosynthesis have to multifilied by leaf area (0.01m-2) and time.
   //  cout<<"Rd respiration: "<<2.21* 30 *60 * 0.000001 *12 * 0.001 * GetValue(*this, LGAA)<<endl;;
   //  KGC A=Photo*0.000001*30*60*0.5 *44 *0.001; //3 (umole/m2/s)* 0.000001Mole *30*60(s) * 0.1m2(should be all leaves in one new branch??no, only one leaf area) * 44 *0.001Kg
    
-  KGC A=Photo * 30.0 *60.0 * 0.000001 * (12.0) * 0.001 * GetValue(*this, LGAA);// * GetValue(*this, LGAA); //(umole/m2/s) * time * 0.000001mole * Carbon(12) *0.001Kg: LeafArea(* GetValue(*this, LGAA)) is not included here any more because it is already timed in VoxelSpaceI.h for Qabs.
+  //KGC A=Al * 30 *60 * 0.000001 * (12) * 0.001 * GetValue(*this, LGAA);// * GetValue(*this, LGAA); //(umole/m2/s) * time * 0.000001mole * Carbon(12) *0.001Kg: LeafArea(* GetValue(*this, LGAA)) is not included here any more because it is already timed in VoxelSpaceI.h for Qabs.
   //  cout<<"leaf area: "<<GetValue(*this, LGAA)<<"Photo: "<<Photo<<endl;
+
+  KGC A = Al*30.0*60.0*1.0e-6*12.0*1.0e-3*GetValue(*this,LGAA);
+
   SetValue(*this, LGAP, A);     //(*this).bla.P=A;
+
+  extern fstream debug_file;
+  debug_file << left  << setfill(' ') 
+             << setw(12) << GetShape(*this).getCenterPoint().getX() 
+             << setw(12) << GetShape(*this).getCenterPoint().getY() 
+             << setw(12) << GetShape(*this).getCenterPoint().getZ() 
+             << setw(12) << Q << " " 
+             << setw(12) << T
+             << setw(12) << Vcmax
+             << setw(12) << Jmax 
+             << setw(12) << J 
+	     << setw(12) << Oi
+	     << setw(12) << Ci
+             << setw(14) << Wc 
+             << setw(14) << Wj
+             << setw(12) << Al
+             << setw(12) << Rd
+             << setw(12) << AlGross <<endl;
 
       
   //** cout <<"print the photosynthesis of segment: "<<GetValue(*this, LGAP)<<endl; 
@@ -146,11 +196,11 @@ void poplarsegment::photosynthesis()
   list<BroadLeaf<Triangle> *> leaves = GetLeafList(*this);
  
   // if (day2>day1)
-    { // cout<<"day1: "<<day1<<" day2: "<<day2<<endl;
-         LeafResize f;
-         for_each(leaves.begin(), leaves.end(), f); 
-	//  day1=day2;
-    }
+  { // cout<<"day1: "<<day1<<" day2: "<<day2<<endl;
+    LeafResize f;
+    for_each(leaves.begin(), leaves.end(), f); 
+    //  day1=day2;
+  }
   //Use functor to traverse leaf list instead of do-while loops
   for_each(leaves.begin(), leaves.end(), PoplarLeafPhotosynthesis());
   
@@ -235,10 +285,10 @@ CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
 	leaf_normal.rotate(origo,axis1,ran);
 	//We need also the left corner of the triangle. Create a vector
 	//towards it.
-	 if (Cross(pdir,up).length() < R_EPSILON)
-	    axis2 = Cross(level,down).normalize();
-         else
-            axis2 = Cross(pdir,down).normalize();
+	if (Cross(pdir,up).length() < R_EPSILON)
+	  axis2 = Cross(level,down).normalize();
+	else
+	  axis2 = Cross(pdir,down).normalize();
 	//We yet need the direction towards the apex of the triangle
 	//to set the apex point
 	PositionVector axis3 = Cross(leaf_normal,axis1).normalize();
