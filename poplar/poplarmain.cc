@@ -174,18 +174,28 @@ int main(int argc, char** argv)
 	  LGMdouble tree_photosynthesis =0; 
 	  LGMdouble tree_respiration = 0;
 	  LGMdouble last_diffuse=0;
-	  f.setDiffuseRadiation(1200);
+	  //Initialize to zero, read diffuse from weather data file.
+	  f.setDiffuseRadiation(0);
 	  //int day=0;
 	  for (int i=0; i<6*7*24*2; i++)
 	    { 
 	      direct=0;
 	      diffuse=0;
 	      if(!feof(fFile))
-		{  //day, time, elevation, azimuth, diffuse, direct, Ta(temperature), VPD(pressure)
-		  fscanf(fFile, "%f %f %f %f %f %f %f %f\n", &a, &b, &c, &d, &e, &ff, &g, &h);
+		{  //day, time, elevation, azimuth, direct, diffuse, Ta(temperature), VPD(pressure)
+		  fscanf(fFile, "%f %f %f %f %f %f %f %f\n", &a, &b, &c, &d, &ff, &e, &g, &h);
 		  direct =ff;
 		  diffuse =e;
 		  day2=a;
+		  float time = b;
+		  //Correct the error in the weather data file. In the
+		  //file the  sun azimuth increases up  until the noon
+		  //12 o'clock when the  azimuth is PI. But after that
+		  //the azimuth decreases, i.e. the sun goes backwards
+		  //in the  sky! So to  make the sun circle  the right
+		  //way increase the azimuth value after the mid day.
+		  if (time > 12.0)
+		    d = PI_VALUE + (PI_VALUE - d);
 		}
 	      else
 		break;
@@ -203,7 +213,8 @@ int main(int argc, char** argv)
 	      f.setSunPosition(a); 
   
 	      f.setDirectRadiation(direct);
-	      // f.setDiffuseRadiation(diffuse);  //diffuse
+	      //The diffuse radiation should be used in the light model (calculatePoplarLight).
+	      f.resize(40,20,diffuse); 
 	      last_diffuse = diffuse;
 	      vs.calculatePoplarLight((LGMdouble)(diffuse), (LGMdouble)structureFlag); 
 	
@@ -231,6 +242,7 @@ int main(int argc, char** argv)
 	      structureFlag=1;
 	    }//for (int i=0; i < 6*7*24*2; i++)
 	  cout << "TreePhotosynthesis:  " << tree_photosynthesis<<endl;
+	  //Why do we set the diffuse datiation here 
 	  f.setDiffuseRadiation(last_diffuse);
  
 	  ForEach(poplartree, DoRespiration()); //poplartree.respiration(); //
