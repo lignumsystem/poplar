@@ -42,6 +42,8 @@ TcData& poplarsegment::diameterGrowth(TcData& data)
   //Pass down sapwood area requirement
   SetValue(data,LGAAs,GetValue(*this,LGAAs)); 
 
+  SetValue(*this,LGARTop,GetValue(*this,LGAR));
+
   /*   
        LGMdouble As=GetValue(*this, LGAAs);
        LGMdouble Af=As*20*10;
@@ -147,7 +149,8 @@ int PoplarLeaf::photosynthesis()
              << setw(12) << GetShape(*this).getCenterPoint().getX() 
              << setw(12) << GetShape(*this).getCenterPoint().getY() 
              << setw(12) << GetShape(*this).getCenterPoint().getZ() 
-             << setw(12) << Q << " " 
+	     << setw(12) << GetValue(*this,LGAQin) 
+             << setw(12) << Q
              << setw(12) << T
              << setw(12) << Vcmax
              << setw(12) << Jmax 
@@ -158,7 +161,8 @@ int PoplarLeaf::photosynthesis()
              << setw(14) << Wj
              << setw(12) << Al
              << setw(12) << Rd
-             << setw(12) << AlGross <<endl;
+             << setw(12) << AlGross 
+	     << setw(12) << A << endl;
 
       
   //** cout <<"print the photosynthesis of segment: "<<GetValue(*this, LGAP)<<endl; 
