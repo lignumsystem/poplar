@@ -2,6 +2,7 @@
 #define POPLAR_H
 
 #include <Lignum.h>
+#include <VoxelSpace.h>
 using namespace cxxadt;
 
 class poplarbud;
@@ -679,5 +680,50 @@ public:
     return r0qin;
   }
 };
+
+template <class TS, class BUD, class SHAPE>
+class SetPoplarSegmentQabsFunctor{
+public:
+  SetPoplarSegmentQabsFunctor(VoxelSpace& s):voxel_space(s){}
+  TreeCompartment<TS,BUD>* operator ()(TreeCompartment<TS,BUD>* tc)const;
+  VoxelSpace& voxel_space;
+};
+
+template <class TS, class BUD, class SHAPE>
+    void SetPoplarQabs(VoxelSpace &s, Tree<TS, BUD> &tree)
+    {
+      SetPoplarSegmentQabsFunctor<TS,BUD,SHAPE> f(s);
+      ForEach(tree, f);
+    }
+
+template <class TS, class SHAPE>
+    void SetPoplarSegmentQabs(VoxelSpace &space,
+			      TS& ts)
+    {
+      Point p;
+      LGMdouble la, bQin, lQabs;
+      VoxelBox box;
+      list<BroadLeaf<SHAPE>*>& leaf_list = GetLeafList(ts);
+      typename list<BroadLeaf<SHAPE>*>::iterator I;
+      for(I = leaf_list.begin(); I != leaf_list.end(); I++) {
+	p = GetCenterPoint(**I);
+	box = space.getVoxelBox(p);
+	bQin = box.getQin();
+	//80% absorbed
+	lQabs = 0.8 * bQin ;
+	//	cout<<"Qin: "<<bQin<<" Qabs: "<<lQabs<<endl;
+	SetValue(**I, LGAQabs, lQabs);
+	SetValue(**I, LGAQin, bQin);
+      }
+    }
+template <class TS, class BUD,class SHAPE>
+TreeCompartment<TS,BUD>* SetPoplarSegmentQabsFunctor<TS,BUD,SHAPE>::operator ()(TreeCompartment<TS,BUD>* tc)const
+    {
+      if (TS* hwts =  dynamic_cast<TS*>(tc))
+	{
+	  SetPoplarSegmentQabs<TS,SHAPE>(voxel_space, *hwts);
+	} 
+      return tc;
+    }
 
 #endif
