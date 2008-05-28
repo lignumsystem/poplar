@@ -49,7 +49,7 @@ fstream debug_file("PoplarPhotosynthesis.txt",ios_base::out);
 
 void Usage()
 {
-  cout << "Usage: ./poplar -iter <iter>  -xml <file>" <<endl; 
+  cout << "Usage: ./poplar -iter <iter>  -xml <file> -toFile <datafile>" <<endl; 
   exit(0);
 }
 
@@ -59,16 +59,19 @@ int main(int argc, char** argv)
   int iter=0;
   string metafile = "MetaFile.txt";
   string xmlfile;//tree outputfile
+  string datafilename;//Data ouput file
  
   Lex l;
-
+ 
   debug_file << left << setfill(' ') << " "
              << setw(12) << " X " << setw(12) << " Y " << setw(12) << " Z "
-             << setw(12) << " Qabs " << setw(12) << " T " 
-             << setw(12) << " Vcmax " << setw(12)  << " Jmax " << setw(12) << " J " 
+             << setw(12) << " Qin " << setw(12) << " Qabs " 
+	     << setw(12) << " T " 
+             << setw(12) << " Vcmax " << setw(12)  << " Jmax " 
+	     << setw(12) << " J " 
              << setw(12) << " Oi " << setw(12) << " Ci " << setw(12) << " Wc " 
 	     << setw(14) << " Wj " << setw(14) << " Al-Rd " << setw(12) 
-	     << " Rd " << setw(12) << " Al " <<endl;
+	     << " Rd " << setw(12) << " Al " << setw(12) << " P " << endl;
 
   //Iterations
   if (ParseCommandLine(argc,argv,"-iter",iterations)){
@@ -80,7 +83,29 @@ int main(int argc, char** argv)
   //Save the simulated poplar to xmlfile
   ParseCommandLine(argc,argv,"-xml",xmlfile);
 
-
+  ParseCommandLine(argc,argv,"-toFile",datafilename);
+  fstream datafile;
+  if (!datafilename.empty()){
+    datafile.setf(ios_base::fixed,ios_base::floatfield);
+    datafile.open(datafilename.c_str(), ios_base::out);
+    if (!datafile){
+      cout << "Could not open " << datafile <<endl;
+      exit(0);
+    }
+    datafile << left << setw(6) << setfill(' ') << "Age"
+		 << setw(12) << "H"
+		 << setw(12) << "D1.3"
+		 << setw(12) << "Wf"
+		 << setw(12) << "WsTot"
+		 << setw(12) << "WsStem"
+		 << setw(12) << "WsBranch" 
+		 << setw(12) << "Wr"
+		 << setw(12) << "P"
+		 << setw(12) << "M"
+		 << endl;
+  }
+    
+  
   poplar::LSystem<poplarsegment,poplarbud,PoplarBD, PoplarBudData> poplarL;
   Erythrina::LSystem<poplarsegment,poplarbud,LGMAD,LGMdouble> rootL;
  
@@ -170,7 +195,8 @@ int main(int argc, char** argv)
 	  vs.resize(vsize, vsize, vsize,nx,ny,nz);  
 	  
 	  DumpHwTree(vs,poplartree);
-
+	  string name("VSDump.txt"); string sep(" ");
+	  vs.writeVoxelBoxesToGnuPlotFile("VSDump.txt"," ");
 	  LGMdouble tree_photosynthesis =0; 
 	  LGMdouble tree_respiration = 0;
 	  LGMdouble last_diffuse=0;
@@ -208,17 +234,16 @@ int main(int argc, char** argv)
 	      a[0] = sin(d);
 	      a[1] = cos(d);
 	      a[2] = c;  
-
 	      vs.resetQinQabs();  //reset the voxelbox to be initial, all Qabs, Qin to be 0.
-	      f.setSunPosition(a); 
-  
-	      f.setDirectRadiation(direct);
+
 	      //The diffuse radiation should be used in the light model (calculatePoplarLight).
 	      f.resize(40,20,diffuse); 
 	      last_diffuse = diffuse;
+	      f.setSunPosition(a); 
+	      f.setDirectRadiation(direct);
 	      vs.calculatePoplarLight((LGMdouble)(diffuse), (LGMdouble)structureFlag); 
 	
-	      SetHwTreeQabs(vs,poplartree); 
+	      SetPoplarQabs<poplarsegment,poplarbud,Triangle>(vs,poplartree); 
 	      // cout<<" setHwTree."<<endl;
 	      LGMdouble maxQin = 0.0;
 	      maxQin = Accumulate(poplartree, maxQin, GetQinMax<poplarsegment,poplarbud>() );
@@ -243,7 +268,7 @@ int main(int argc, char** argv)
 	    }//for (int i=0; i < 6*7*24*2; i++)
 	  cout << "TreePhotosynthesis:  " << tree_photosynthesis<<endl;
 	  //Why do we set the diffuse datiation here 
-	  f.setDiffuseRadiation(last_diffuse);
+	  //f.setDiffuseRadiation(last_diffuse);
  
 	  ForEach(poplartree, DoRespiration()); //poplartree.respiration(); //
  
@@ -325,7 +350,8 @@ int main(int argc, char** argv)
 	  poplarL.lignumToLstring(poplartree,1,PoplarD);  
 	  poplarL.lstringToLignum(poplartree,1,PoplarD);
 	  poplarL.prune(poplartree);
-	 
+
+
 	}
       fclose(fFile);
       if (age==derivation-1)
@@ -341,37 +367,63 @@ int main(int argc, char** argv)
       poplarL.lignumToLstring(poplartree,1,PoplarD);  
       poplarL.lstringToLignum(poplartree,1,PoplarD);  
       drop_leaf_flag=1;
-    }
-  
-
-
-      //Some optional clean up see End in sym2d.L
-      poplarL.end();  
-      rootL.end();
-      PrintTreeInformation<poplarsegment, poplarbud, ostream> printPoplar;
-      printPoplar(poplartree);    //print out tree information such as tree height, dbh
-
-      if (xmlfile.length() > 0){
-	XMLDomTreeWriter<poplarsegment,poplarbud,Triangle> writer;
-	writer.writeTreeToXML(poplartree,xmlfile);
+      int age = static_cast<int>(GetValue(poplartree,LGAage));
+      double h   = GetValue(poplartree,LGAH);
+      double d13 = GetValue(poplartree,LGADbh);
+      double wf = 0.0;
+      wf = Accumulate(poplartree,wf,CollectFoliageMass<poplarsegment,poplarbud>());
+      double ws = 0.0;
+      ws = Accumulate(poplartree,ws,CollectWoodMass<poplarsegment,poplarbud>());
+      double ws_stem = 0.0;
+      ws_stem =  Accumulate(poplartree,ws_stem,CollectStemWoodMass<poplarsegment,poplarbud>());
+      double ws_branch = ws - ws_stem;
+      double wr = GetValue(poplartree,TreeWr);
+      double p = GetValue(poplartree,TreeP);
+      double m = GetValue(poplartree,TreeM);
+      if (datafile){
+	datafile << left << setw(6) << setfill(' ') << age
+		 << setw(12) << h
+		 << setw(12) << d13
+		 << setw(12) << wf
+		 << setw(12) << ws
+		 << setw(12) << ws_stem
+		 << setw(12) << ws_branch
+		 << setw(12) << wr
+		 << setw(12) << p
+		 << setw(12) << m 
+		 << endl;
       }
-      return 0;  
+    }
+  
 
-      // ForEach(poplartree, DropAllLeaves<poplarsegment, poplarbud,Triangle>());
+
+  //Some optional clean up see End in sym2d.L
+  poplarL.end();  
+  rootL.end();
+  PrintTreeInformation<poplarsegment, poplarbud, ostream> printPoplar;
+  printPoplar(poplartree);    //print out tree information such as tree height, dbh
+
+  if (xmlfile.length() > 0){
+    XMLDomTreeWriter<poplarsegment,poplarbud,Triangle> writer;
+    writer.writeTreeToXML(poplartree,xmlfile);
+  }
+  return 0;  
+
+  // ForEach(poplartree, DropAllLeaves<poplarsegment, poplarbud,Triangle>());
 
   
-      //new version of visualization
-      /*
-	LGMVisualization viz;
-	viz.InitVisualization(argc,argv);
-	//viz.OrderFoliage(true);
-	viz.AddHwTree<poplarsegment,poplarbud, Triangle>(poplartree,string("koivu.bmp"), string("lehti.tga"));
+  //new version of visualization
+  /*
+    LGMVisualization viz;
+    viz.InitVisualization(argc,argv);
+    //viz.OrderFoliage(true);
+    viz.AddHwTree<poplarsegment,poplarbud, Triangle>(poplartree,string("koivu.bmp"), string("lehti.tga"));
 							 
-	viz.SetMode(SOLID);
-	viz.StartVisualization();
-      */
+    viz.SetMode(SOLID);
+    viz.StartVisualization();
+  */
 
-    }
+}
 
 
 
