@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 #include <iomanip>
 
 //Include Lignum implementation 
@@ -11,7 +12,7 @@
 #include <CompareLeaves.h>
 #include <Bisection.h>
 #include <Shading.h>
-
+#include <PoplarGrowthAllocator.h>
 //Include the implementation of the  tree segment and bud You probably
 //define your own segment and bud in real project for cottonwood.
 #include <poplar.h>
@@ -60,7 +61,10 @@ int main(int argc, char** argv)
   string metafile = "MetaFile.txt";
   string xmlfile;//tree outputfile
   string datafilename;//Data ouput file
- 
+  string writeinterval;//write interval command line argument
+  int interval=0;//write interval to xml file
+  //Root senescence at medium time step (structure update)
+  double root_senescence=0.0;
   Lex l;
  
   debug_file << left << setfill(' ') << " "
@@ -82,8 +86,12 @@ int main(int argc, char** argv)
   }
   //Save the simulated poplar to xmlfile
   ParseCommandLine(argc,argv,"-xml",xmlfile);
-
+  //Data file
   ParseCommandLine(argc,argv,"-toFile",datafilename);
+  //Write interval
+  ParseCommandLine(argc,argv,"-writeInterval",writeinterval);
+  if (!writeinterval.empty())
+    interval = atoi(writeinterval.c_str());
   fstream datafile;
   if (!datafilename.empty()){
     datafile.setf(ios_base::fixed,ios_base::floatfield);
@@ -295,8 +303,8 @@ int main(int argc, char** argv)
 	  SetValue(poplartree,TreeM,M);  //should be M
 	  SetValue(poplartree,TreeP,P);
 	  cout<<"P: "<<P<<" M: "<<M<<endl;
-	  TreeGrowthAllocatorPropagateUp<poplarsegment, poplarbud,
-	    SetSegmentLength, TryDiameterGrowth, double> G(poplartree, 0.0);
+	  PoplarGrowthAllocatorPropagateUp<poplarsegment, poplarbud,
+	    SetSegmentLength, TryDiameterGrowth, double> G(poplartree, 0.0,root_senescence);
    
 	  G.init();
 	  cout << "G.init finished." << endl;
@@ -359,6 +367,7 @@ int main(int argc, char** argv)
       //sapwood senescence
       ForEach(poplartree,TreeAging<poplarsegment,poplarbud>());   //use this if using subage
       //Root mortality
+      root_senescence = GetValue(poplartree,LGPsr)/4 *  GetValue(poplartree,TreeWr);
       SetValue(poplartree,TreeWr, 
 	       GetValue(poplartree,TreeWr)-GetValue(poplartree,LGPsr)/4 *
 	       GetValue(poplartree,TreeWr));
@@ -392,6 +401,16 @@ int main(int argc, char** argv)
 		 << setw(12) << p
 		 << setw(12) << m 
 		 << endl;
+      }
+      if (interval && !xmlfile.empty()){
+	if (static_cast<int>(GetValue(poplartree,LGAage)) % interval == 0){
+	  ostringstream xml_interval;
+	  xml_interval << GetValue(poplartree,LGAage) << "-" << xmlfile;
+	  XMLDomTreeWriter<poplarsegment,poplarbud,Triangle> writer;
+	  cout << "Saving tree to "<< xml_interval.str() << " begin" <<endl; 
+	  writer.writeTreeToXML(poplartree,xml_interval.str());
+	  cout << "End" <<endl;
+	}
       }
     }
   
