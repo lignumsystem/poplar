@@ -13,6 +13,7 @@
 #include <Bisection.h>
 #include <Shading.h>
 #include <PoplarGrowthAllocator.h>
+#include <PoplarConstants.h>
 //Include the implementation of the  tree segment and bud You probably
 //define your own segment and bud in real project for cottonwood.
 #include <poplar.h>
@@ -66,7 +67,9 @@ int main(int argc, char** argv)
   //Root senescence at medium time step (structure update)
   double root_senescence=0.0;
   Lex l;
- 
+
+  const ParametricCurve radiation_index("radiationindex.fun");
+
   debug_file << left << setfill(' ') << " "
              << setw(12) << " X " << setw(12) << " Y " << setw(12) << " Z "
              << setw(12) << " Qin " << setw(12) << " Qabs " 
@@ -251,7 +254,7 @@ int main(int argc, char** argv)
 	      f.setDirectRadiation(direct);
 	      vs.calculatePoplarLight((LGMdouble)(diffuse), (LGMdouble)structureFlag); 
 	
-	      SetPoplarQabs<poplarsegment,poplarbud,Triangle>(vs,poplartree); 
+	      SetPoplarQabs<poplarsegment,poplarbud,Triangle>(vs,poplartree,radiation_index); 
 	      // cout<<" setHwTree."<<endl;
 	      LGMdouble maxQin = 0.0;
 	      maxQin = Accumulate(poplartree, maxQin, GetQinMax<poplarsegment,poplarbud>() );
@@ -277,7 +280,9 @@ int main(int argc, char** argv)
 	  cout << "TreePhotosynthesis:  " << tree_photosynthesis<<endl;
 	  //Why do we set the diffuse datiation here 
 	  //f.setDiffuseRadiation(last_diffuse);
- 
+	  //Now set the mean radiation index
+	  ForEach(poplartree,SetMeanRadiationIndex<poplarsegment,poplarbud,Triangle>());
+
 	  ForEach(poplartree, DoRespiration()); //poplartree.respiration(); //
  
 	  ForEach(poplartree,SubAging<poplarsegment,poplarbud>()); 

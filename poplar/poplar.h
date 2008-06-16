@@ -3,6 +3,7 @@
 
 #include <Lignum.h>
 #include <VoxelSpace.h>
+#include <PoplarConstants.h>
 using namespace cxxadt;
 
 class poplarbud;
@@ -236,11 +237,31 @@ public:
   poplarsegment(const Point& p, const PositionVector& d, const LGMdouble go,
                 const METER l, const METER r, const METER rn, 
                 Tree<poplarsegment, poplarbud>* t)
-    :HwTreeSegment<poplarsegment,poplarbud,Triangle>(p,d,go,l,r,rn,t), subAge(0.0){}
+    :HwTreeSegment<poplarsegment,poplarbud,Triangle>(p,d,go,l,r,rn,t), subAge(0.0), 
+     sum_radiation_index(0.0),mean_radiation_index(0.0),size(0){}
   virtual void photosynthesis(); 
   virtual void respiration();
   TcData& diameterGrowth(TcData& data);
 
+  //sum qabs during the short time step
+  void addRadiationIndex(double val){
+    sum_radiation_index = sum_radiation_index + val;
+    size = size + 1;
+  }
+  void setMeanRadiationIndex(){
+    //cout << "Set Mean RI " <<  sum_radiation_index << " " << size<< endl;
+    if (size)
+      mean_radiation_index = sum_radiation_index/size;
+    else
+      mean_radiation_index = 0.0;
+    //reset for the next light calculation
+    sum_radiation_index = 0.0;
+    size = 0;
+  }
+  //index can be queried after setMeanRadiationIndex
+  double getMeanRadiationIndex(){
+    return mean_radiation_index;
+  }
   double r_segment;
   double segment_length;
   double subAge;
@@ -250,6 +271,9 @@ private:
   //poplar specific segment attributes and structures here
   //initialize in constructor. p1 is just an example.
   LGMdouble p1;
+  double sum_radiation_index;
+  double mean_radiation_index;
+  double size;
 };
 
 
@@ -684,21 +708,22 @@ public:
 template <class TS, class BUD, class SHAPE>
 class SetPoplarSegmentQabsFunctor{
 public:
-  SetPoplarSegmentQabsFunctor(VoxelSpace& s):voxel_space(s){}
+  SetPoplarSegmentQabsFunctor(VoxelSpace& s, const ParametricCurve& ri):voxel_space(s), rad_index(ri){}
   TreeCompartment<TS,BUD>* operator ()(TreeCompartment<TS,BUD>* tc)const;
   VoxelSpace& voxel_space;
+private:
+  const ParametricCurve& rad_index;
 };
 
 template <class TS, class BUD, class SHAPE>
-    void SetPoplarQabs(VoxelSpace &s, Tree<TS, BUD> &tree)
+void SetPoplarQabs(VoxelSpace &s, Tree<TS, BUD> &tree, const ParametricCurve& rad_index)
     {
-      SetPoplarSegmentQabsFunctor<TS,BUD,SHAPE> f(s);
+      SetPoplarSegmentQabsFunctor<TS,BUD,SHAPE> f(s,rad_index);
       ForEach(tree, f);
     }
 
 template <class TS, class SHAPE>
-    void SetPoplarSegmentQabs(VoxelSpace &space,
-			      TS& ts)
+void SetPoplarSegmentQabs(VoxelSpace &space,TS& ts, const ParametricCurve& rad_index)
     {
       Point p;
       LGMdouble la, bQin, lQabs;
@@ -710,20 +735,50 @@ template <class TS, class SHAPE>
 	box = space.getVoxelBox(p);
 	bQin = box.getQin();
 	//80% absorbed
-	lQabs = 0.8 * bQin ;
+	lQabs =QIN_TO_QABS_CONVERSION_EFFICIENCY * bQin ;
 	//	cout<<"Qin: "<<bQin<<" Qabs: "<<lQabs<<endl;
 	SetValue(**I, LGAQabs, lQabs);
 	SetValue(**I, LGAQin, bQin);
+	//radiation index book  keeping, note that rad_index(Qabs) can
+	//be less  than 0,  radiation index of  a segment will  be the
+	//mean of the radiaton indices of the leaves attached to it
+	ts.addRadiationIndex(max(rad_index(lQabs),0.0));
       }
     }
+
 template <class TS, class BUD,class SHAPE>
 TreeCompartment<TS,BUD>* SetPoplarSegmentQabsFunctor<TS,BUD,SHAPE>::operator ()(TreeCompartment<TS,BUD>* tc)const
     {
       if (TS* hwts =  dynamic_cast<TS*>(tc))
 	{
-	  SetPoplarSegmentQabs<TS,SHAPE>(voxel_space, *hwts);
+	  SetPoplarSegmentQabs<TS,SHAPE>(voxel_space, *hwts,rad_index);
 	} 
       return tc;
     }
 
+template <class TS, class BUD,class SHAPE>
+class SetMeanRadiationIndex{
+public:
+  TreeCompartment<TS,BUD>* operator ()(TreeCompartment<TS,BUD>* tc)const
+    {
+      if (TS* hwts =  dynamic_cast<TS*>(tc))
+	{
+	  hwts->setMeanRadiationIndex();
+	} 
+      return tc;
+    }
+};
+
+template <class TS, class BUD,class SHAPE>
+class CheckMeanRadiationIndex{
+public:
+  TreeCompartment<TS,BUD>* operator ()(TreeCompartment<TS,BUD>* tc)const
+    {
+      if (TS* hwts =  dynamic_cast<TS*>(tc))
+	{
+	  cout << "Check " << hwts->getMeanRadiationIndex()<<endl;
+	} 
+      return tc;
+    }
+};
 #endif
