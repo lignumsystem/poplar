@@ -1,0 +1,14 @@
+set style data histogram 
+set style histogram clustered
+set style fill solid 1.0 border -1 
+set xtics offset 1 , graph 0.0 
+
+set title "Diameters at 4 and 8 years"
+set ylabel "D (cm)"
+set xlabel "Age (years)"
+
+plot [0:*][0:*] newhistogram "C-1" , 'poplar-Jun-1-10.txt' every 4:4 using ($3)*100.0:xtic(1) title "C-1 D1.3",\
+     newhistogram "C-4", 'poplar-Jun-4-10.txt' every 4:4 using ($3)*100.0:xtic(1) title "C-4 D1.3",\
+     newhistogram "C-3", 'poplar-Jun-3-10.txt' every 4:4 using ($3)*100.0:xtic(1) title "C-3 D1.3",\
+     newhistogram "C-2", 'poplar-Jun-2-10.txt' every 4:4 using ($3)*100.0:xtic(1) title "C-2 D1.3"
+replot    newhistogram "Data (4 year old)", 'biomass.txt' using ($2)/10.0:xtic(1) title "Do", 'biomass.txt' using ($3):xtic(1) ti "ro" 

@@ -1,0 +1,13 @@
+set key left
+set ylabel "H (m)"
+plot "poplar-Jun-1-10.txt" using 1:2 with lines lw 2 title "C-1 H",\
+     "poplar-Jun-4-10.txt" using 1:2 with lines lw 2 title "C-4 H",\
+     "poplar-Jun-3-10.txt" using 1:2 with lines lw 2 title "C-3 H",\
+     "poplar-Jun-2-10.txt" using 1:2 with lines lw 2 title "C-2 H"
+pause -1
+set ylabel "D1.3 cm"
+plot     "poplar-Jun-1-10.txt" using 1:($3)*100.0 with lines lw 2 title "C-1 D1.3",\
+     "poplar-Jun-4-10.txt" using 1:($3)*100.0 with lines lw 2 title "C-4 D1.3",\
+     "poplar-Jun-3-10.txt" using 1:($3)*100.0 with lines lw 2 title "C-3 D1.3",\
+     "poplar-Jun-2-10.txt" using 1:($3)*100.0 with lines lw 2 title "C-2 D1.3"
+
