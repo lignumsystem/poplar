@@ -10,7 +10,7 @@ public:
   LeafResize(double la){leafArea=la;}
   LeafResize(){}
   void operator()(BroadLeaf<Triangle>* b)  
-  {  leafArea=min((GetValue(*b, LGAA)+0.0000055), 0.007); //+0.00002; 0.001
+  {  leafArea=min((GetValue(*b, LGAA)+LEAF_GROWTH), MAX_LEAF); //+0.00002; 0.001
     // cout<<"leafarea: "<<leafArea<<endl;
     SetValue(*b, LGAA, leafArea); 
   }
