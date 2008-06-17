@@ -92,7 +92,7 @@ double PoplarGrowthAllocatorPropagateUp<TS,BUD,F1,F2,T>::operator()(double l)con
 	  //Note the  requirement according  to new sapwood  and short
 	  //time  step senescence of  roots (roots  are killed  once a
 	  //year in the main loop: sr*Wr and sr = 0.3)
-    (ROOT_SAPWOOD_REQUIREMENT * GetValue(data,DGWfnew)+ ROOT_COMPENSATION*this->Dr);
+    (GetValue(this->tree,LGPar)* GetValue(data,DGWfnew)+ ROOT_COMPENSATION*this->Dr);
 
 }
 #endif
