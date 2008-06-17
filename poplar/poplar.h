@@ -417,21 +417,22 @@ public:
     return *this;
   }
   //TreeCompartment<TS,BUD>* operator()(TreeCompartment<TS,BUD>* tc)const
-  double& operator()(double& qin, TreeCompartment<poplarsegment, poplarbud>* tc)const
+  double& operator()(double& rad_index, TreeCompartment<poplarsegment, poplarbud>* tc)const
   {
     // cout<<"set Segment Length here"<<endl;
     if (poplarsegment* ts = dynamic_cast<poplarsegment*>(tc)){
       if (GetValue(*ts, SUBAGE) > 0.5){  //SUBAGE
-	qin=GetValue(*ts, LGAQin);//Take the Qin, it will be passed to segment in front
+	//qin=GetValue(*ts, LGAQin);//Take the Qin, it will be passed to segment in front
 	// cout<<"qin from old segment: "<<qin<<endl;
+	rad_index=ts->getMeanRadiationIndex();
       }
       else {
-	SetValue(*ts, LGAQin, qin);
+	//SetValue(*ts, LGAQin, qin);
 	Firmament& f = GetFirmament(GetTree(*ts));
 	//double B = f.diffuseBallSensor();
 	vector<double> direct_direction(3);
 	vector<double> diffuse_direction(3);
-	double B = f.directRadiation(direct_direction)+f.diffuseRadiationSum(diffuse_direction);
+	//double B = f.directRadiation(direct_direction)+f.diffuseRadiationSum(diffuse_direction);
 	//cout<<"qin of segment: "<<qin<<" B: "<<B<<" and the ratio: "<<qin/B<<endl;
 	const ParametricCurve& fip = GetFunction(GetTree(*ts),LGMIP);
 	//Omega starts from 1 
@@ -454,11 +455,15 @@ public:
 	  apical=1;
 	else
 	  {
-	    apical = qin/B;  //double(double(qin)/double(B));
+	    apical = rad_index;  //double(double(qin)/double(B));
 	    //  cout<<apical<<" : the value of apical."<<endl;
 	  }
 
-	double L_new=l * apical *fip(qin/B) *(1/(GetValue(*ts,LGAomega)+1)) * (0.1+0.9*vi);  //* (0.1+0.9*vi); //*fip(qin/B);  
+	double L_new=l * apical *fip(rad_index) *(1/(GetValue(*ts,LGAomega)+1)) * FVIGOUR(vi);  
+	cout << "apical" << apical << " rad_index " << rad_index << " fip " << fip(rad_index) 
+	     << " go "<< GetValue(*ts,LGAomega) << " f(go) " 
+	     <<(1.0/(GetValue(*ts,LGAomega)+1.0)) << " vi " << vi << " f(vi) "<< FVIGOUR(vi) <<endl;;
+	cout << "L New " << L_new << endl;
 	L_new = max(L_new,0.0);
 	
 	if (L_new<0.05)  //0.05) //0.006)
@@ -473,7 +478,7 @@ public:
 	// cout<<"mass LGAWs1: "<<GetValue(*ts, LGAWs)<<endl;
 	//Initial radius
 	//SetValue(*ts,LGAR, 0.0015*sqrt(L_new));   //0.0015*sqrt(L_new));  0.005*L_new
-	SetValue(*ts,LGAR, 0.008*L_new);  // SetValue(*ts,LGAR,GetValue(GetTree(*ts),LGPlr)*L_new);0.005*L_new);
+	SetValue(*ts,LGAR, INITIAL_LR*L_new);  // SetValue(*ts,LGAR,GetValue(GetTree(*ts),LGPlr)*L_new);0.005*L_new);
 	//Reset previous Rh!!!!
 	SetValue(*ts,LGARh,0.0);
 	//Initial heartwood
@@ -505,7 +510,7 @@ public:
       else
 	terminal = true;
     }
-    return qin;
+    return rad_index;
   }
 private:
   double l;//Lamda to iterate segment lengths
