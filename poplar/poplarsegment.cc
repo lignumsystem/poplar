@@ -1,7 +1,7 @@
 #include <poplar.h>
 #include <poplarstand.h>
 #include <poplarmetabolism.h>
-
+#include <PoplarConstants.h>
 // declared in poplar.h poplarsegment class.
 
 class LeafResize
@@ -183,11 +183,7 @@ void PoplarLeafPhotosynthesis::operator()(BroadLeaf<Triangle>* b)
 
 void PoplarLeafRespiration::operator()(BroadLeaf<Triangle>* bl)
 { 
-  // cout<<"leaf mass: "<<GetValue(*bl, LGAWf)<<endl;
-  // Tree<poplarsegment, poplarbud>& t = dynamic_cast<Tree<poplarsegment, poplarbud>&>(GetTree(*this));
-  SetValue(*bl, LGAM, 0.2 *GetValue(*bl, LGAWf));
-  // SetValue(*bl, LGAM, 0.0); //0.25 is growth respiration for poplar, 0.25 is too big, use 0.05
-  // cout<<"LGPmf: "<<GetValue(t, LGPmf)<<endl;
+  //Leaf respiration is accounted for in the photosynthesis
 }
 
 void poplarsegment::photosynthesis()
@@ -229,7 +225,7 @@ void poplarsegment::respiration()
  
   m_hw += GetValue(t,LGPms)*GetValue(*this,LGAWs);
 
-  SetValue(*this,LGAM, m_hw/4.0);  
+  SetValue(*this,LGAM, m_hw/NUMBER_OF_STRUCTURE_UPDATES);  
 }
 
 vector<PositionVector>& 
@@ -309,7 +305,7 @@ CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
 	SetValue(*leaf, LGAtauL, GetValue(GetTree(*tc), LGPtauL));
 	SetValue(*leaf, LGAsf, GetValue(GetTree(*tc), LGPsf));
   
-	double Af = 0.1 * 0.01; //GetValue(GetTree(*ts), LGPaleafmax);
+	double Af = POPLAR_LEAF_AREA; //GetValue(GetTree(*ts), LGPaleafmax);
 	// cout<<"LGPaleafmax value: "<<GetValue(GetTree(*ts), LGPaleafmax)<<endl;
 	SetValue(*leaf, LGAA, Af); // 0.02);   //set the leaf area value, which is used in DumpLeaf()
 	//cout<<"Insert leaf"<<endl;
