@@ -17,8 +17,8 @@
 template <class TS, class BUD>
 class PoplarGrowthAllocatorBase{
 public: 
-  PoplarGrowthAllocatorBase(Tree<TS,BUD>& t,double dr)
-    :tree(t),P(0.0),M(0.0),Dr(dr){}
+  PoplarGrowthAllocatorBase(Tree<TS,BUD>& t,double dr,double foliage_growth)
+    :tree(t),P(0.0),M(0.0),Dr(dr),iWfgrowth(foliage_growth),root_requirement(0.0){}
   void init();
   double getP()const{return P;}
   double getM()const{return M;}
@@ -29,11 +29,14 @@ public:
     P=p;
     return old_p;
   }
+  double getRootRequirement()const{return root_requirement;}
 protected:
   Tree<TS,BUD>& tree;
   double P;//Production of the tree
   double M;//Respiration of the tree
-  double Dr;//senescence from the prevíous growth season N
+  double Dr;//senescence from the prevíous growth season N-1
+  double iWfgrowth;//Growth of foliage in the short time step
+  mutable double root_requirement;//Part of carbon that goes below ground to roots
 };
 
 //The data of type T given by the user will be passed up in the tree
@@ -42,8 +45,8 @@ template <class TS, class BUD, class F1, class F2, class T>
 class PoplarGrowthAllocatorPropagateUp:
   public PoplarGrowthAllocatorBase<TS,BUD>{
 public:
-  PoplarGrowthAllocatorPropagateUp(Tree<TS,BUD>& t,const T& up1,double dr)
-    :PoplarGrowthAllocatorBase<TS,BUD>(t,dr),up(up1){}
+  PoplarGrowthAllocatorPropagateUp(Tree<TS,BUD>& t,const T& up1,double dr,double foliage_growth)
+    :PoplarGrowthAllocatorBase<TS,BUD>(t,dr,foliage_growth),up(up1){}
   double operator()(double l)const;
 private:
   const T up;
@@ -78,21 +81,12 @@ double PoplarGrowthAllocatorPropagateUp<TS,BUD,F1,F2,T>::operator()(double l)con
   //3. return P-M-G where G = iWs(l) + iWfnew(l) + iWrnew(l)
   //iWs = sapwood mass: new segments + thickening
   //iWfnew = new foliage
-  //iWrnew = new roots = ar*iWfnew
-  //  return (0.875*(this->P - this->M) - GetValue(data,DGWs) - GetValue(data,DGWfnew)- GetValue(this->tree,LGPar)* GetValue(data,DGWfnew));
-  //  return (0.875*(this->P - this->M) - GetValue(data,DGWs) - GetValue(data,DGWfnew)- (0.3*(GetValue(data,DGWs)+GetValue(this->tree, LGAWs))-GetValue((this->tree), TreeWr)));
-  //      0.875 accunts for growth respiration (which is about 12.5%)
-//   cout << "L " << l << " P " << this->P << " " << this->M << "  " 
-//        << GROWTH_ALLOCATION*(this->P - this->M) << " " <<  GetValue(data,DGWs) << " " 
-//        << GetValue(data,DGWfnew) << " " <<  (ROOT_SAPWOOD_REQUIREMENT * GetValue(data,DGWs)+ ROOT_COMPENSATION*(this->Dr)) << " "
-//        <<GROWTH_ALLOCATION*(this->P - this->M) - GetValue(data,DGWs) - GetValue(data,DGWfnew)- 
-//     (ROOT_SAPWOOD_REQUIREMENT * GetValue(data,DGWs)+ ROOT_COMPENSATION*(this->Dr)) <<endl;
-
+  
+  //account also the growth of new leaves to growth
+  this->root_requirement =  GetValue(this->tree,LGPar)* (GetValue(data,DGWfnew)+this->iWfgrowth)
+    + ROOT_COMPENSATION*(this->Dr);
   return GROWTH_ALLOCATION*(this->P - this->M) - GetValue(data,DGWs) - GetValue(data,DGWfnew)-
-	  //Note the  requirement according  to new sapwood  and short
-	  //time  step senescence of  roots (roots  are killed  once a
-	  //year in the main loop: sr*Wr and sr = 0.3)
-    (GetValue(this->tree,LGPar)* GetValue(data,DGWfnew)+ ROOT_COMPENSATION*this->Dr);
+  this->root_requirement;
 
 }
 #endif
