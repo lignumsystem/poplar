@@ -37,7 +37,8 @@ class PoplarBudData{
 public:
 
   PoplarBudData():state(ALIVE), status(1.0), omega(1.0), brp(1.0), x(0.0), y(0.0), z(1.0){}
-  PoplarBudData(const PoplarBudData& d):state(d.state), status(d.status), omega(d.omega), brp(d.brp), x(d.x), y(d.y), z(d.z){}
+  PoplarBudData(const PoplarBudData& d):state(d.state), status(d.status), 
+					omega(d.omega), brp(d.brp), x(d.x), y(d.y), z(d.z){}
   PoplarBudData(LGMdouble state1,LGMdouble status1,LGMdouble omega1, LGMdouble brp1)
     :state(state1),status(status1),omega(omega1),brp(brp1), x(0.0), y(0.0), z(1.0){}
 
@@ -427,30 +428,8 @@ public:
 	rad_index=ts->getMeanRadiationIndex();
       }
       else {
-	//SetValue(*ts, LGAQin, qin);
-	Firmament& f = GetFirmament(GetTree(*ts));
-	//double B = f.diffuseBallSensor();
-	vector<double> direct_direction(3);
-	vector<double> diffuse_direction(3);
-	//double B = f.directRadiation(direct_direction)+f.diffuseRadiationSum(diffuse_direction);
-	//cout<<"qin of segment: "<<qin<<" B: "<<B<<" and the ratio: "<<qin/B<<endl;
 	const ParametricCurve& fip = GetFunction(GetTree(*ts),LGMIP);
-	//Omega starts from 1 
-	//TreeQinMax should work also for open trees: TreeQinMax should then equal to 
-	//Ball sensor reading
-	//Open grown branching effect
-	//double Lq = 1.0-(GetValue(*ts,LGAomega)-1.0)*GetValue(GetTree(*ts),q);
-	
 	double vi=GetValue(*ts, LGAvi);
-	// cout<<"vi: "<<vi<<endl;
-	//In Tree Physiology for side branches fp is for example as follows: Lq = apical*(0.15+0.85*Lq);
-	//experimental forest grown
-	//** double Lq = pow(1.0 - GetValue(GetTree(*ts),q),GetValue(*ts,LGAomega)-1);
-	//relative light, if TreeQinMax is ball sensor reading, it is as for open grown pine
-	// B = GetValue(GetTree(*ts),TreeQinMax); // because don't know what is TreeQinMax
-	// B=1200;
- 
-	// cout<<"terminal: "<<terminal<<endl;
 	if(terminal)   
 	  apical=1;
 	else
@@ -460,35 +439,20 @@ public:
 	  }
 
 	double L_new=l * apical *fip(rad_index) *(1/(GetValue(*ts,LGAomega)+1)) * FVIGOUR(vi);  
-	cout << "apical" << apical << " rad_index " << rad_index << " fip " << fip(rad_index) 
-	     << " go "<< GetValue(*ts,LGAomega) << " f(go) " 
-	     <<(1.0/(GetValue(*ts,LGAomega)+1.0)) << " vi " << vi << " f(vi) "<< FVIGOUR(vi) <<endl;;
-	cout << "L New " << L_new << endl;
+// 	cout << "Lambda " << l << " apical" << apical << " rad_index " << rad_index << " fip " << fip(rad_index) 
+// 	     << " go "<< GetValue(*ts,LGAomega) << " f(go) " 
+// 	     <<(1.0/(GetValue(*ts,LGAomega)+1.0)) << " vi " << vi << " f(vi) "<< FVIGOUR(vi) <<endl;;
+// 	cout << "L New " << L_new << endl;
 	L_new = max(L_new,0.0);
 	
 	if (L_new<0.05)  //0.05) //0.006)
 	  L_new=0.0;  //0.006;  
 	// cout<<"L_new: "<<L_new<<", l: "<<l<<endl;
 	SetValue(*ts,LGAL,L_new);
-	
-	double af=0.01; 
-	SetValue(*ts, LGARTop, af);
-	double asf=af/(GetValue(GetTree(*ts), LGPsf)*GetValue(GetTree(*ts), LGPyc));
-	double atot=asf;
-	// cout<<"mass LGAWs1: "<<GetValue(*ts, LGAWs)<<endl;
 	//Initial radius
-	//SetValue(*ts,LGAR, 0.0015*sqrt(L_new));   //0.0015*sqrt(L_new));  0.005*L_new
 	SetValue(*ts,LGAR, INITIAL_LR*L_new);  // SetValue(*ts,LGAR,GetValue(GetTree(*ts),LGPlr)*L_new);0.005*L_new);
 	//Reset previous Rh!!!!
 	SetValue(*ts,LGARh,0.0);
-	//Initial heartwood
-	//*** SetValue(*ts,LGARh,sqrt((GetValue(GetTree(*ts),LGPxi)*GetValue(*ts,LGAAs))/PI_VALUE));
-	//cout<<"mass LGAWs2: "<<GetValue(*ts, LGAWs)<<endl;
-	//Initial foliage
-	//NOTE: HwTree does not have SetValue for LGAWf!!!
-	// SetValue(*ts,LGAWf,GetValue(GetTree(*ts),LGPaf)*GetValue(*ts,LGASa));
-	//Remember original sapwood area As0
-
 	//NOTE: HwTree does not have LGAAs0!!!!!
 	SetValue(*ts,LGAAs0,GetValue(*ts,LGAAs));   
 	//* cout<<GetValue(*ts, LGAAs)<<"check radius of segment................"<<GetValue(*ts, LGAR)<<endl;
@@ -527,60 +491,134 @@ public:
   { 
     if (poplarsegment* ts = dynamic_cast<poplarsegment*>(tc)){ 
       if (GetValue(*ts, SUBAGE) < 0.5){   //SUBAGE
-	//Collect the masses
-	//***SetValue(data,DGWfnew,GetValue(*ts,DGWfnew));
-	//***SetValue(data,DGWf,GetValue(*ts,DGWf));
-	//***SetValue(data,DGWs,GetValue(*ts,DGWs));
-	//Sapwood requirement
-	//**SetValue(data,LGAAs,GetValue(*ts,LGAAs));
+	//Number of future leaves depends on the segment length
+	double L = GetValue(*ts,LGAL);
+	double nbuds = 0.0;
+	if (L < 0.01)
+	  nbuds = 0.0;
+	else if (L < 0.02)
+	  nbuds = 1.0;
+	else if (L < 0.04)
+	  nbuds = 2.0;
+	else if (L < 0.06)
+	  nbuds = 3.0;
+	else if (L < 0.08)
+	  nbuds = 4.0;
+	else if (L < 0.10)
+	  nbuds = 5.0;
+	else if (L < 0.12)
+	  nbuds = 6.0;
+	else if (L < 0.14)
+	  nbuds = 7.0;
+	else if (L < 0.16)
+	  nbuds = 8.0;
+	else if (L < 0.18)
+	  nbuds = 9.0;
+	else if (L < 0.20)
+	  nbuds = 10.0;
+	else if (L < 0.22)
+	  nbuds = 11.0;
+	else if (L < 0.24)
+	  nbuds = 12.0;
+	else if (L < 0.26)
+	  nbuds = 13.0;
+	else if (L < 0.28)
+	  nbuds = 14.0;
+	else if (L < 0.30)
+	  nbuds = 15.0;
+	else if (L < 0.32)
+	  nbuds = 16.0;
+	else if (L < 0.34)
+	  nbuds = 17.0;
+	else if (L < 0.36)
+	  nbuds = 18.0;
+	else if (L < 0.38)
+	  nbuds = 19.0;
+	else if (L < 0.40)
+	  nbuds = 20.0;
+	else if (L < 0.42)
+	  nbuds = 21.0;
+	else if (L < 0.44)
+	  nbuds = 22.0;
+	else if (L < 0.46)
+	  nbuds = 23.0;
+	else  if (L < 0.48)
+	  nbuds = 24.0;
+	else if (L < 0.50)
+	  nbuds = 25.0;
+	else if (L < 0.52)
+	  nbuds = 26.0;
+	else if (L < 0.54)
+	  nbuds = 27.0;
+	else if (L < 0.56)
+	  nbuds = 28.0;
+	else if (L < 0.58)
+	  nbuds = 29.0;
+	else if (L < 0.60)
+	  nbuds = 30.0;
+	else
+	  nbuds = 31.0;
 
-	LGMdouble As=GetValue(*ts, LGAAs);
-	LGMdouble Af=As*20*10;
-	LGMdouble Wf = Af/20;//LGMdouble Wf =GetValue(*ts, LGAL)/2000; 
-	//cout<<"mass in try diametergrowth: "<<As<<" "<<Af<<" "<<Wf<<" "<<GetValue(*ts, LGAWs)<<endl;
-	//  cout<<"mass LGAWs4: "<<GetValue(*ts, LGAWs)<<endl;
-	SetValue(data, DGWfnew, Wf);
-	SetValue(data, DGWf, Wf);
-	//cout<<"setValue of DGWfnew is: "<<GetValue(data,DGWfnew)<<"or "<<Wf<<endl;
+ 	//The foliage area
+	double Af = nbuds*POPLAR_LEAF_AREA;
+	double sf = GetValue(GetTree(*ts),LGPsf);
+	double yc = GetValue(GetTree(*ts),LGPyc);
+	//The foliage mass
+	double Wfnew = Af/sf;
+	//The sapwood area required by foliage
+	double Asf = Af/(sf*yc);
+	//Set segment radius
+	double Rnew = sqrt(Asf/PI_VALUE);
+	SetValue(*ts,LGAR,Rnew);
+	SetValue(*ts,LGARh,0.0);
+
+	cout << "TRY1 R old " << GetValue(*ts,LGAR) << " R new " << Rnew 
+	     << " Asu " << GetValue(data,LGAAs) << " Asf " << Asf << " Ah " <<  GetValue(*ts,LGARh)
+	     << " As " << GetValue(*ts,LGAAs) << " AsDown " << GetValue(*ts,LGAAs) 
+	     <<  " Wsu " << GetValue(data,DGWs) << " Wsnew " << GetValue(*ts,LGAWs) << " Wsdown " 
+	     << GetValue(*ts,LGAWs) << " L " << GetValue(*ts,LGAL) 
+	     << " G " << GetValue(*ts,LGAomega) << endl; 
+	SetValue(data, DGWfnew, Wfnew);
+	SetValue(data, DGWf, Wfnew);
 	SetValue(data, DGWs, GetValue(*ts, LGAWs));
-	//  cout<<"setValue of DGWs is: "<<GetValue(*ts, LGAWs)<<" LGAAs: "<<GetValue(*ts, LGAAs)<<endl;
-	SetValue(data, LGAAs, GetValue(*ts, LGAAs));  //Wf/10);   //GetValue(*ts, LGAAs));
-        //cout<<"DGWs: "<<GetValue(data,DGWs)<<" DGWfnew: "<<GetValue(data,DGWfnew)<<"DGWf: "<<GetValue(data, DGWf)<<endl;
-
+	SetValue(data, LGAAs, GetValue(*ts, LGAAs));  
       }
       else{//old segment
-	//**const ParametricCurve& fm = GetFunction(GetTree(*ts),LGMFM);
-	//Sapwood requirement of  remaining foliage, assume fm returns
-	//proportion of initial foliage present, declining function of
-	//age from 1 to 0.
-	//*LGMdouble Asr = fm(GetValue(*ts,LGAage))*GetValue(*ts,LGAAs0);
-	//sapwood area from above
-	//cout<<"LGAAs-Asu: "<<GetValue(data,LGAAs)<<" Ahown: "<<GetValue(*ts,LGAA)<<endl;
-	LGMdouble Asu = GetValue(data,LGAAs); 
+	//Sapowood requirement by the foliage
+	double Af = GetValue(*ts,LGAAf);
+	double Asf = 0.0;
+	if (fabs(Af) > R_EPSILON){
+	  double sf = GetValue(GetTree(*ts),LGPsf);
+	  double yc = GetValue(GetTree(*ts),LGPyc);
+	  Asf = Af/(sf*yc);
+	}	  
+	//Sapwood from above
+	double Asu = PIPE_MODEL_CONSTANT*GetValue(data,LGAAs); 
 	//own heartwood, assume aging has done
-	LGMdouble Ahown  =GetValue(*ts,LGAAh); //GetValue(*ts,LGAAh);
-	//requirement for new radius: sapwood above + own heartwood + own foliage 
-	//***LGMdouble Rnew = sqrt((Asu + Ahown + Asr)/PI_VALUE);
-        LGMdouble Rnew = sqrt((Asu + Ahown)/PI_VALUE);
+	double Ahown = GetValue(*ts,LGAAh); //GetValue(*ts,LGAAh);
+	//New sapwood requirement
+	//requirement for new radius: sapwood above + own foliage + own heartwood  
+        double Rnew = sqrt((Asu+Asf+Ahown)/PI_VALUE);
 	//compare Rnew to R, choose max
-	//cout<<"Rnew: "<<Rnew<<" GetValue(*ts,LGAR): "<< GetValue(*ts,LGAR)<<endl;
 	Rnew = max(Rnew, GetValue(*ts,LGAR));
 	//New sapwood requirement, thickness growth
-	double Asnew =PI_VALUE*pow(Rnew,2.0) -  GetValue(*ts,LGAA); 
 	//cout<<"Asnew: "<<Asnew<<endl;
 	//Mass of the new sapwood 
+	double Asnew = PI_VALUE*pow(Rnew,2.0)- GetValue(*ts,LGAA);
+	
 	double Wsnew = GetValue(GetTree(*ts),LGPrhoW)*Asnew*GetValue(*ts,LGAL); 
+	cout << "TRY2 R old " << GetValue(*ts,LGAR) << " R new " << Rnew 
+	     << " Asu " << GetValue(data,LGAAs) << " Asf " << Asf << " Asnew " << Asnew << " Ah " <<  Ahown 
+	     << " As " << GetValue(*ts,LGAAs) << " AsDown " << GetValue(*ts,LGAAs) + Asnew
+	     <<  " Wsu " << GetValue(data,DGWs) << " Wsnew " << Wsnew  << " Wsdown " 
+	     << GetValue(data,DGWs)+Wsnew << " L " << GetValue(*ts,LGAL) 
+	     << " G " << GetValue(*ts,LGAomega) << endl;
+	
         //cout<<"FOR Wsnew: "<<Wsnew<<" Asnew: "<<Asnew<<" LGAL: "<<GetValue(*ts,LGAL)<<endl;
-
 	//Down goes new plus existing sapwood area 
 	//cout<<"set data LGAAs: "<<Asnew+GetValue(*ts,LGAAs)<<endl;
 	SetValue(data,LGAAs,Asnew+GetValue(*ts,LGAAs)); 
 	//cout<<"get data LGAAs: "<<GetValue(data,LGAAs)<<endl;  
-
-	//Mass of sapwood used in diamater growth
-	/*cout<<"setValue of DGWs is: "<<GetValue(data,DGWs)+Wsnew<<endl;
-	  cout<<"setValue of old DGWs is: "<<GetValue(data,DGWs)<<endl;
-	  cout<<"setValue of Wsnew is: "<<Wsnew<<endl; */
 	SetValue(data,DGWs,GetValue(data,DGWs)+Wsnew);
 	//Total foliage
 	SetValue(data,DGWf,GetValue(data,DGWf)+GetValue(*ts,LGAWf));
@@ -647,10 +685,6 @@ public:
   void operator()(TreeCompartment<TS, BUD>* tc)const{
     if (TS* ts = dynamic_cast<TS*>(tc)){
       SetValue(*ts, SUBAGE, GetValue(*ts, SUBAGE)+1.0);         
-    }
-    if (BUD* b = dynamic_cast<BUD*>(tc)){
-      //SetValue(*b, SUBAGE, GetValue(*b, SUBAGE)+1.0); 
-      SetValue(*b,LGAstatus, GetValue(*b, LGAstatus)+ 0.1);
     }
   }
 };
@@ -786,4 +820,24 @@ public:
       return tc;
     }
 };
+
+template <class TS, class BUD,class SHAPE>
+class DisplaySegmentData{
+public:
+  TreeCompartment<TS,BUD>* operator ()(TreeCompartment<TS,BUD>* tc)const
+    {
+      if (TS* hwts =  dynamic_cast<TS*>(tc))
+	{
+	  cout << setfill(' ') << setw(7) << "SubAge" << setw(6) << GetValue(*hwts,SUBAGE)
+	       << setw(3) << "G" << setw(6) << GetValue(*hwts,LGAomega)
+	       << setw(3) << "L" << setw(13) << GetValue(*hwts,LGAL) 
+	       << setw(3) << "R" << setw(13) << GetValue(*hwts,LGAR)
+	       << setw(3) << "Wf" << setw(13) << GetValue(*hwts,LGAWf) 
+	       << setw(3) << "Af" << setw(13) << GetValue(*hwts,LGAAf) <<endl;
+	} 
+      return tc;
+    }
+};
+
+
 #endif
