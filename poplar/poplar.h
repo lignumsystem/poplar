@@ -20,7 +20,7 @@ extern float day1, day2;
 enum PoplarBD {PoplarBRP,PoplarD};
 
 //enumarations (i.e. names) for the attributes of poplar segment and bud
-enum poplar_attributes {P1, Pb1, SUBAGE};
+enum poplar_attributes {P1, Pb1, SUBAGE,ISTERMINAL};
 enum PoplarFN {PoplarAD,PoplarBF,PoplarBS,PoplarLN,PoplarLS,PoplarMSL,PoplarPL,PoplarRCE,PoplarVI};
 
 
@@ -323,15 +323,38 @@ class poplarbud : public Bud<poplarsegment, poplarbud>
 {
   friend PoplarBudData SetValue(poplarbud& b,PoplarBD name,const PoplarBudData& d);
   friend PoplarBudData GetValue(const poplarbud& b,PoplarBD name);
+  friend bool GetValue(const poplarbud& b, poplar_attributes isterminal)
+  {
+    if (isterminal == ISTERMINAL)
+      return b.terminal;
+    else
+      cerr << "poplarbud ERROR unknown attribute " << isterminal <<endl;
+    return b.terminal;
+  }
+  friend bool SetValue(poplarbud& b, poplar_attributes isterminal, bool val)
+  {
+    bool old_val = GetValue(b,isterminal);
+    if (isterminal == ISTERMINAL)
+      b.terminal = val;
+    return old_val;
+  }
 public:
-  poplarbud(const Point& p, const PositionVector& d, const LGMdouble omege, 
+  poplarbud(const Point& p, const PositionVector& d, const LGMdouble go, 
 	    Tree<poplarsegment, poplarbud>* tree)
-    :Bud<poplarsegment,poplarbud>(p,d,LGAomega,tree), brp(0.0){}
+    :Bud<poplarsegment,poplarbud>(p,d,go,tree), brp(0.0),terminal(true)
+  {
+    //The main axis bud is always terminal (does not create leaves)
+    if (go == 1)
+      terminal = true;
+    //Ohter buds are created nonterminal (they create a leaf and then become terminal) 
+    else
+      terminal = false;
+  }
 private:
   LGMdouble brp; //[0:1] meaning the relative position of the bud in a
 		 //segment
   void aging(){SetValue(*this, LGAage, GetValue(*this, LGAage)+1.0);}
-
+  bool terminal;
 };
 
 //SetValue and GetValue for the structure PoplarBudData in L-systems
@@ -445,7 +468,7 @@ public:
 // 	cout << "L New " << L_new << endl;
 	L_new = max(L_new,0.0);
 	
-	if (L_new<0.05)  //0.05) //0.006)
+	if (L_new<MIN_SEGMENT_LENGTH)  //0.05) //0.006)
 	  L_new=0.0;  //0.006;  
 	// cout<<"L_new: "<<L_new<<", l: "<<l<<endl;
 	SetValue(*ts,LGAL,L_new);
@@ -572,33 +595,23 @@ public:
 	SetValue(*ts,LGAR,Rnew);
 	SetValue(*ts,LGARh,0.0);
 
-	cout << "TRY1 R old " << GetValue(*ts,LGAR) << " R new " << Rnew 
-	     << " Asu " << GetValue(data,LGAAs) << " Asf " << Asf << " Ah " <<  GetValue(*ts,LGARh)
-	     << " As " << GetValue(*ts,LGAAs) << " AsDown " << GetValue(*ts,LGAAs) 
-	     <<  " Wsu " << GetValue(data,DGWs) << " Wsnew " << GetValue(*ts,LGAWs) << " Wsdown " 
-	     << GetValue(*ts,LGAWs) << " L " << GetValue(*ts,LGAL) 
-	     << " G " << GetValue(*ts,LGAomega) << endl; 
+// 	cout << "TRY1 R old " << GetValue(*ts,LGAR) << " R new " << Rnew 
+// 	     << " Asu " << GetValue(data,LGAAs) << " Asf " << Asf << " Ah " <<  GetValue(*ts,LGARh)
+// 	     << " As " << GetValue(*ts,LGAAs) << " AsDown " << GetValue(*ts,LGAAs) 
+// 	     <<  " Wsu " << GetValue(data,DGWs) << " Wsnew " << GetValue(*ts,LGAWs) << " Wsdown " 
+// 	     << GetValue(*ts,LGAWs) << " L " << GetValue(*ts,LGAL) 
+// 	     << " G " << GetValue(*ts,LGAomega) << endl; 
 	SetValue(data, DGWfnew, Wfnew);
 	SetValue(data, DGWf, Wfnew);
 	SetValue(data, DGWs, GetValue(*ts, LGAWs));
 	SetValue(data, LGAAs, GetValue(*ts, LGAAs));  
       }
       else{//old segment
-	//Sapowood requirement by the foliage
-	double Af = GetValue(*ts,LGAAf);
-	double Asf = 0.0;
-	if (fabs(Af) > R_EPSILON){
-	  double sf = GetValue(GetTree(*ts),LGPsf);
-	  double yc = GetValue(GetTree(*ts),LGPyc);
-	  Asf = Af/(sf*yc);
-	}	  
 	//Sapwood from above
 	double Asu = PIPE_MODEL_CONSTANT*GetValue(data,LGAAs); 
-	//own heartwood, assume aging has done
-	double Ahown = GetValue(*ts,LGAAh); //GetValue(*ts,LGAAh);
 	//New sapwood requirement
 	//requirement for new radius: sapwood above + own foliage + own heartwood  
-        double Rnew = sqrt((Asu+Asf+Ahown)/PI_VALUE);
+        double Rnew = sqrt(Asu/PI_VALUE);
 	//compare Rnew to R, choose max
 	Rnew = max(Rnew, GetValue(*ts,LGAR));
 	//New sapwood requirement, thickness growth
@@ -607,12 +620,12 @@ public:
 	double Asnew = PI_VALUE*pow(Rnew,2.0)- GetValue(*ts,LGAA);
 	
 	double Wsnew = GetValue(GetTree(*ts),LGPrhoW)*Asnew*GetValue(*ts,LGAL); 
-	cout << "TRY2 R old " << GetValue(*ts,LGAR) << " R new " << Rnew 
-	     << " Asu " << GetValue(data,LGAAs) << " Asf " << Asf << " Asnew " << Asnew << " Ah " <<  Ahown 
-	     << " As " << GetValue(*ts,LGAAs) << " AsDown " << GetValue(*ts,LGAAs) + Asnew
-	     <<  " Wsu " << GetValue(data,DGWs) << " Wsnew " << Wsnew  << " Wsdown " 
-	     << GetValue(data,DGWs)+Wsnew << " L " << GetValue(*ts,LGAL) 
-	     << " G " << GetValue(*ts,LGAomega) << endl;
+// 	cout << "TRY2 R old " << GetValue(*ts,LGAR) << " R new " << Rnew 
+// 	     << " Asu " << GetValue(data,LGAAs) << " Asnew " << Asnew 
+// 	     << " As " << GetValue(*ts,LGAAs) << " AsDown " << GetValue(*ts,LGAAs) + Asnew
+// 	     <<  " Wsu " << GetValue(data,DGWs) << " Wsnew " << Wsnew  << " Wsdown " 
+// 	     << GetValue(data,DGWs)+Wsnew << " L " << GetValue(*ts,LGAL) 
+// 	     << " G " << GetValue(*ts,LGAomega) << endl;
 	
         //cout<<"FOR Wsnew: "<<Wsnew<<" Asnew: "<<Asnew<<" LGAL: "<<GetValue(*ts,LGAL)<<endl;
 	//Down goes new plus existing sapwood area 
