@@ -72,8 +72,8 @@ Start:
   PoplarBudData d2(ALIVE,0.1,1.0,1.0);
 
 
- // produce Roll(30.0 * PI_VALUE/180.0) F(0.2, 0)  Roll(roll)  B(d1);  
-  produce Roll(30.0 * PI_VALUE/180.0) F(0.2, 0) SB() Pitch(PI_VALUE/4.0)B(d2) EB() Roll(roll)  B(d1);    
+  // produce Roll(30.0 * PI_VALUE/180.0) F(0.2, 0)  Roll(roll)  B(d1);  
+  produce Roll(30.0 * PI_VALUE/180.0) F(0.2, 0) SB() Pitch(PI_VALUE/4.0)  B(d2) EB() B(d1);    
 
 }
 
@@ -118,7 +118,7 @@ F(s,od)  < B(d):
   LGMdouble o=GetValue(d, LGAomega);
   LGMdouble st = GetValue(d, LGAstate);
 
-//Bend branches upwards 0<=asin(direct.getZ()) &&
+  //Bend branches upwards 0<=asin(direct.getZ()) &&
 
   PositionVector direct = GetDirection(d);
   direct.normalize();
@@ -143,12 +143,13 @@ F(s,od)  < B(d):
     double r = g1(5.5, 3.0, seed);  //for trees in Alley Cropping
     double I = g2(36.0, 5.0, seed); //  double I = g2(45.0, 21.0, seed);
           //cout<<"r: "<<r/10.0<<endl;
-    if (GetValue(d,LGAomega) == 0)
+    if (GetValue(d,LGAomega) == 0){
          produce F(r/10.0, o) Split()  B(d1);
+    }
     else if (GetValue(d,LGAomega) == 1)
          produce F(r/10.0, o) Split()  Pitch(-fac)B(d2);
     else
-         produce F(r/10.0, o) Split() Pitch(-fac)B(d2);
+         produce F(r/10.0, o) Split() Pitch(-fac) B(d2);
   }
   else
     produce B(dead);
@@ -158,6 +159,7 @@ F(s,od)  < B(d):
 //split the segment main axis
 F(s,o) > Split():
 {
+  cout << "LSYSTEM SEGMENT SPLIT LENGTH " << s << " ORDER " << o <<endl; 
   // cout<<"s: "<<s<<endl;
    PoplarBudData dorm(DORMANT, 0.1, o+1, 1.0);
    PoplarBudData d1(1.0, 0.1, o+1, 1.0);
@@ -177,29 +179,29 @@ F(s,o) > Split():
   //cout<<"angle A:"<<A<<" "<<A1<<" "<<A2<<" "<<A3<<" "<<A4<<endl;
  // cout<<"angle I:"<<I<<" "<<I1<<" "<<I2<<" "<<I3<<" "<<I4<<endl;
 
-  if (s<0.1){
+if (s<0.01){
     produce F(s, o);
 }
-else if (0.1<=s && s<0.2)
+else if (s < 0.02)
 {
  // cout<<s<<" :value of s(o=0)"<<endl;
   produce F(s/2, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
-        F(s/2, o);
+          F(s/2, o);
 }
-else if (0.2<=s && s<0.3)
+else if (s < 0.04)
 {
 produce F(s/3, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
         F(s/3, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
         F(s/3, o);
 }
-else if (0.3<=s && s<0.4)
+else if (s <0.06)
 {
 produce F(s/4, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
         F(s/4, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
         F(s/4, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
         F(s/4, o);
 }
-else
+else if (s <0.08)
 {
 produce F(s/5, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
         F(s/5, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
@@ -207,9 +209,603 @@ produce F(s/5, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB
         F(s/5, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
         F(s/5, o);
 }
+else if (s <0.10)
+{
+produce F(s/6, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/6, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/6, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/6, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/6, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/6, o);
+}
+else if (s<0.12)
+{
+produce F(s/7, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/7, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/7, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/7, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/7, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/7, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/7, o);
+}
+else if (s < 0.14)
+{
+produce F(s/8, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/8, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/8, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/8, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/8, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/8, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/8, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/8, o);
+}
+else if (s < 0.16)
+{
+produce F(s/9, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/9, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/9, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/9, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/9, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/9, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/9, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/9, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/9, o);
+}
+else if (s < 0.18)
+{
+produce F(s/10, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/10, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/10, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/10, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/10, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/10, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/10, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/10, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/10, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/10, o);
+}
+else if (s < 0.20)
+{
+produce F(s/11, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/11, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/11, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/11, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/11, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/11, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/11, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/11, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/11, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/11, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/11, o);
+}
+else if (s < 0.22)
+{
+produce F(s/12, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/12, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/12, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/12, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/12, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/12, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/12, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/12, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/12, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/12, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/12, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/12, o);
+}
+else if (s < 0.24)
+{
+produce F(s/13, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/13, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/13, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/13, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/13, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/13, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/13, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/13, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/13, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/13, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/13, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/13, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/13, o);
+}
+else if (s < 0.26)
+{
+produce F(s/14, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/14, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/14, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/14, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/14, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/14, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/14, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/14, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/14, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/14, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/14, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/14, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/14, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/14, o);
+}
+else if (s < 0.28)
+{
+produce F(s/15, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/15, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/15, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/15, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/15, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/15, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/15, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/15, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/15, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/15, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/15, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/15, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/15, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/15, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/15, o);
+}
+else if (s < 0.30)
+{
+produce F(s/16, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/16, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/16, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/16, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/16, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/16, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/16, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/16, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/16, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/16, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/16, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/16, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/16, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/16, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/16, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/16, o); 
+}
+else if (s < 0.32)
+{
+produce F(s/17, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/17, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/17, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/17, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/17, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/17, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/17, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/17, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/17, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/17, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/17, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/17, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/17, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/17, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/17, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/17, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/17, o);
+}
+else if (s < 0.34)
+{
+produce F(s/18, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/18, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/18, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/18, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/18, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/18, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/18, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/18, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/18, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/18, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/18, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/18, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/18, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/18, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/18, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/18, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/18, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/18, o);
+}
+else if (s < 0.36)
+{
+produce F(s/19, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/19, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/19, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/19, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/19, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/19, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/19, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/19, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/19, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/19, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/19, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/19, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/19, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/19, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/19, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/19, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/19, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/19, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/19, o); 
+}
+else if (s < 0.38)
+{
+produce F(s/20, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/20, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/20, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/20, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/20, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/20, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/20, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/20, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/20, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/20, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/20, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/20, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/20, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/20, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/20, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/20, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/20, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/20, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/20, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/20, o);
+}
+else if (s < 0.40)
+{
+produce F(s/21, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/21, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/21, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/21, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/21, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/21, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/21, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/21, o);
+}
+else if (s < 0.42)
+{
+produce F(s/22, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/22, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/22, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/22, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/22, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/22, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/22, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/22, o);
+}
+else if (s < 0.44)
+{
+produce F(s/23, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/23, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/23, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/23, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/23, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/23, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/23, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/23, o);
+}
+else if (s < 0.46)
+{
+produce F(s/24, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/24, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/24, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/24, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/24, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/24, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/24, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/24, o);
+}
+else if (s < 0.48)
+{
+produce F(s/25, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/25, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/25, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/25, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/25, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/25, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/25, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/25, o);
+}
+else if (s < 0.50)
+{
+produce F(s/26, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/26, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/26, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/26, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/26, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/26, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/26, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/26, o);
+}
+else if (s < 0.52)
+{
+produce F(s/27, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/27, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/27, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/27, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/27, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/27, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/27, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/27, o);
+}
+else if (s < 0.54)
+{
+produce F(s/28, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/28, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/28, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/28, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/28, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/28, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/28, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/28, o);
+}
+else if (s < 0.56)
+{
+produce F(s/29, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/29, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/29, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/29, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/29, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/29, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/29, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/29, o);
+}
+else if (s < 0.58)
+{
+produce F(s/30, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/30, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/30, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/30, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/30, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/30, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/30, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/30, o);
+}
+else if (s < 0.60)
+{
+produce F(s/31, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/31, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/31, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/31, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/31, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/31, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/31, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/31, o);
+}
+else
+{
+cout << "LSYSTEM SEGMENT SPLIT LENGTH " << s << " ORDER " << o <<endl; 
+produce F(s/32, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/32, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/32, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/32, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/32, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/32, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/32, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A3*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A1*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o) SB() Roll(A2*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/32, o);
 }
 
-
+}
 //Remove split symbols after split 
 Split():
 {
