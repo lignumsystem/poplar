@@ -45,11 +45,14 @@ template <class TS, class BUD, class F1, class F2, class T>
 class PoplarGrowthAllocatorPropagateUp:
   public PoplarGrowthAllocatorBase<TS,BUD>{
 public:
-  PoplarGrowthAllocatorPropagateUp(Tree<TS,BUD>& t,const T& up1,double dr,double foliage_growth)
-    :PoplarGrowthAllocatorBase<TS,BUD>(t,dr,foliage_growth),up(up1){}
+  PoplarGrowthAllocatorPropagateUp(Tree<TS,BUD>& t,const T& up1,double dr,double foliage_growth, bool debug = false)
+    :PoplarGrowthAllocatorBase<TS,BUD>(t,dr,foliage_growth),up(up1),verbose(debug),header(false){}
   double operator()(double l)const;
 private:
   const T up;
+  //Verbose debugging 
+  bool verbose;
+  mutable bool header;
 };
 //Collect  photosynthates and  respiration once  per  (and obviously
 //before) growth allocation. Throw excption if P <= M
@@ -74,6 +77,7 @@ double PoplarGrowthAllocatorPropagateUp<TS,BUD,F1,F2,T>::operator()(double l)con
   //1.Elongate or shorten segment lengths
   PropagateUp(this->tree,up_new,F1(l));
     
+  //cout << "L " << l<<endl;
   //2. Simulate  diameter  growth  and  collect  sapwood  and  foliage
   //masses.
   data = AccumulateDown(this->tree,data,F2());   
@@ -81,12 +85,49 @@ double PoplarGrowthAllocatorPropagateUp<TS,BUD,F1,F2,T>::operator()(double l)con
   //3. return P-M-G where G = iWs(l) + iWfnew(l) + iWrnew(l)
   //iWs = sapwood mass: new segments + thickening
   //iWfnew = new foliage
-  
-  //account also the growth of new leaves to growth
+  //iWGrowth = growth of older leaves
+  if (verbose && !header){
+    cout << setfill(' ') << setw(4) << "L" 
+	 << setw(14) << "P" << setw(14) << "M" << setw(6) << "GA" 
+	 << setw(14) << "NET" << setw(14) << "P-M-G" 
+	 << setw(14) << "iWs+iWf+iWfg" 
+	 << setw(14) << "iWr"
+	 << setw(14) << "iWs" << setw(14) << "iWf" 
+	 << setw(14) << "iWfg" << setw(16) << "iWs/(iWf+iWfg)" << setw(14) << "Dr" 
+	 << setw(14) << "rc" << setw(14) << "Dr*rc"  <<endl;
+    header = true;
+  }
+  if (verbose)
+    cout << setfill(' ') << setw(4) << l
+	 << setw(14) << this->P
+	 << setw(14) << this->M
+	 << setw(6)  << GROWTH_ALLOCATION
+	 << setw(14) << GROWTH_ALLOCATION*(this->P - this->M)
+	 << setw(14) <<  GROWTH_ALLOCATION*(this->P - this->M)
+                                      -GetValue(data,DGWs) 
+                                      -GetValue(data,DGWfnew)
+                                      -this->iWfgrowth
+                                      -GetValue(this->tree,LGPar)* (GetValue(data,DGWfnew)+this->iWfgrowth)
+                                      -ROOT_COMPENSATION*(this->Dr)
+	 << setw(14) << GetValue(data,DGWs)+GetValue(data,DGWfnew)+this->iWfgrowth
+	 << setw(14) << GetValue(this->tree,LGPar)* (GetValue(data,DGWfnew)+this->iWfgrowth)
+                        + ROOT_COMPENSATION*(this->Dr)
+	 << setw(14) << GetValue(data,DGWs) 
+	 << setw(14) << GetValue(data,DGWfnew)
+	 << setw(14) << this->iWfgrowth
+	 << setw(16) << GetValue(data,DGWs)/(GetValue(data,DGWfnew)+ this->iWfgrowth)
+	 << setw(14) << this->Dr
+	 << setw(14) << ROOT_COMPENSATION
+	 << setw(14) << ROOT_COMPENSATION*(this->Dr) <<endl;
+
+  //cout << endl;  
   this->root_requirement =  GetValue(this->tree,LGPar)* (GetValue(data,DGWfnew)+this->iWfgrowth)
     + ROOT_COMPENSATION*(this->Dr);
-  return GROWTH_ALLOCATION*(this->P - this->M) - GetValue(data,DGWs) - GetValue(data,DGWfnew)-
-  this->root_requirement;
+  return GROWTH_ALLOCATION*(this->P - this->M) 
+    - GetValue(data,DGWs) 
+    - GetValue(data,DGWfnew)
+    - this->iWfgrowth
+    - this->root_requirement;
 
 }
 #endif
