@@ -10,8 +10,8 @@ public:
   LeafResize(double la){leafArea=la;}
   LeafResize(){}
   void operator()(BroadLeaf<Triangle>* b)  
-  {  leafArea=min((GetValue(*b, LGAA)+LEAF_GROWTH), MAX_LEAF); //+0.00002; 0.001
-    // cout<<"leafarea: "<<leafArea<<endl;
+  {  
+    leafArea=min((GetValue(*b, LGAA)+LEAF_GROWTH), MAX_LEAF); //+0.00002; 0.001
     SetValue(*b, LGAA, leafArea); 
   }
   double leafArea;
@@ -20,43 +20,30 @@ public:
 
 TcData& poplarsegment::diameterGrowth(TcData& data)
 {
-  //New segment (age == 0) is iteratively set. 
-  if (GetValue(*this, SUBAGE) > 0.0){
-    const ParametricCurve& fm = GetFunction(GetTree(*this),LGMFM);
-    LGMdouble Asu = GetValue(data,LGAAs); //sapwood area from above
-    LGMdouble Ahown  = GetValue(*this,LGAAh);//own heartwood
-    //Sapwood  requirement  of  remaining  foliage,  assume  fm  returns
-    //proportion initial  foliage present, declining function  from 1 to
-    //0.
-    LGMdouble Asr = fm(GetValue(*this,LGAage))*GetValue(*this,LGAAs0);
-    // cout<<GetValue(*this,LGAage)<<": the value of age and As0:"<<GetValue(*this,LGAAs0)<<endl; 
-    //**cout<<"the value of Asr:"<<Asr<<endl;
-    //possible new radius
-    LGMdouble Rnew = sqrt((Asu + Ahown + Asr)/PI_VALUE);
+    //New segment (age == 0) is iteratively set. 
+  if (GetValue(*this, SUBAGE) < 0.5){ 
+      double As = GetValue(*this,LGAAs);
+      SetValue(data,LGAAs,As);
+  }
+  //Old segment dimensions must be  set
+  else{
+    double Asu = PIPE_MODEL_CONSTANT*GetValue(data,LGAAs); //sapwood area from above
+    //New radius
+    double As = GetValue(*this,LGAAs);
+    double Ws = GetValue(*this,LGAWs);
+    LGMdouble Rnew = sqrt(Asu/PI_VALUE);
     //compare Rnew to R, choose max
     Rnew = max(Rnew, GetValue(*this,LGAR));
     //New wood radius
-    //**cout<<Rnew<<": the value of new radius"<<endl;
+    double Rold = GetValue(*this,LGAR);
     SetValue(*this,LGAR, Rnew);
+    double Asnew = GetValue(*this,LGAAs) - As;
+//     cout << "DO R old " << Rold << " R new " << Rnew 
+// 	 << " Asu " << GetValue(data,LGAAs) <<  " Anew " << Asnew 
+// 	 << " As " << GetValue(*this,LGAAs) << " AsDown " << GetValue(*this,LGAAs) <<endl;
+
+    SetValue(data,LGAAs,GetValue(*this,LGAAs));
   } 
-  //Pass down sapwood area requirement
-  SetValue(data,LGAAs,GetValue(*this,LGAAs)); 
-
-  SetValue(*this,LGARTop,GetValue(*this,LGAR));
-
-  /*   
-       LGMdouble As=GetValue(*this, LGAAs);
-       LGMdouble Af=As*20*10;
-       list<BroadLeaf<Triangle> *> leaves=GetLeafList(*this);
-       int nLeaves = leaves.size();
-       double la;
-       if(nLeaves>=1 && Af>0)
-       {  la= min(Af/(double)(nLeaves), 0.008); // min(Af/(double)(nLeaves), 0.05);
-       // cout<<"number of leaves: "<<nLeaves<<" leafArea: "<<la<<endl;
-       LeafResize f(la);
-       for_each(leaves.begin(), leaves.end(), f); 
-       }
-  */
   return data;
 }
 
@@ -234,14 +221,16 @@ CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
 { 
   
   if (poplarbud* b = dynamic_cast<poplarbud*>(tc)){ 
-    if (GetValue(*b,LGAstatus)>0.0){    // == 1	     
-      pdv.push_back(GetDirection(*b));
-      SetValue(*b,LGAstatus,0.0); //leaf created, no more leaves for
+    // cout << "STATUS " << GetValue(*b,LGAstatus) <<endl;
+    if (!GetValue(*b,ISTERMINAL)){  // == 1	  
+      //cout << "STATUS " << GetValue(*b,LGAstatus) <<endl;
+      pdv.push_back(GetDirection(*b));      
+      SetValue(*b,ISTERMINAL,true); //leaf created, no more leaves for
       //this bud
     }
   }
   if (poplarsegment* ts = dynamic_cast<poplarsegment*>(tc)){
-    if(GetValue(*ts, LGAage) == 0.0){
+    if(GetValue(*ts, SUBAGE) == 0.0){
       Point origo(0,0,0);
       Point point = GetEndPoint(*ts);
       PositionVector up(0,0,1);
@@ -301,7 +290,7 @@ CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
 	Triangle shape(left,right,apex);
 	BroadLeaf<Triangle>* leaf = new BroadLeaf<Triangle>(shape,petiole);
 
-	SetValue(*leaf, LGAdof, 0.6); //GetValue(GetTree(*tc), LGPdof)); // cout<<"LGAdof: "<<GetValue(*leaf, LGAdof)<<endl;
+	SetValue(*leaf, LGAdof, GetValue(GetTree(*tc),LGPdof)); 
 	SetValue(*leaf, LGAtauL, GetValue(GetTree(*tc), LGPtauL));
 	SetValue(*leaf, LGAsf, GetValue(GetTree(*tc), LGPsf));
   
@@ -309,7 +298,10 @@ CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
 	// cout<<"LGPaleafmax value: "<<GetValue(GetTree(*ts), LGPaleafmax)<<endl;
 	SetValue(*leaf, LGAA, Af); // 0.02);   //set the leaf area value, which is used in DumpLeaf()
 	//cout<<"Insert leaf"<<endl;
+	cout << "NUMBER OF LEAVES BEFORE " << GetNumberOfLeaves(*ts) 
+	     << " SUBAGE " << GetValue(*ts,SUBAGE) << endl;
 	InsertLeaf(*ts,leaf);
+	//cout << "NUMBER OF LEAVES AFTER " << GetNumberOfLeaves(*ts) <<endl;
 	// Point p = GetCenterPoint(*leaf);
 	// cout<<p<<endl;
       }
