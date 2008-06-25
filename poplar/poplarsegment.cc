@@ -225,8 +225,8 @@ CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
     if (!GetValue(*b,ISTERMINAL)){  // == 1	  
       //cout << "STATUS " << GetValue(*b,LGAstatus) <<endl;
       pdv.push_back(GetDirection(*b));      
-      SetValue(*b,ISTERMINAL,true); //leaf created, no more leaves for
-      //this bud
+      //leaf created, no more leaves for this bud
+      SetValue(*b,ISTERMINAL,true);
     }
   }
   if (poplarsegment* ts = dynamic_cast<poplarsegment*>(tc)){
