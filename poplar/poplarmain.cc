@@ -2,7 +2,6 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-
 //Include Lignum implementation 
 #include <Lignum.h>
 #include <RootFunctor.h>
@@ -70,9 +69,10 @@ int main(int argc, char** argv)
   int structure_update = 0;
   //account for the foliage growth (used in the root growth)
   double foliage_growth = 0.0;
-
   const ParametricCurve radiation_index("radiationindex.fun");
-
+  //Collect foliage masses from each structure update
+  double wf_su1,wf_su2,wf_su3,wf_su4;
+  wf_su1 = wf_su2= wf_su3 = wf_su4 = 0.0;
   debug_file << left << setfill(' ') << " "
              << setw(12) << " X " << setw(12) << " Y " << setw(12) << " Z "
              << setw(12) << " Qin " << setw(12) << " Qabs " 
@@ -107,16 +107,20 @@ int main(int argc, char** argv)
       exit(0);
     }
     datafile << left << setw(6) << setfill(' ') << "Age"
-		 << setw(12) << "H"
-		 << setw(12) << "D1.3"
-		 << setw(12) << "Wf"
-		 << setw(12) << "WsTot"
-		 << setw(12) << "WsStem"
-		 << setw(12) << "WsBranch" 
-		 << setw(12) << "Wr"
-		 << setw(12) << "P"
-		 << setw(12) << "M"
-		 << endl;
+	     << setw(12) << "H"
+	     << setw(12) << "D1.3"
+	     << setw(12) << "Wf 1"
+	     << setw(12) << "Wf 2"
+	     << setw(12) << "Wf 3"
+	     << setw(12) << "Wf 4"
+	     << setw(12) << "Wf"
+	     << setw(12) << "WsTot"
+	     << setw(12) << "WsStem"
+	     << setw(12) << "WsBranch" 
+	     << setw(12) << "Wr"
+	     << setw(12) << "P"
+	     << setw(12) << "M"
+	     << endl;
   }
     
   
@@ -134,7 +138,7 @@ int main(int argc, char** argv)
   // SetValue(poplartree,TreeRefRadiation,2480.0);
 
   Firmament& f = GetFirmament(poplartree);
-  f.resize(40,20,1200); //resize:  inclinations,  azimuths,  1200 MJ/year for previous tree,  
+  f.resize(INCLINATION,AZIMUTH,1200); //resize:  inclinations,  azimuths,  1200 MJ/year for previous tree,  
 
   //create voxel space 
   VoxelSpace vs(Point(0,0,0), Point(50, 50, 18), 1, 1, 1, 50, 50, 18,  GetFirmament(poplartree));
@@ -149,9 +153,14 @@ int main(int argc, char** argv)
 
   //First leaves
   vector<PositionVector> pv;
+  cout << "CREATE LEAVES " <<endl;
+  ForEach(poplartree,DisplaySegmentData<poplarsegment,poplarbud,Triangle>());
+  DisplayStructure(poplartree);
   AccumulateDown(poplartree,pv,
 		 AppendSequence<vector<PositionVector> >(),
-		 CreatePoplarLeaves(PETIOLE_LENGTH,LEAF_BASE,LEAF_HEIGHT));   //petiolLength, base and heighth
+		 CreatePoplarLeaves(PETIOLE_LENGTH,LEAF_BASE,LEAF_HEIGHT)); 
+  cout << "CREATE LEAVES " <<endl;
+//petiolLength, base and heighth
   double wf_init=0.0;
   //Initial root mass
   wf_init = Accumulate(poplartree,wf_init,CollectFoliageMass<poplarsegment,poplarbud>());
@@ -246,7 +255,7 @@ int main(int argc, char** argv)
 	      vs.resetQinQabs();  //reset the voxelbox to be initial, all Qabs, Qin to be 0.
 
 	      //The diffuse radiation should be used in the light model (calculatePoplarLight).
-	      f.resize(40,20,diffuse); 
+	      f.resize(INCLINATION,AZIMUTH,diffuse); 
 	      last_diffuse = diffuse;
 	      f.setSunPosition(a); 
 	      f.setDirectRadiation(direct);
@@ -315,20 +324,36 @@ int main(int argc, char** argv)
 	  SetValue(poplartree,TreeP,P);
 	  cout<<"P: "<<P<<" M: "<<M<<endl;
 	  
-	  //The leaves remain 4,3,2 or 1 structure updates   
+	  //The leaves remain 4 (from 0 to 3)  structure updates  
+	  structure_update++;
+	  //Collect foliage that has photosynthesised
+	  double wf_su= 0.0;
+	  Accumulate(poplartree,wf_su,CollectFoliageMass<poplarsegment, poplarbud>());
+	  switch (structure_update){
+	  case 1: 
+	    wf_su1 =  wf_su;break;
+	  case 2:
+	    wf_su2 =  wf_su;break;
+	  case 3:
+	    wf_su3 =  wf_su;break;
+	  case 4:
+	    wf_su4 =  wf_su;break;
+	  }
 	  if(structure_update==4)
 	    {
 	      cout << "Drop leaves " <<endl;
 	      ForEach(poplartree, DropAllLeaves<poplarsegment, poplarbud,Triangle>());
+	      double Wf= 0.0;
+	      Accumulate(poplartree,Wf,CollectFoliageMass<poplarsegment, poplarbud>());
+	      cout << "Wf " << Wf << " (should 0)" << endl;
 	    }
-	  structure_update++; 
 	  //DisplayStructure(poplartree);
 	  //Compentate root_senescence and take into account foliage growth
 	  bool verbose = true;
 	  PoplarGrowthAllocatorPropagateUp<poplarsegment, poplarbud,
 	    SetSegmentLength, TryDiameterGrowth, double> G(poplartree, 0.0,
 							   root_senescence,foliage_growth,verbose);
-	  //Reset the leaf growth from the short time step
+	  //Reset the leaf growth from the short time step. (We are not using it. leaves are born full sized)
 	  foliage_growth = 0.0;
 	  G.init();
 	  cout << "G.init finished." << endl;
@@ -343,6 +368,7 @@ int main(int argc, char** argv)
 	  pair<double, double> r0Qin(0.0, 0.0);
 	  //   double r0Qin = 0.0;
 	  PropagateUp(poplartree,r0Qin,ForwardR0Qin());
+
 
 	  //ForEach(poplartree,DisplaySegmentData<poplarsegment,poplarbud,Triangle>());
 	  // cout << "lstringToLignum done " << endl;
@@ -360,7 +386,9 @@ int main(int argc, char** argv)
 	  SetValue(poplartree, TreeWr, 
 		   GetValue(poplartree,TreeWr)+G.getRootRequirement());
 
-
+	  double Wfall= 0.0;
+	  Accumulate(poplartree,Wfall,CollectFoliageMass<poplarsegment, poplarbud>());
+	  cout << "Wfall " << Wfall<< endl;
  
           //Tree pruning
 	  double length=0.0;
@@ -404,6 +432,10 @@ int main(int argc, char** argv)
 	datafile << left << setw(6) << setfill(' ') << age
 		 << setw(12) << h
 		 << setw(12) << d13
+		 << setw(12) << wf_su1
+		 << setw(12) << wf_su2
+		 << setw(12) << wf_su3
+		 << setw(12) << wf_su4 
 		 << setw(12) << wf
 		 << setw(12) << ws
 		 << setw(12) << ws_stem
@@ -413,6 +445,7 @@ int main(int argc, char** argv)
 		 << setw(12) << m 
 		 << endl;
       }
+      wf_su1 = wf_su2 = wf_su3 = wf_su4 = 0.0;
       if (interval && !xmlfile.empty()){
 	if (static_cast<int>(GetValue(poplartree,LGAage)) % interval == 0){
 	  ostringstream xml_interval;
