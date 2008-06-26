@@ -579,8 +579,19 @@ public:
 	  nbuds = 29.0;
 	else if (L < 0.60)
 	  nbuds = 30.0;
-	else
+	else if (L < 0.62)
 	  nbuds = 31.0;
+	else if (L < 0.64)
+	  nbuds = 32.0;
+	else if (L < 0.66)
+	  nbuds = 33.0;
+	else if (L < 0.68)
+	  nbuds = 34.0;
+	else if (L < 0.70)
+	  nbuds = 35.0;
+	else 
+	  nbuds = 36.0;
+	
 
  	//The foliage area
 	double Af = nbuds*POPLAR_LEAF_AREA;
