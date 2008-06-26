@@ -70,7 +70,7 @@ Start:
   //Terminating bud not creating leaves
   PoplarBudData d1(ALIVE,0.1,0.0,1.0);
   //Axillary buds assoaciated with a leaf
-  PoplarBudData d2(ALIVE,0.1,1.0,1.0);
+  PoplarBudData d2(DORMANT,0.1,1.0,1.0);
 
 
   // produce Roll(30.0 * PI_VALUE/180.0) F(0.2, 0)  Roll(roll)  B(d1);  
@@ -160,7 +160,7 @@ F(s,od)  < B(d):
 //split the segment main axis
 F(s,o) > Split():
 {
-  cout << "LSYSTEM SEGMENT SPLIT LENGTH " << s << " ORDER " << o <<endl; 
+  //cout << "LSYSTEM SEGMENT SPLIT LENGTH " << s << " ORDER " << o <<endl; 
   // cout<<"s: "<<s<<endl;
    PoplarBudData dorm(DORMANT, 0.1, o+1, 1.0);
    PoplarBudData d1(1.0, 0.1, o+1, 1.0);
@@ -763,7 +763,7 @@ produce F(s/31, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0
         F(s/31, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
         F(s/31, o);
 }
-else
+else if (s < 0.62)
 {
 cout << "LSYSTEM SEGMENT SPLIT LENGTH " << s << " ORDER " << o <<endl; 
 produce F(s/32, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
@@ -799,8 +799,203 @@ produce F(s/32, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0
         F(s/32, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
         F(s/32, o);
 }
-
+else if (s < 0.64)
+{
+cout << "LSYSTEM SEGMENT SPLIT LENGTH " << s << " ORDER " << o <<endl; 
+produce F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/33, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/33, o);
 }
+else if (s < 0.66)
+{
+cout << "LSYSTEM SEGMENT SPLIT LENGTH " << s << " ORDER " << o <<endl; 
+produce F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/34, o);
+}
+else if (s < 0.68)
+{
+cout << "LSYSTEM SEGMENT SPLIT LENGTH " << s << " ORDER " << o <<endl; 
+produce F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/35, o);
+}
+else if (s < 0.70)
+{
+cout << "LSYSTEM SEGMENT SPLIT LENGTH " << s << " ORDER " << o <<endl; 
+produce F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/36, o);
+}
+else{//s > 0.70
+cout << "LSYSTEM SEGMENT SPLIT LENGTH " << s << " ORDER " << o <<endl; 
+produce F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+	F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+	F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+	F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()	
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I1*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+	F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I2*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I3*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o) SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) Pitch(I*PI_VALUE/180.0) B(dorm) EB()
+        F(s/37, o);
+}
+}
+
+
 //Remove split symbols after split 
 Split():
 {
