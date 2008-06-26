@@ -218,12 +218,12 @@ void poplarsegment::respiration()
 vector<PositionVector>& 
 CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
 			       TreeCompartment<poplarsegment, poplarbud>* tc)const
-{ 
-  
+{ //Ranom number for leaf pitch
+  static Uniform u(-2);
   if (poplarbud* b = dynamic_cast<poplarbud*>(tc)){ 
-    // cout << "STATUS " << GetValue(*b,LGAstatus) <<endl;
+    //cout << "STATUS " << GetValue(*b,ISTERMINAL) <<endl;
     if (!GetValue(*b,ISTERMINAL)){  // == 1	  
-      //cout << "STATUS " << GetValue(*b,LGAstatus) <<endl;
+      //cout << "STATUS " << GetValue(*b,ISTERMINAL) <<endl;
       pdv.push_back(GetDirection(*b));      
       //leaf created, no more leaves for this bud
       SetValue(*b,ISTERMINAL,true);
@@ -231,75 +231,51 @@ CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
   }
   if (poplarsegment* ts = dynamic_cast<poplarsegment*>(tc)){
     if(GetValue(*ts, SUBAGE) == 0.0){
-      Point origo(0,0,0);
-      Point point = GetEndPoint(*ts);
-      PositionVector up(0,0,1);
-      PositionVector down(0,0,-1);
-	
-      static Uniform u; //uniform random number [0,1] for setting leaf
-      //normals;  static makes it  common throughout
-      //the  program and  not reinitialized  in each
-      //call.
-      int seed = 3267;
-	
-      if (GetValue(*ts, LGAL)==0.0)
-	pdv.clear();
-      for (unsigned int i = 0; i <pdv.size(); i++){
-	PositionVector pdir = pdv[i];
-	//Leaves are  created at the end  of the segment  where the buds
-	//are, second argument is the intial length of the petiole
-	Petiole petiole(point,point + pl*(Point)pdir);
-	//Randomize  the leaf blade  normal by  rotating in  around axis
-	//that lies in the horizontal plane defined by cross product of
-	//petiole direction and up-vector. Also it is direction towards  
-	//right corner of the triangle
-	/*if (Cross(pdir,up).length() < R_EPSILON){
-	  cout << "Petiole Up --> Cross(pdir,up) == 0 ---> No leaf here" <<endl;
-	  cout << GetPoint(*ts) << endl;
-	  pdv.clear();
-	  return pdv;
-	  }*/
-
-	PositionVector level(1,0,0);
-        PositionVector axis1;
-	PositionVector axis2;
-        if (Cross(pdir,up).length() < R_EPSILON)
-	  axis1 = Cross(level,up).normalize();
-        else 
-	  axis1 = Cross(pdir,up).normalize();
-	//limit the rotation  of the leaf normal to  [-90,90] degrees so
-	//that the leaf normal does not point downwards
-	double ran = (-90.0 +180.0*u(seed))*2.0*PI_VALUE/360.0; //(radians)
-	PositionVector leaf_normal(0,0,1);
-	leaf_normal.rotate(origo,axis1,ran);
-	//We need also the left corner of the triangle. Create a vector
-	//towards it.
-	if (Cross(pdir,up).length() < R_EPSILON)
-	  axis2 = Cross(level,down).normalize();
-	else
-	  axis2 = Cross(pdir,down).normalize();
-	//We yet need the direction towards the apex of the triangle
-	//to set the apex point
-	PositionVector axis3 = Cross(leaf_normal,axis1).normalize();
-	//I hope I got the cross  products right, but we will see in
-	//the visualization how the leaves settle themselves
-
-	Point right = point + base*0.5*(Point)axis1;
-	Point left  = point + base*0.5*(Point)axis2;
-	Point apex  = point + height*(Point)axis3;
-	Triangle shape(left,right,apex);
+      //cout << "SUBAGE " << GetValue(*ts, SUBAGE) << " AGE " << GetValue(*ts,LGAage) << endl;
+      if (pdv.size()){
+	//Assume equilateral leaf triange --> alpha, beta, gamma = 60 deg
+	//and |w3| = |w2| = |w1| (base, left and  right edge) 
+	double Af = POPLAR_LEAF_AREA;
+	//Length of one triangle side
+	//A = 0.5*|w1||w2|*sin(60) = 0.5*s^2*sin(60)
+	double s = sqrt(2.0*Af/sin(60.0*PI_VALUE/180.0));
+	//Height of the triangle 
+	//h/|w1|=cos(30) 
+	double h = s*cos(30.0*PI_VALUE/180.0);
+	//The up vector (initial leaf normal)
+	PositionVector up(0,0,1);
+	//The petiole directtion
+	PositionVector pdir(pdv[0]);
+	pdir.normalize();
+	//The start point of the petiole
+	Point pstart = GetEndPoint(*ts);
+	//The end point of the petiole, pl = petiole length
+	Point pend = pstart + Point(pl*pdir);
+	Petiole petiole(pstart,pend);
+	//Project petiole dir onto x,y -plane
+	PositionVector pproj(pdir.getX(),pdir.getY(),0.0);
+	pproj.normalize();
+	//The apex corner
+	Point apex = pend + Point(h*pproj);
+	//The direction to the left corner
+	PositionVector dleft = Cross(up,pproj);
+	dleft.normalize();
+	//The left corner
+	Point leftcorner = pend + Point(0.5*s*dleft);
+	//The direction to the right corner
+	PositionVector dright = Cross(pproj,up);
+	dright.normalize();
+	//The right corner
+	Point rightcorner = pend + Point(0.5*s*dright);
+	Triangle shape(leftcorner,rightcorner,apex);
+	//The pitch angle [0,90], i.e. horizontal->vertical
+	int rpitch = static_cast<int>(u(1)*90.0);
+	shape.pitch(rpitch*PI_VALUE/180.0);
+	//cout << "H " << h << " s " << s << " A " << shape.getArea() <<endl;
 	BroadLeaf<Triangle>* leaf = new BroadLeaf<Triangle>(shape,petiole);
-
 	SetValue(*leaf, LGAdof, GetValue(GetTree(*tc),LGPdof)); 
 	SetValue(*leaf, LGAtauL, GetValue(GetTree(*tc), LGPtauL));
 	SetValue(*leaf, LGAsf, GetValue(GetTree(*tc), LGPsf));
-  
-	double Af = POPLAR_LEAF_AREA; //GetValue(GetTree(*ts), LGPaleafmax);
-	// cout<<"LGPaleafmax value: "<<GetValue(GetTree(*ts), LGPaleafmax)<<endl;
-	SetValue(*leaf, LGAA, Af); // 0.02);   //set the leaf area value, which is used in DumpLeaf()
-	//cout<<"Insert leaf"<<endl;
-	cout << "NUMBER OF LEAVES BEFORE " << GetNumberOfLeaves(*ts) 
-	     << " SUBAGE " << GetValue(*ts,SUBAGE) << endl;
 	InsertLeaf(*ts,leaf);
 	//cout << "NUMBER OF LEAVES AFTER " << GetNumberOfLeaves(*ts) <<endl;
 	// Point p = GetCenterPoint(*leaf);
