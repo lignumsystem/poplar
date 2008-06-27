@@ -221,9 +221,11 @@ CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
 { //Ranom number for leaf pitch
   static Uniform u(-2);
   if (poplarbud* b = dynamic_cast<poplarbud*>(tc)){ 
-    //cout << "STATUS " << GetValue(*b,ISTERMINAL) <<endl;
+    //cout << "STATUS " << GetValue(*b,ISTERMINAL) << " G " << GetValue(*b,LGAomega) <<endl;
+    //cout << GetDirection(*b) <<endl;
     if (!GetValue(*b,ISTERMINAL)){  // == 1	  
-      //cout << "STATUS " << GetValue(*b,ISTERMINAL) <<endl;
+      //cout << "STATUS " << GetValue(*b,ISTERMINAL) <<  " G " << GetValue(*b,LGAomega) << endl;
+      //cout << GetDirection(*b) <<endl;
       pdv.push_back(GetDirection(*b));      
       //leaf created, no more leaves for this bud
       SetValue(*b,ISTERMINAL,true);
@@ -247,6 +249,11 @@ CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
 	//The petiole directtion
 	PositionVector pdir(pdv[0]);
 	pdir.normalize();
+	if (up == pdir){
+	  cout << "Special case Petiole up. Pitching petiole 45 degrees down" <<endl;
+	  PositionVector left(1,0.0);
+	  pdir.rotate(Point(0,0,0),left,45.0*PI_VALUE/180.0);
+	} 
 	//The start point of the petiole
 	Point pstart = GetEndPoint(*ts);
 	//The end point of the petiole, pl = petiole length
@@ -267,12 +274,15 @@ CreatePoplarLeaves::operator()(vector<PositionVector>& pdv,
 	dright.normalize();
 	//The right corner
 	Point rightcorner = pend + Point(0.5*s*dright);
-	Triangle shape(leftcorner,rightcorner,apex);
+	Triangle shape = Triangle(leftcorner,rightcorner,apex);
 	//The pitch angle [0,90], i.e. horizontal->vertical
 	int rpitch = static_cast<int>(u(1)*90.0);
+	//cout << "Before Pitch H " << h << " s " << s << " A " << shape.getArea() <<endl;
+	//cout << shape.getCenterPoint() << flush;
 	shape.pitch(rpitch*PI_VALUE/180.0);
-	//cout << "H " << h << " s " << s << " A " << shape.getArea() <<endl;
-	BroadLeaf<Triangle>* leaf = new BroadLeaf<Triangle>(shape,petiole);
+	//cout << "After Pitch H " << h << " s " << s << " A " << shape.getArea() <<endl;
+	//cout << shape.getCenterPoint() << flush;
+	PoplarLeaf* leaf = new PoplarLeaf(shape,petiole);
 	SetValue(*leaf, LGAdof, GetValue(GetTree(*tc),LGPdof)); 
 	SetValue(*leaf, LGAtauL, GetValue(GetTree(*tc), LGPtauL));
 	SetValue(*leaf, LGAsf, GetValue(GetTree(*tc), LGPsf));
