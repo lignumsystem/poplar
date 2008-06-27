@@ -112,9 +112,9 @@ End:
 F(s,od)  < B(d):
 {  
   PoplarBudData dead(DEAD, 0.0, GetValue(d, LGAomega), 1.0);
-  PoplarBudData dorm(DORMANT, 0.1, GetValue(d, LGAomega), 1.0);
+  PoplarBudData dorm(DORMANT, 0.1, GetValue(d, LGAomega)+1, 1.0);
   PoplarBudData d1(GetValue(d, LGAstate), 0.1, GetValue(d, LGAomega), 1.0);
-  PoplarBudData d2(GetValue(d, LGAstate), 0.1, GetValue(d, LGAomega), 1.0);
+  //PoplarBudData d2(GetValue(d, LGAstate), 0.1, GetValue(d, LGAomega), 1.0);
 
   LGMdouble o=GetValue(d, LGAomega);
   LGMdouble st = GetValue(d, LGAstate);
@@ -137,20 +137,22 @@ F(s,od)  < B(d):
 
  if (GetValue(d, LGAstate)==DEAD)
       produce B(dead);
-  else if (GetValue(d, LGAstate)==DORMANT)
+ else if (GetValue(d, LGAstate)==DORMANT)
       produce B(dorm);
-  else if (GetValue(d, LGAomega)<3){
+ else if (GetValue(d, LGAomega)<3){
     int seed = time(NULL);
     double r = g1(5.5, 3.0, seed);  //for trees in Alley Cropping
     double I = g2(36.0, 5.0, seed); //  double I = g2(45.0, 21.0, seed);
           //cout<<"r: "<<r/10.0<<endl;
     if (GetValue(d,LGAomega) == 0){
-         produce F(r/10.0, o) Split()  B(d1);
+         produce F(r/10.0, o) Split() SB() Roll(static_cast<int>(u(generator)*360.0)*PI_VALUE/180.0) 
+                                           Pitch(PI_VALUE/4.0) B(dorm) 
+                                      EB()  B(d1);
     }
     else if (GetValue(d,LGAomega) == 1)
-         produce F(r/10.0, o) Split()  Pitch(-fac)B(d2);
+         produce F(r/10.0, o) Split()  SB() Pitch(-fac) B(dorm) EB() B(d1);
     else
-         produce F(r/10.0, o) Split() Pitch(-fac) B(d2);
+         produce F(r/10.0, o) Split() SB() Pitch(-fac) B(dorm) EB() B(d1);
   }
   else
     produce B(dead);
