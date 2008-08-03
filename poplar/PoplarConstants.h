@@ -17,13 +17,22 @@ const double GROWTH_ALLOCATION = 1.0-GROWTH_RESPIRATION;//0.875
 const double PIPE_MODEL_CONSTANT = 1.0;
 const double ROOT_SAPWOOD_REQUIREMENT = 0.5;
 const double ROOT_TURNOVER = 0.25;//medium time step allocation
-const double ROOT_COMPENSATION = 0.2;//Check LGPsr in Tree.txt!!! 
+const double ROOT_COMPENSATION = 0.25;//Check LGPsr in Tree.txt!!! 
 //Four structure updates per growing season
 const double NUMBER_OF_STRUCTURE_UPDATES = 4.0; 
 //LGPsr = 0.3 root senescence annual time step
+
+//FGRAVELIUS an FVIGOUR in SetSegmentLength (poplar.h)
+inline double FGRAVELIUS(double go)
+{
+  if (go == 0.0){
+    cout << "FGRAVELIUS ERROR: main axis must 1 " << go <<endl; 
+  }
+  return 1.0-log10(go);
+}
 inline double FVIGOUR(double vi)
 { //0.18 + 0.82*vi
-  return 0.18 + 0.82*vi;
+  return 0.7 + 0.3*vi;
 }
 
 
