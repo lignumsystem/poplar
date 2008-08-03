@@ -132,24 +132,24 @@ int PoplarLeaf::photosynthesis()
   SetValue(*this, LGAP, A);     //(*this).bla.P=A;
 
   extern fstream debug_file;
-  debug_file << left  << setfill(' ') 
-             << setw(12) << GetShape(*this).getCenterPoint().getX() 
-             << setw(12) << GetShape(*this).getCenterPoint().getY() 
-             << setw(12) << GetShape(*this).getCenterPoint().getZ() 
-	     << setw(12) << GetValue(*this,LGAQin) 
-             << setw(12) << Q
-             << setw(12) << T
-             << setw(12) << Vcmax
-             << setw(12) << Jmax 
-             << setw(12) << J 
-	     << setw(12) << Oi
-	     << setw(12) << Ci
-             << setw(14) << Wc 
-             << setw(14) << Wj
-             << setw(12) << Al
-             << setw(12) << Rd
-             << setw(12) << AlGross 
-	     << setw(12) << A << endl;
+//   debug_file << left  << setfill(' ') 
+//              << setw(12) << GetShape(*this).getCenterPoint().getX() 
+//              << setw(12) << GetShape(*this).getCenterPoint().getY() 
+//              << setw(12) << GetShape(*this).getCenterPoint().getZ() 
+// 	     << setw(12) << GetValue(*this,LGAQin) 
+//              << setw(12) << Q
+//              << setw(12) << T
+//              << setw(12) << Vcmax
+//              << setw(12) << Jmax 
+//              << setw(12) << J 
+// 	     << setw(12) << Oi
+// 	     << setw(12) << Ci
+//              << setw(14) << Wc 
+//              << setw(14) << Wj
+//              << setw(12) << Al
+//              << setw(12) << Rd
+//              << setw(12) << AlGross 
+// 	     << setw(12) << A << endl;
 
       
   //** cout <<"print the photosynthesis of segment: "<<GetValue(*this, LGAP)<<endl; 

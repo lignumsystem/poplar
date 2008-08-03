@@ -3,10 +3,11 @@ set style histogram
 set key left
 set style fill solid 1.0 border -1 
 set xtics offset 0, graph 0.0 
-set logscale y
+#set logscale y
 set title "Cottonwood Biomasses, f(vi) = 0.2+0.8*vi"
-set ylabel "kgC (log10 scale)"
+set ylabel "kgC"
 set xlabel "Age (years)"
-plot newhistogram "Simulated", file using 4:xtic(1)  ti col  ,'' using 5 ti col , '' using 6 ti col,  '' using 8 ti col, '' using 7 ti col, '' using ($4/$8) ti "Wf/Wr"
+plot newhistogram "Simulated", file using 4:xtic(1)  ti col  ,'' using 5 ti col , '' using 6 ti col,  '' using 8 ti col, '' using 7 ti col 
+replot newhistogram "Wf/Wr", file  using ($4/$8):xtic(1) ti "Wf/Wr"
 #set key left
-#replot newhistogram "Data (4 year old)" lt 2, 'biomass.txt' using ($3)*0.5:xtic(1) ti "WsTot", '' using ($5)*0.5:xtic(1) ti "WsShoot" , '' using ($4)*0.5:xtic(1) ti "Wr" 
+replot newhistogram "Data (4 year old)" lt 2, 'biomass.txt' using ($3)*0.5:xtic(1) ti "WsTot", '' using ($5)*0.5:xtic(1) ti "WsShoot" , '' using ($4)*0.5:xtic(1) ti "Wr" 

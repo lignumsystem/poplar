@@ -250,7 +250,7 @@ public:
     size = size + 1;
   }
   void setMeanRadiationIndex(){
-    //cout << "Set Mean RI " <<  sum_radiation_index << " " << size<< endl;
+
     if (size)
       mean_radiation_index = sum_radiation_index/size;
     else
@@ -258,6 +258,8 @@ public:
     //reset for the next light calculation
     sum_radiation_index = 0.0;
     size = 0;
+    //cout << "Set Mean RI " <<  mean_radiation_index << " " << " FM " << GetValue(*this,LGAWf) 
+    // <<  " SUBAGE " << GetValue(*this,SUBAGE) << " G " << GetValue(*this,LGAomega) <<endl;
   }
   //index can be queried after setMeanRadiationIndex
   double getMeanRadiationIndex(){
@@ -401,11 +403,11 @@ class PoplarLeaf:public BroadLeaf<Triangle>{
 public:
 
   PoplarLeaf(LGMdouble sf,LGMdouble tauL,LGMdouble dof,int number_of_sectors,
-	     const Petiole& petiole, const PositionVector& leaf_normal,
-	     const Triangle& shap): BroadLeaf<Triangle>(sf, tauL, dof, number_of_sectors, petiole, shap), T(25.0){}
+	     const Petiole& petiole, const Triangle& shape): 
+    BroadLeaf<Triangle>(sf, tauL, dof, number_of_sectors, petiole, shape), T(25.0){}
 
-  PoplarLeaf(const Triangle& shape, const Petiole& petiole, 
-	     const PositionVector& leaf_normal): BroadLeaf<Triangle>(shape, petiole), T(25.0){}
+  PoplarLeaf(const Triangle& shape, const Petiole& petiole)
+  : BroadLeaf<Triangle>(shape, petiole), T(25.0){}
 
   int photosynthesis();
   void respiration();
@@ -461,7 +463,8 @@ public:
 	    //  cout<<apical<<" : the value of apical."<<endl;
 	  }
 
-	double L_new=l * apical *fip(rad_index) *(1/(GetValue(*ts,LGAomega)+1)) * FVIGOUR(vi);  
+	double L_new = l*fip(rad_index)*FGRAVELIUS(GetValue(*ts,LGAomega))*FVIGOUR(vi);  
+	//double L_new = l*apical*fip(rad_index)*FVIGOUR(vi);
 // 	cout << "Lambda " << l << " apical" << apical << " rad_index " << rad_index << " fip " << fip(rad_index) 
 // 	     << " go "<< GetValue(*ts,LGAomega) << " f(go) " 
 // 	     <<(1.0/(GetValue(*ts,LGAomega)+1.0)) << " vi " << vi << " f(vi) "<< FVIGOUR(vi) <<endl;;
@@ -589,8 +592,28 @@ public:
 	  nbuds = 34.0;
 	else if (L < 0.70)
 	  nbuds = 35.0;
-	else 
+	else if (L < 0.72)
 	  nbuds = 36.0;
+	else if (L < 0.74)
+	  nbuds = 37.0;
+	else if (L < 0.76)
+	  nbuds = 38.0;
+	else if (L < 0.78)
+	  nbuds = 39.0;
+	else if (L < 0.80)
+	  nbuds = 40.0;
+	else if (L < 0.82)
+	  nbuds = 41.0;
+	else if (L < 0.84)
+	  nbuds = 42.0;
+	else if (L < 0.86)
+	  nbuds = 43.0;
+	else if (L < 0.88)
+	  nbuds = 44.0;
+	else if (L < 0.90)
+	  nbuds = 45.0;
+	else
+	  nbuds = 46.0;
 	
 
  	//The foliage area

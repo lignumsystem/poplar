@@ -50,7 +50,7 @@ fstream debug_file("PoplarPhotosynthesis.txt",ios_base::out);
 
 void Usage()
 {
-  cout << "Usage: ./poplar -iter <iter>  -xml <file> -toFile <datafile>" <<endl; 
+  cout << "Usage: ./poplar -iter <years>  -xml <file.xml> -toFile <datafile.txt> -writeInterval <number>" <<endl; 
   exit(0);
 }
 
@@ -73,15 +73,15 @@ int main(int argc, char** argv)
   //Collect foliage masses from each structure update
   double wf_su1,wf_su2,wf_su3,wf_su4;
   wf_su1 = wf_su2= wf_su3 = wf_su4 = 0.0;
-  debug_file << left << setfill(' ') << " "
-             << setw(12) << " X " << setw(12) << " Y " << setw(12) << " Z "
-             << setw(12) << " Qin " << setw(12) << " Qabs " 
-	     << setw(12) << " T " 
-             << setw(12) << " Vcmax " << setw(12)  << " Jmax " 
-	     << setw(12) << " J " 
-             << setw(12) << " Oi " << setw(12) << " Ci " << setw(12) << " Wc " 
-	     << setw(14) << " Wj " << setw(14) << " Al-Rd " << setw(12) 
-	     << " Rd " << setw(12) << " Al " << setw(12) << " P " << endl;
+//   debug_file << left << setfill(' ') << " "
+//              << setw(12) << " X " << setw(12) << " Y " << setw(12) << " Z "
+//              << setw(12) << " Qin " << setw(12) << " Qabs " 
+// 	     << setw(12) << " T " 
+//              << setw(12) << " Vcmax " << setw(12)  << " Jmax " 
+// 	     << setw(12) << " J " 
+//              << setw(12) << " Oi " << setw(12) << " Ci " << setw(12) << " Wc " 
+// 	     << setw(14) << " Wj " << setw(14) << " Al-Rd " << setw(12) 
+// 	     << " Rd " << setw(12) << " Al " << setw(12) << " P " << endl;
 
   //Iterations
   if (ParseCommandLine(argc,argv,"-iter",iterations)){
@@ -108,6 +108,7 @@ int main(int argc, char** argv)
     }
     datafile << left << setw(6) << setfill(' ') << "Age"
 	     << setw(12) << "H"
+	     << setw(12) << "Dbase"
 	     << setw(12) << "D1.3"
 	     << setw(12) << "Wf 1"
 	     << setw(12) << "Wf 2"
@@ -120,6 +121,8 @@ int main(int argc, char** argv)
 	     << setw(12) << "Wr"
 	     << setw(12) << "P"
 	     << setw(12) << "M"
+	     << setw(12) << "R:S"
+	     << setw(12) << "WoodTot"
 	     << endl;
   }
     
@@ -155,7 +158,7 @@ int main(int argc, char** argv)
   vector<PositionVector> pv;
   cout << "CREATE LEAVES " <<endl;
   ForEach(poplartree,DisplaySegmentData<poplarsegment,poplarbud,Triangle>());
-  DisplayStructure(poplartree);
+  //DisplayStructure(poplartree);
   AccumulateDown(poplartree,pv,
 		 AppendSequence<vector<PositionVector> >(),
 		 CreatePoplarLeaves(PETIOLE_LENGTH,LEAF_BASE,LEAF_HEIGHT)); 
@@ -221,6 +224,7 @@ int main(int argc, char** argv)
 	  //Initialize to zero, read diffuse from weather data file.
 	  f.setDiffuseRadiation(0);
 	  //int day=0;
+	  cout << "Tree photosynthesis begin" <<endl;
 	  for (int i=0; i<6*7*24*2; i++)
 	    { 
 	      direct=0;
@@ -259,8 +263,9 @@ int main(int argc, char** argv)
 	      last_diffuse = diffuse;
 	      f.setSunPosition(a); 
 	      f.setDirectRadiation(direct);
+	      //cout << "Calculate Light begin" <<endl;
 	      vs.calculatePoplarLight((LGMdouble)(diffuse), (LGMdouble)structureFlag); 
-	
+	      //cout << "Calculate Light end" <<endl;
 	      //Set qabs and calculate radiation index
 	      SetPoplarQabs<poplarsegment,poplarbud,Triangle>(vs,poplartree,radiation_index); 
 	      // cout<<" setHwTree."<<endl;
@@ -299,12 +304,13 @@ int main(int argc, char** argv)
 	    }//for (int i=0; i < 6*7*24*2; i++)
 	  cout << "TreePhotosynthesis:  " << tree_photosynthesis<<endl;
 
+
 	  ForEach(poplartree,SetMeanRadiationIndex<poplarsegment,poplarbud,Triangle>());
 
 	  ForEach(poplartree, DoRespiration()); //poplartree.respiration(); //
- 
+
 	  ForEach(poplartree,SubAging<poplarsegment,poplarbud>()); 
-  
+	  //DisplayStructure(poplartree);
 	  //One derivation of L-string, above ground trunk and tree crown
 	  poplarL.derive();
 	  //below ground roots
@@ -312,7 +318,7 @@ int main(int argc, char** argv)
 	  //Update tree so that structures match 
 	  poplarL.lstringToLignum(poplartree,1, PoplarD);
 	  cout << "lstringToLignum done " << endl;
-    
+	  //DisplayStructure(poplartree);
 	  TreePhysiologyVigourIndex(poplartree);
 	  // cout << "Vigour index" << endl;
      
@@ -368,7 +374,7 @@ int main(int argc, char** argv)
 	  pair<double, double> r0Qin(0.0, 0.0);
 	  //   double r0Qin = 0.0;
 	  PropagateUp(poplartree,r0Qin,ForwardR0Qin());
-
+	  //DisplayStructure(poplartree);
 
 	  //ForEach(poplartree,DisplaySegmentData<poplarsegment,poplarbud,Triangle>());
 	  // cout << "lstringToLignum done " << endl;
@@ -417,6 +423,7 @@ int main(int argc, char** argv)
       //Collect data for output file
       int age = static_cast<int>(GetValue(poplartree,LGAage));
       double h   = GetValue(poplartree,LGAH);
+      double dbase = GetValue(poplartree,LGADbase);
       double d13 = GetValue(poplartree,LGADbh);
       double wf = 0.0;
       wf = Accumulate(poplartree,wf,CollectFoliageMass<poplarsegment,poplarbud>());
@@ -431,6 +438,7 @@ int main(int argc, char** argv)
       if (datafile){
 	datafile << left << setw(6) << setfill(' ') << age
 		 << setw(12) << h
+                 << setw(12) << dbase
 		 << setw(12) << d13
 		 << setw(12) << wf_su1
 		 << setw(12) << wf_su2
@@ -443,6 +451,8 @@ int main(int argc, char** argv)
 		 << setw(12) << wr
 		 << setw(12) << p
 		 << setw(12) << m 
+		 << setw(12) << wr/ws
+		 << setw(12) << ws+wr
 		 << endl;
       }
       wf_su1 = wf_su2 = wf_su3 = wf_su4 = 0.0;
