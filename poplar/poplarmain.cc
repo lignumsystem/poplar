@@ -345,6 +345,9 @@ int main(int argc, char** argv)
 	  case 4:
 	    wf_su4 =  wf_su;break;
 	  }
+	  //This structure update at year N makes the last elongation.
+	  //The leaves created will photosynthesize the following year
+	  //N+1
 	  if(structure_update==4)
 	    {
 	      cout << "Drop leaves " <<endl;
@@ -402,7 +405,17 @@ int main(int argc, char** argv)
 	  poplarL.lignumToLstring(poplartree,1,PoplarD);  
 	  poplarL.lstringToLignum(poplartree,1,PoplarD);
 	  poplarL.prune(poplartree);
-
+	  //This is the fourth structure update, maximum number of leaves in the tree
+	  if (structure_update == 3 && !xmlfile.empty()){
+	    if (static_cast<int>(GetValue(poplartree,LGAage)) % interval == 0){
+	      ostringstream xml_interval;
+	      xml_interval << GetValue(poplartree,LGAage) << "-4th-structure-update-" << xmlfile;
+	      XMLDomTreeWriter<poplarsegment,poplarbud,Triangle> writer;
+	      cout << "Saving tree to "<< xml_interval.str() << " begin" <<endl; 
+	      writer.writeTreeToXML(poplartree,xml_interval.str());
+	      cout << "End" <<endl;
+	    }
+	  }
 	  cout << "Structure update " << structure_update << endl;
 
 	}
