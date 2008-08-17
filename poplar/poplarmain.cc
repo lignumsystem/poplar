@@ -180,7 +180,7 @@ int main(int argc, char** argv)
   
   for (int age=0; age<derivation; age++) // poplarL.derivationLength()--yearly
     {   
-      debug_file << "Tree age " << GetValue(poplartree,LGAage) <<endl; 
+      //debug_file << "Tree age " << GetValue(poplartree,LGAage) <<endl; 
       day1=0; day2=0;
       cout << "age: " << age << endl;  
       fFile = fopen("weatherdata.dat", "r"); // fFile = fopen(filename[month], "r");
@@ -407,7 +407,7 @@ int main(int argc, char** argv)
 	  poplarL.prune(poplartree);
 	  //This is the fourth structure update, maximum number of leaves in the tree
 	  if (structure_update == 3 && !xmlfile.empty()){
-	    if (static_cast<int>(GetValue(poplartree,LGAage)) % interval == 0){
+	    if (interval && static_cast<int>(GetValue(poplartree,LGAage)) % interval == 0){
 	      ostringstream xml_interval;
 	      xml_interval << GetValue(poplartree,LGAage) << "-4th-structure-update-" << xmlfile;
 	      XMLDomTreeWriter<poplarsegment,poplarbud,Triangle> writer;
