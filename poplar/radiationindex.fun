@@ -1,3 +1,4 @@
+#to reproduce this file run the file test-photosynthesis.cc
 0     -0.126533   
 1     -0.11803    
 2     -0.109617   
