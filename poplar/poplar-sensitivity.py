@@ -8,7 +8,7 @@ p_file.write(str(110.0125)+" "+str(42.12)+" "+str(1.09)+" "+str(0.0075)+" "+str(
 p_file.close()
 
 command_line = ['poplar','-iter','10','-xml','Aug-20-1.xml','-toFile','Aug-20-1.txt','-writeInterval','1']
-result = os.spawnvpe(os.P_WAIT,"./poplar-Aug-20-1",command_line,os.environ)
+result = os.spawnvpe(os.P_WAIT,"./poplar",command_line,os.environ)
 command_line = ['move-results.sh','Aug-20-1']
 result = os.spawnvpe(os.P_WAIT,"./move-results.sh", command_line,os.environ)
 
