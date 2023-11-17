@@ -4,6 +4,8 @@ This cottonwood project may contain useful
 components like Farquhar photosynthesis model
 and short time step weather data (weatherdata,dat).
 
+Note that Qt4 does not compile Lignum models on Apple Silicon processors.
+
 ## To compile type
 
   qmake -r poplar.pro
