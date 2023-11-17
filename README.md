@@ -1,7 +1,7 @@
 # Cottonwood project
 
 This cottonwood project may contain useful
-components like Farquhar photisynthesis model
+components like Farquhar photosynthesis model
 and short time step weather data (weatherdata,dat).
 
 ## To compile type
